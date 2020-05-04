@@ -15,7 +15,6 @@
 *.obj
 *.class
 *.exe
-*.out
 *.app
 *.log
 *.tmp
