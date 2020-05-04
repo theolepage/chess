@@ -1,6 +1,10 @@
 # SETUP
 cmake_minimum_required(VERSION 3.12)
-project(Chess)
+project(Chess
+        DESCRIPTION "Chess Engine & Chess AI using standard protocols"
+        VERSION 0.1
+        HOMEPAGE_URL "https://gitlab.cri.epita.fr/theo.lepage/chess"
+        LANGUAGES CXX)
 
 #[[
 ----- USAGE -----
@@ -51,20 +55,21 @@ set(SRC_TESTS
 
 # BUILD OPTIONS
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra -pedantic")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${OPT_FLAGS}")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Og -g3 -fsanitize=address")
 
-# Set default BUILD_TYPE
+# BUILD_TYPE (if not defined by the user)
 if (NOT CMAKE_BUILD_TYPE)
     string(REGEX REPLACE ".*/build_" "" BUILD_NAME ${CMAKE_BINARY_DIR})
+    # Default BUILD_TYPE is Release
     set(CMAKE_BUILD_TYPE Release)
+    # If folder is named "build_debug" BUILD_TYPE is set to: Debug
     if(${BUILD_NAME} STREQUAL "Debug" OR ${BUILD_NAME} STREQUAL "debug")
         set(CMAKE_BUILD_TYPE Debug)
     endif()
     message(STATUS "Build type : ${CMAKE_BUILD_TYPE}")
 endif()
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra -pedantic")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${OPT_FLAGS}")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Og -g3 -fsanitize=address")
 
 # LIBRARIES
 set(Boost_USE_STATIC_LIBS ON)
@@ -73,6 +78,9 @@ set(LIBRARIES Boost::system Boost::program_options ${CMAKE_DL_LIBS})
 
 # CHESSENGINE
 add_executable(chessengine ${MAIN_ENGINE})
+set_target_properties(chessengine PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR} # binary destination
+)
 target_sources(chessengine PRIVATE ${SRC_ENGINE})
 target_link_libraries(chessengine PRIVATE ${LIBRARIES} -static)
 
