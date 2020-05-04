@@ -1,0 +1,70 @@
+# C++ and tmp files
+*~
+*.swp
+*.o
+*.d
+*.a
+*.so
+*.slo
+*.lo
+*.la
+*.lai
+*.so.*
+*.dll
+*.dylib
+*.obj
+*.class
+*.exe
+*.out
+*.app
+*.log
+*.tmp
+
+# Documentation
+*.pdf
+*.mp4
+
+# Build folders
+bin*
+build*
+cmake-build-*/
+gen*
+out*
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+
+# CMAKE
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps
+
+# Vim
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+Session.vim
+Sessionx.vim
+.netrwhist
+*~
+tags
+[._]*.un~
+
+# VisualStudioCode
+.vscode/*
+*.code-workspace
