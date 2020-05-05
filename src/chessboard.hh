@@ -34,9 +34,7 @@ namespace board
         bool is_move_legal(const Move& move);
 
         bool is_check();
-
         bool is_check_mate();
-
         bool is_draw();
 
         opt_piece_t operator[](const Position& pos) const override
@@ -60,6 +58,8 @@ namespace board
             return std::nullopt;
         }
 
+        friend std::ostream& operator<<(std::ostream& os, const Chessboard& board);
+
     private:
         std::array<bitboard_t, nb_pieces> white_bitboards;
         std::array<bitboard_t, nb_pieces> black_bitboards;
@@ -79,4 +79,52 @@ namespace board
         void init_end_ranks(PieceType piecetype, File file);
         void symetric_init_end_ranks(PieceType piecetype, File file);
     };
+
+    /*
+     * White pieces are displayed with uppercase and
+     * black pieces with lowercase
+     */
+    inline std::ostream& operator<<(std::ostream& os, const Chessboard& board)
+    {
+        constexpr std::string_view sep = " ";
+
+        for (int rank_i = Chessboard::width - 1; rank_i >= 0; rank_i--)
+        {
+            std::cout << rank_i + 1 << sep;
+            for (size_t file_i = 0; file_i < Chessboard::width; file_i++)
+            {
+                const auto file = static_cast<File>(file_i);
+                const auto rank = static_cast<Rank>(rank_i);
+                const auto curr_piece = board[Position(file, rank)];
+
+                if (curr_piece.has_value())
+                {
+                    const PieceType piecetype = curr_piece.value().first;
+                    const Color piece_color = curr_piece.value().second;
+
+                    const char piecetype_char = piecetype_to_char(piecetype);
+
+                    std::cout << char(piece_color == Color::WHITE ?
+                                      piecetype_char :
+                                      tolower(piecetype_char));
+                }
+                else
+                {
+                    std::cout << empty_cell_char;
+                }
+
+                std::cout << sep;
+            }
+
+            std::cout << std::endl;
+        }
+
+        std::cout << sep << sep;
+        for (size_t file_i = 0; file_i < Chessboard::width; file_i++)
+            std::cout << char('A' + file_i) << sep;
+
+        std::cout << std::endl;
+
+        return os;
+    }
 }
