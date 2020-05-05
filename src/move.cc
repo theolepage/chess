@@ -19,6 +19,7 @@ namespace board
         , double_pawn_push_(double_pawn_push)
         , queen_castling_(queen_castling)
         , king_castling_(king_castling)
+        , en_passant_(en_passant)
     {}
 
     PieceType Move::piece_get() const
