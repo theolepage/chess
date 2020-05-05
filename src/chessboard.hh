@@ -8,11 +8,18 @@
 
 namespace board
 {
+    enum class Axis
+    {
+        VERTICAL,
+        HORIZONTAL
+    };
+
     class Chessboard : public ChessboardInterface
     {
     public:
         using side_piece_t = std::pair<PieceType, Color>;
         using opt_piece_t = std::optional<side_piece_t>;
+        using piece_pos_t = std::pair<Position, Color>;
 
         std::vector<Move> generate_legal_moves();
 
@@ -26,8 +33,11 @@ namespace board
 
         bool is_draw();
 
-        opt_piece_t operator[](const Position& position);
+        opt_piece_t operator[](const Position& position) const;
 
+        std::vector<piece_pos_t> get_pieces(PieceType piece) const;
+
+        std::vector<piece_pos_t> get_pieces(Position from, Position to, Axis axis) const;
 
     private:
         bool white_turn_;

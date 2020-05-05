@@ -38,9 +38,21 @@ namespace board
         return false;
     }
 
-    Chessboard::opt_piece_t Chessboard::operator[](const Position&)
+    Chessboard::opt_piece_t Chessboard::operator[](const Position&) const
     {
         // FIXME
         return std::nullopt;
+    }
+
+    std::vector<Chessboard::piece_pos_t> Chessboard::get_pieces(PieceType) const
+    {
+        // FIXME
+        return std::vector<Chessboard::piece_pos_t>();
+    }
+
+    std::vector<Chessboard::piece_pos_t> Chessboard::get_pieces(Position, Position, Axis) const
+    {
+        // FIXME
+        return std::vector<Chessboard::piece_pos_t>();
     }
 }
