@@ -40,8 +40,9 @@ set(OPT_FLAGS
 set(MAIN_ENGINE
     src/main.cc)
 set(SRC_ENGINE
-    #src/...
-    #FIXME
+    src/move.cc
+    src/rule.cc
+    src/chessboard.cc
     )
 include_directories(src
                     #FIXME
@@ -73,17 +74,18 @@ if (NOT CMAKE_BUILD_TYPE)
 endif()
 
 # LIBRARIES
-set(Boost_USE_STATIC_LIBS ON)
+if (CMAKE_BUILD_TYPE STREQUAL "Release")
+    set(Boost_USE_STATIC_LIBS ON)
+endif()
 find_package(Boost REQUIRED COMPONENTS system program_options)
 set(LIBRARIES Boost::system Boost::program_options ${CMAKE_DL_LIBS})
 
 # CHESSENGINE
-add_executable(chessengine ${MAIN_ENGINE})
+add_executable(chessengine)
 set_target_properties(chessengine PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR} # binary destination
-)
-target_sources(chessengine PRIVATE ${SRC_ENGINE})
-if (${CMAKE_BUILD_TYPE} MATCHES "Release")
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}) # binary destination
+target_sources(chessengine PRIVATE ${MAIN_ENGINE} ${SRC_ENGINE})
+if (CMAKE_BUILD_TYPE STREQUAL "Release")
     target_link_libraries(chessengine PRIVATE ${LIBRARIES} -static)
 else()
     target_link_libraries(chessengine PRIVATE ${LIBRARIES})
@@ -104,9 +106,11 @@ if (${GTEST_FOUND} AND ${THREADS_FOUND})
         # Create an executable with all sources and lib needed
         add_executable(${TEST_NAME} ${f})
         target_sources(${TEST_NAME} PRIVATE ${SRC_ENGINE})
+        target_compile_options(${TEST_NAME} PRIVATE -Wall -Werror -Wextra)
         target_link_libraries(${TEST_NAME} PRIVATE
             ${GTEST_BOTH_LIBRARIES}
             ${CMAKE_THREAD_LIBS_INIT}
+            ${LIBRARIES}
         )
 
         # Add the executable created to the test list of ctest
