@@ -11,6 +11,7 @@ project(Chess
 1. Create and go to a directory of build (preference : debug or release) :
     - `mkdir build_debug` / `mkdir build_release`
     - `cd build_debug` / `cd build_release`
+    (Use `build_debug` folder to use a Debug BUILD_TYPE)
 
 2. Generate cmake files in build directory with the good options :
     - `cmake .. [OPTIONS]`
@@ -82,7 +83,11 @@ set_target_properties(chessengine PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR} # binary destination
 )
 target_sources(chessengine PRIVATE ${SRC_ENGINE})
-target_link_libraries(chessengine PRIVATE ${LIBRARIES} -static)
+if (${CMAKE_BUILD_TYPE} MATCHES "Release")
+    target_link_libraries(chessengine PRIVATE ${LIBRARIES} -static)
+else()
+    target_link_libraries(chessengine PRIVATE ${LIBRARIES})
+endif()
 
 # TESTS
 find_package(GTest)

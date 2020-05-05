@@ -21,6 +21,7 @@ chessengine
 *.app
 *.log
 *.tmp
+core
 
 # Documentation
 *.pdf
