@@ -4,8 +4,6 @@
 #include <string>
 #include <vector>
 
-#include "move.hh"
-
 namespace pgn_parser
 {
     class PgnParsingException : public std::exception
