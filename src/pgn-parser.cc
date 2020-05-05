@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <regex>
+#include <iostream>
 
 #include "pgn-exception.hh"
 #include "piece-type.hh"
