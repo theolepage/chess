@@ -93,10 +93,4 @@ namespace board
         // FIXME
         return false;
     }
-
-    Chessboard::opt_piece_t Chessboard::operator[](const Position&)
-    {
-        // FIXME
-        return std::nullopt;
-    }
 }
