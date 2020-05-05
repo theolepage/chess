@@ -43,6 +43,7 @@ set(SRC_ENGINE
     src/move.cc
     src/rule.cc
     #FIXME
+    src/chessboard.cc
     )
 include_directories(src
                     #FIXME
