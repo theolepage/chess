@@ -8,13 +8,13 @@ namespace board
         return std::vector<Move>();
     }
 
-    void Chessboard::do_move(const Move& move)
+    void Chessboard::do_move(const Move&)
     {
         // FIXME
 
     }
 
-    bool Chessboard::is_move_legal(const Move& move)
+    bool Chessboard::is_move_legal(const Move&)
     {
         // FIXME
         return false;
@@ -38,7 +38,7 @@ namespace board
         return false;
     }
 
-    opt_piece_t Chessboard::operator[](const Position& position)
+    Chessboard::opt_piece_t Chessboard::operator[](const Position&)
     {
         // FIXME
         return std::nullopt;

@@ -8,7 +8,7 @@
 
 namespace board
 {
-    class Chessboard
+    class Chessboard : public ChessboardInterface
     {
     public:
         using side_piece_t = std::pair<PieceType, Color>;
@@ -26,7 +26,7 @@ namespace board
 
         bool is_draw();
 
-        opt_piece_t operator[](const Position& position) override;
+        opt_piece_t operator[](const Position& position);
 
 
     private:
