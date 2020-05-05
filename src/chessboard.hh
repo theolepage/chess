@@ -1,5 +1,8 @@
 #pragma once
 
+#include <iostream>
+#include <array>
+#include <bitset>
 #include <vector>
 #include <optional>
 
@@ -11,8 +14,18 @@ namespace board
     class Chessboard : public ChessboardInterface
     {
     public:
-        using side_piece_t = std::pair<PieceType, Color>;
-        using opt_piece_t = std::optional<side_piece_t>;
+        constexpr static size_t width = 8;
+
+        /*
+         * the board is represented by width lines
+         * a line is represented by a bitset (of width bits)
+         *
+         * each bit is set to 1 if there is a piece at its corresponding
+         * position or 0 otherwise
+         */
+        using bitboard_t = std::array<std::bitset<width>, width>;
+
+        Chessboard();
 
         std::vector<Move> generate_legal_moves();
 
@@ -30,6 +43,9 @@ namespace board
 
 
     private:
+        std::array<bitboard_t, nb_pieces> white_bitboards;
+        std::array<bitboard_t, nb_pieces> black_bitboards;
+
         bool white_turn_;
 
         bool white_king_castling_;
@@ -41,5 +57,8 @@ namespace board
 
         unsigned turn_;
         unsigned last_fifty_turn_;
+
+        void init_end_ranks(PieceType piecetype, File file);
+        void symetric_init_end_ranks(PieceType piecetype, File file);
     };
 }
