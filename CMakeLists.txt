@@ -40,7 +40,8 @@ set(OPT_FLAGS
 set(MAIN_ENGINE
     src/main.cc)
 set(SRC_ENGINE
-    #src/...
+    src/move.cc
+    src/rule.cc
     #FIXME
     src/chessboard.cc
     )
