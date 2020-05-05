@@ -3,6 +3,8 @@
 #include <array>
 #include <optional>
 
+#include "utype.hh"
+
 namespace board
 {
     /* PieceType is an enum representing every possible
@@ -26,6 +28,8 @@ namespace board
         PieceType::QUEEN,  PieceType::ROOK, PieceType::BISHOP,
         PieceType::KNIGHT, PieceType::PAWN, PieceType::KING};
 
+    constexpr size_t nb_pieces = piecetype_array.size();
+
     inline PieceType char_to_piece(const char c)
     {
         switch (c)
@@ -45,6 +49,15 @@ namespace board
         default:
             throw std::invalid_argument("Unknown piece");
         }
+    }
+
+    constexpr char empty_cell_char = ' ';
+
+    inline char piecetype_to_char(const PieceType piecetype)
+    {
+        constexpr std::array<char, nb_pieces> piece_chars = {'Q', 'R', 'B', 'N', 'P', 'K'};
+
+        return piece_chars[utils::utype(piecetype)];
     }
 
 } // namespace board
