@@ -42,6 +42,7 @@ set(MAIN_ENGINE
 set(SRC_ENGINE
     #src/...
     #FIXME
+    src/chessboard.cc
     )
 include_directories(src
                     #FIXME
