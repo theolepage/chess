@@ -102,11 +102,11 @@ namespace board
                     const PieceType piecetype = curr_piece.value().first;
                     const Color piece_color = curr_piece.value().second;
 
-                    const char piecetype_char = piecetype_to_char(piecetype);
+                    const char piece_char = piece_to_char(piecetype);
 
                     std::cout << char(piece_color == Color::WHITE ?
-                                      piecetype_char :
-                                      tolower(piecetype_char));
+                                      piece_char :
+                                      tolower(piece_char));
                 }
                 else
                 {
