@@ -4,12 +4,12 @@ namespace board
 {
     Move::Move(const Position& start,
                const Position& end,
-               PieceType piece,
-               bool capture,
-               bool double_pawn_push,
-               bool queen_castling,
-               bool king_castling,
-               bool en_passant,
+               const PieceType& piece,
+               const bool capture,
+               const bool double_pawn_push,
+               const bool queen_castling,
+               const bool king_castling,
+               const bool en_passant,
                const opt_piece_t& promotion)
         : start_(start)
         , end_(end)
