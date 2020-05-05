@@ -1,0 +1,15 @@
+image: gcc
+
+build:
+  stage: build
+  script:
+    - cmake
+    - make
+  artifacts:
+    paths:
+      - chessengine
+
+test:
+  stage: test
+  script:
+    - ctest
