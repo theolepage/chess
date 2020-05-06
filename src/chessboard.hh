@@ -37,26 +37,7 @@ namespace board
         bool is_check_mate();
         bool is_draw();
 
-        opt_piece_t operator[](const Position& pos) const override
-        {
-            size_t rank_i = utils::utype(pos.rank_get());
-            size_t file_i = utils::utype(pos.file_get());
-
-            for (auto piecetype : piecetype_array)
-            {
-                const auto piecetype_i = utils::utype(piecetype);
-                const bitboard_t white_piecetype_bitboard = white_bitboards[piecetype_i];
-                const bitboard_t black_piecetype_bitboard = black_bitboards[piecetype_i];
-
-                if (white_piecetype_bitboard[rank_i][file_i])
-                    return std::make_pair(piecetype, Color::WHITE);
-
-                if (black_piecetype_bitboard[rank_i][file_i])
-                    return std::make_pair(piecetype, Color::BLACK);
-            }
-
-            return std::nullopt;
-        }
+        opt_piece_t operator[](const Position& pos) const override;
 
         friend std::ostream& operator<<(std::ostream& os, const Chessboard& board);
 

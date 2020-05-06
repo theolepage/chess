@@ -93,4 +93,25 @@ namespace board
         // FIXME
         return false;
     }
+
+    Chessboard::opt_piece_t Chessboard::operator[](const Position& pos) const
+    {
+        size_t rank_i = utils::utype(pos.rank_get());
+        size_t file_i = utils::utype(pos.file_get());
+
+        for (auto piecetype : piecetype_array)
+        {
+            const auto piecetype_i = utils::utype(piecetype);
+            const bitboard_t white_piecetype_bitboard = white_bitboards_[piecetype_i];
+            const bitboard_t black_piecetype_bitboard = black_bitboards_[piecetype_i];
+
+            if (white_piecetype_bitboard[rank_i][file_i])
+                return std::make_pair(piecetype, Color::WHITE);
+
+            if (black_piecetype_bitboard[rank_i][file_i])
+                return std::make_pair(piecetype, Color::BLACK);
+        }
+
+        return std::nullopt;
+    }
 }
