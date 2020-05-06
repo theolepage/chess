@@ -66,7 +66,10 @@ namespace perft_parser
                     return board::PieceType::BISHOP;
                 default:
                     assert(false);
+                    return board::PieceType::BISHOP;
             }
+            assert(false);
+            return board::PieceType::BISHOP;
         }
         std::vector<opt_piece_t> pieces_;
     };
