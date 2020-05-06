@@ -26,7 +26,7 @@ namespace board
 
         bool is_draw();
 
-        opt_piece_t operator[](const Position& position);
+        opt_piece_t operator[](const Position& position) const;
 
 
     private:
