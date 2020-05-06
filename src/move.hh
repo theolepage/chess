@@ -24,25 +24,18 @@ namespace board
              const bool en_passant,
              const opt_piece_t& promotion = std::nullopt);
 
+        bool operator==(const Move& move) const;
+        bool operator!=(const Move& move) const;
+
+        const Position& start_get() const;
+        const Position& end_get() const;
         PieceType piece_get() const;
-
-        bool operator==(const Move& move) const
-        {
-             return start_ == move.start_ &&
-                     end_ == move.end_ &&
-                     piece_ == move.piece_ &&
-                     promotion_.value() == move.promotion_.value() &&
-                     capture_ == move.capture_ &&
-                     double_pawn_push_ == move.double_pawn_push_ &&
-                     queen_castling_ == move.queen_castling_ &&
-                     king_castling_ == move.king_castling_ &&
-                     en_passant_ == move.en_passant_;
-        }
-
-        bool operator!=(const Move& move) const
-        {
-            return !(*this == move);
-        }
+        bool capture_get() const;
+        bool double_pawn_push_get() const;
+        bool queen_castling_get() const;
+        bool king_castling_get() const;
+        bool en_passant_get() const;
+        const opt_piece_t& promotion_get() const;
 
     private:
         // The original position of the piece
@@ -73,3 +66,5 @@ namespace board
         const bool en_passant_;
     };
 } // namespace board
+
+#include "move.hxx"
