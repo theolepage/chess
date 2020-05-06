@@ -42,4 +42,22 @@ namespace board
         // FIXME
         return std::nullopt;
     }
+
+    std::optional<Position> Chessboard::get_en_passant() const
+    {
+        // FIXME
+        return std::nullopt;
+    }
+
+    bool Chessboard::get_king_castling(const Color&) const
+    {
+        // FIXME
+        return false;
+    }
+    
+    bool Chessboard::get_queen_castling(const Color&) const
+    {
+        // FIXME
+        return false;
+    }
 }

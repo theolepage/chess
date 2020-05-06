@@ -36,6 +36,9 @@ namespace board
 
         std::optional<Position> get_en_passant() const;
 
+        bool get_king_castling(const Color& color) const;
+        bool get_queen_castling(const Color& color) const;
+
     private:
         bool white_turn_;
 
