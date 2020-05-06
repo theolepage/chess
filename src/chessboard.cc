@@ -140,6 +140,25 @@ namespace board
         return false;
     }
 
+    Chessboard::opt_pos_t Chessboard::en_passant_get()
+    {
+        return en_passant_;
+    }
+
+    bool Chessboard::king_castling_get(Color color)
+    {
+        return color == Color::WHITE ?
+            white_king_castling_:
+            black_king_castling_;
+    }
+
+    bool Chessboard::queen_castling_get(Color color)
+    {
+        return color == Color::WHITE ?
+            white_queen_castling_:
+            black_queen_castling_;
+    }
+
     Chessboard::opt_piece_t Chessboard::operator[](const Position& pos) const
     {
         size_t rank_i = utils::utype(pos.rank_get());

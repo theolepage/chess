@@ -25,6 +25,7 @@ namespace board
          * position or 0 otherwise
          */
         using bitboard_t = std::array<std::bitset<width>, width>;
+        using opt_pos_t = std::optional<Position>;
 
         Chessboard();
 
@@ -38,6 +39,10 @@ namespace board
         bool is_check();
         bool is_check_mate();
         bool is_draw();
+
+        opt_pos_t en_passant_get();
+        bool king_castling_get(Color color);
+        bool queen_castling_get(Color color);
 
         opt_piece_t operator[](const Position& pos) const override;
 
@@ -54,7 +59,7 @@ namespace board
         bool black_king_castling_;
         bool black_queen_castling_;
 
-        // FIXME en_passant;
+        opt_pos_t en_passant_;
 
         unsigned turn_;
         unsigned last_fifty_turn_;
