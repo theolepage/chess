@@ -43,6 +43,11 @@ set(SRC_ENGINE
     src/move.cc
     src/rule.cc
     src/chessboard.cc
+    src/option-parser.cc
+    src/perft-parser.cc
+    src/pgn-exception.cc
+    src/pgn-move.cc
+    src/pgn-parser.cc
     )
 include_directories(src
                     #FIXME
