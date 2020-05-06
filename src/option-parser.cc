@@ -76,11 +76,11 @@ namespace option_parser
 
             if (vm.count("help"))
                 std::cout << desc << '\n';
-            else if (vm.count("pgn"))
+            if (vm.count("pgn"))
                 on_pgn(pgn_path);
-            else if (vm.count("listeners"))
+            if (vm.count("listeners"))
                 on_listerners(listeners_path, manager);
-            else if (vm.count("perft"))
+            if (vm.count("perft"))
                 on_perft(perft_path);
         }
         catch (const error &ex)
