@@ -1,6 +1,4 @@
-// To-Do: Handle first turn of pawn => able to move of 2 cells
-// To-Do: Fix check for traversed cells axis
-
+// To-Do: Implement get_pieces()
 // To-Do: Handle castling and "en passant", check and advanced rules
 
 #include <vector>
@@ -153,9 +151,16 @@ namespace rule
             std::optional<Position> to_forward = (color == Color::BLACK)
                 ? from.move(0,  1)
                 : from.move(0, -1);
-
             if (to_forward && !board[*to_forward])
                 res.emplace_back(from, *to_forward, PieceType::PAWN,
+                                 false, false, false, false, false);
+
+            std::optional<Position> to_forward_2 = (color == Color::BLACK)
+                ? from.move(0,  2)
+                : from.move(0, -2);
+            bool first_move = from.rank_get() == Rank::TWO || from.rank_get() == Rank::SEVEN;
+            if (first_move && to_forward_2 && !board[*to_forward_2])
+                res.emplace_back(from, *to_forward_2, PieceType::PAWN,
                                  false, false, false, false, false);
 
             // Pawn can move to a cell diagonally in front of it on an adjacent
