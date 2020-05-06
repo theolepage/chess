@@ -1,5 +1,4 @@
 // To-Do: Handle castling
-// To-Do: Handle "en passant"
 
 #include <vector>
 #include <cmath>
@@ -140,7 +139,9 @@ namespace rule
         
         // At this stage, board at position to is free
         // or occupied by the opposite color.
-        bool capture = board[to].has_value();
+        // Handle "en passant": if cell is free and is
+        // board.en_passant_ it is a capture.
+        bool capture = board[to].has_value() || board.get_en_passant() == to;
         return std::make_pair<>(true, capture);
     }
 

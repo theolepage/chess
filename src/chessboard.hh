@@ -34,6 +34,8 @@ namespace board
 
         opt_piece_t operator[](const Position& position) const;
 
+        std::optional<Position> get_en_passant() const;
+
     private:
         bool white_turn_;
 
@@ -43,6 +45,7 @@ namespace board
         bool black_queen_castling_;
 
         // FIXME en_passant;
+        std::optional<Position> en_passant_;
 
         unsigned turn_;
         unsigned last_fifty_turn_;
