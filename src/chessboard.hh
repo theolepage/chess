@@ -61,8 +61,8 @@ namespace board
         friend std::ostream& operator<<(std::ostream& os, const Chessboard& board);
 
     private:
-        std::array<bitboard_t, nb_pieces> white_bitboards;
-        std::array<bitboard_t, nb_pieces> black_bitboards;
+        std::array<bitboard_t, nb_pieces> white_bitboards_;
+        std::array<bitboard_t, nb_pieces> black_bitboards_;
 
         bool white_turn_;
 

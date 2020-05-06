@@ -10,8 +10,8 @@ namespace board
         size_t bitboard_i = utils::utype(piecetype);
         const size_t file_i = utils::utype(file);
 
-        white_bitboards[bitboard_i][white_end_rank_i].set(file_i);
-        black_bitboards[bitboard_i][black_end_rank_i].set(file_i);
+        white_bitboards_[bitboard_i][white_end_rank_i].set(file_i);
+        black_bitboards_[bitboard_i][black_end_rank_i].set(file_i);
     }
 
     File symetric_file(File file)
@@ -48,8 +48,8 @@ namespace board
     Chessboard::Chessboard()
     {
         const size_t pawn_i = utils::utype(PieceType::PAWN);
-        white_bitboards[pawn_i][1].set();
-        black_bitboards[pawn_i][width - 2].set();
+        white_bitboards_[pawn_i][1].set();
+        black_bitboards_[pawn_i][width - 2].set();
 
         symetric_init_end_ranks(PieceType::ROOK, File::A);
         symetric_init_end_ranks(PieceType::KNIGHT, File::B);
