@@ -11,7 +11,6 @@ namespace board
     void Chessboard::do_move(const Move&)
     {
         // FIXME
-
     }
 
     bool Chessboard::is_move_legal(const Move&)
@@ -42,17 +41,5 @@ namespace board
     {
         // FIXME
         return std::nullopt;
-    }
-
-    std::vector<Chessboard::piece_pos_t> Chessboard::get_pieces(PieceType) const
-    {
-        // FIXME
-        return std::vector<Chessboard::piece_pos_t>();
-    }
-
-    std::vector<Chessboard::piece_pos_t> Chessboard::get_pieces(Position, Position, Axis) const
-    {
-        // FIXME
-        return std::vector<Chessboard::piece_pos_t>();
     }
 }

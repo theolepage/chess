@@ -1,7 +1,8 @@
-// To-Do: Implement get_pieces()
-// To-Do: Handle castling and "en passant", check and advanced rules
+// To-Do: Handle castling
+// To-Do: Handle "en passant"
 
 #include <vector>
+#include <cmath>
 
 #include "chessboard.hh"
 #include "move.hh"
@@ -10,6 +11,51 @@ using namespace board;
 
 namespace rule
 {
+    using piece_pos_t = std::pair<Position, Color>;
+
+    static std::vector<piece_pos_t> get_pieces(const Chessboard& board,
+                                               const PieceType& piece_type)
+    {
+        std::vector<piece_pos_t> res;
+
+        for (int file = 0; file < 8; file++)
+        {
+            for (int rank = 0; rank < 8; rank++)
+            {
+                Position pos(static_cast<File>(file), static_cast<Rank>(rank));
+                if (board[pos]->first == piece_type)
+                    res.emplace_back(pos, board[pos]->second);
+            }
+        }
+
+        return res;
+    }
+
+    static std::vector<piece_pos_t> get_pieces(const Chessboard& board,
+                                               const Position& x,
+                                               const Position& y)
+    {
+        std::vector<piece_pos_t> res;
+
+        int x_file = static_cast<int>(x.file_get());
+        int x_rank = static_cast<int>(x.rank_get());
+        int y_file = static_cast<int>(y.file_get());
+        int y_rank = static_cast<int>(y.rank_get());
+
+        // Determine shift_file and shift_rank
+        int shift_file = (y_file - x_file) / abs(y_file - x_file);
+        int shift_rank = (y_rank - x_rank) / abs(y_rank - x_rank);
+
+        std::optional<Position> pos = x.move(shift_file, shift_rank);
+        while (pos)
+        {
+            res.emplace_back(*pos, board[*pos]->second);
+            pos = pos->move(shift_file, shift_rank);
+        }
+
+        return res;
+    }
+
     static void register_pos(std::vector<Position>& v,
                              std::vector<std::optional<Position>> positions)
     {
@@ -87,7 +133,7 @@ namespace rule
         // piece - regardless of its color (except for the Knight).
         if (piece != PieceType::KNIGHT)
         {
-            auto pieces_traversed = board.get_pieces(from, to, Axis::VERTICAL);
+            auto pieces_traversed = get_pieces(board, from, to);
             if (!pieces_traversed.empty())
                 return std::make_pair<>(false, false);
         }
@@ -107,7 +153,7 @@ namespace rule
                                             const PieceType& piece_type)
     {
         std::vector<Move> res;
-        auto pieces = board.get_pieces(piece_type);
+        auto pieces = get_pieces(board, piece_type);
 
         for (auto piece : pieces)
         {
@@ -139,7 +185,7 @@ namespace rule
     std::vector<Move> generate_pawn_moves(const Chessboard& board)
     {
         std::vector<Move> res;
-        auto pieces = board.get_pieces(PieceType::PAWN);
+        auto pieces = get_pieces(board, PieceType::PAWN);
 
         for (auto p : pieces)
         {
@@ -161,7 +207,7 @@ namespace rule
             bool first_move = from.rank_get() == Rank::TWO || from.rank_get() == Rank::SEVEN;
             if (first_move && to_forward_2 && !board[*to_forward_2])
                 res.emplace_back(from, *to_forward_2, PieceType::PAWN,
-                                 false, false, false, false, false);
+                                 false, true, false, false, false);
 
             // Pawn can move to a cell diagonally in front of it on an adjacent
             // file if (and only if) the cell already contains a piece of the
