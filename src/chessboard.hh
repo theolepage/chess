@@ -30,6 +30,7 @@ namespace board
 
         std::vector<Move> generate_legal_moves();
 
+        // Assume that move is legal
         void do_move(const Move& move);
 
         bool is_move_legal(const Move& move);

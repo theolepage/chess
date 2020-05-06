@@ -48,6 +48,8 @@ namespace board
 
     Chessboard::Chessboard()
     {
+        white_turn_ = true;
+
         const size_t pawn_i = utils::utype(PieceType::PAWN);
         white_bitboards_[pawn_i][1].set();
         black_bitboards_[pawn_i][width - 2].set();
@@ -62,13 +64,32 @@ namespace board
     std::vector<Move> Chessboard::generate_legal_moves()
     {
         // FIXME
+
         return std::vector<Move>();
     }
 
-    void Chessboard::do_move(const Move&)
+    // FIXME only works with simple moves (move to an empty cell)
+    void Chessboard::do_move(const Move& move)
     {
-        // FIXME
+        const Position& move_start = move.start_get();
+        const Position& move_end = move.end_get();
 
+        Color moved_piece_color = (*this)[move_start].value().second;
+        const auto piecetype_i = utils::utype(move.piece_get());
+
+        bitboard_t& piece_bitboard = moved_piece_color == Color::WHITE ?
+            white_bitboards_[piecetype_i] :
+            black_bitboards_[piecetype_i];
+
+        const auto start_rank_i = utils::utype(move_start.rank_get());
+        const auto start_file_i = utils::utype(move_start.file_get());
+        const auto end_rank_i = utils::utype(move_end.rank_get());
+        const auto end_file_i = utils::utype(move_end.file_get());
+
+        piece_bitboard[start_rank_i].reset(start_file_i);
+        piece_bitboard[end_rank_i].set(end_file_i);
+
+        white_turn_ = !white_turn_;
     }
 
     bool Chessboard::is_move_legal(const Move& move)
