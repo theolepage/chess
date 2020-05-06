@@ -120,6 +120,84 @@ TEST(InitialPieces, EmptyMid)
     }
 }
 
+size_t count_pieces(const Chessboard& board)
+{
+    auto count = 0;
+
+    for (size_t rank_i = 0; rank_i < Chessboard::width; rank_i++)
+    {
+        auto rank = static_cast<Rank>(rank_i);
+
+        for (size_t file_i = 0; file_i < Chessboard::width; file_i++)
+        {
+            auto file = static_cast<File>(file_i);
+
+            if (board[Position(file, rank)].has_value())
+                count++;
+        }
+    }
+
+    return count;
+}
+
+TEST(InitialPieces, PieceCount)
+{
+    Chessboard board;
+
+    EXPECT_EQ(count_pieces(board), 32);
+}
+
+Move dummy_move(const Position& start, const Position& end, const PieceType& piece)
+{
+    return Move(start, end, piece, false, false, false, false, false, std::nullopt);
+}
+
+Move dummy_double_pawn_push_move(const Position& start, const Position& end)
+{
+    return Move(start, end, PieceType::PAWN, false, true, false, false, false, std::nullopt);
+}
+
+//Move
+
+TEST(DoMove, SimplePawnMove)
+{
+    Chessboard board;
+
+    auto start_pos = Position(File::A, Rank::TWO);
+    auto end_pos = Position(File::A, Rank::THREE);
+
+    //  Move the leftmost white pawn one rank up
+    board.do_move(dummy_move(start_pos, end_pos, PieceType::PAWN));
+
+    EXPECT_FALSE(board[start_pos].has_value());
+
+    auto moved_side_piece = board[end_pos].value();
+    EXPECT_COLOR(moved_side_piece, Color::WHITE);
+    EXPECT_PIECETYPE(moved_side_piece, PieceType::PAWN);
+
+    EXPECT_EQ(count_pieces(board), 32);
+}
+
+TEST(DoMove, DoublePawnPush)
+{
+    Chessboard board;
+
+    auto start_pos = Position(File::B, Rank::TWO);
+    auto start_pos_front = Position(File::B, Rank::THREE);
+    auto end_pos = Position(File::B, Rank::FOUR);
+
+    board.do_move(dummy_double_pawn_push_move(start_pos, end_pos));
+
+    EXPECT_FALSE(board[start_pos].has_value());
+    EXPECT_FALSE(board[start_pos_front].has_value());
+
+    auto moved_side_piece = board[end_pos].value();
+    EXPECT_COLOR(moved_side_piece, Color::WHITE);
+    EXPECT_PIECETYPE(moved_side_piece, PieceType::PAWN);
+
+    EXPECT_EQ(count_pieces(board), 32);
+}
+
 // To start tests
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
