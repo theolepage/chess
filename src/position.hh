@@ -1,6 +1,8 @@
 #pragma once
 
 #include <utility>
+#include <cctype>
+#include <cassert>
 
 #include "utype.hh"
 
@@ -8,9 +10,9 @@ namespace board
 {
     /* The file enum represent the colomns
      * on the board */
-    enum class File
+    enum class File : uint8_t
     {
-        A,
+        A = 0,
         B,
         C,
         D,
@@ -22,9 +24,9 @@ namespace board
 
     /* The rank enum represent the lines
      * on the board */
-    enum class Rank
+    enum class Rank : uint8_t
     {
-        ONE,
+        ONE = 0,
         TWO,
         THREE,
         FOUR,
@@ -40,6 +42,13 @@ namespace board
     {
     public:
         Position(File file, Rank rank);
+
+        Position(char file, char rank)
+        {
+            assert(islower(file) && isdigit(rank));
+            file_ = static_cast<File>(file - 'a');
+            rank_ =  static_cast<Rank>(rank - '0');
+        }
 
         File file_get() const;
         Rank rank_get() const;
