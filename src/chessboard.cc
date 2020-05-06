@@ -1,4 +1,5 @@
 #include "chessboard.hh"
+#include "rule.hh"
 
 namespace board
 {
@@ -70,10 +71,34 @@ namespace board
 
     }
 
-    bool Chessboard::is_move_legal(const Move&)
+    bool Chessboard::is_move_legal(const Move& move)
     {
-        // FIXME
-        return false;
+        std::vector<Move> legal_moves;
+
+        switch (move.piece_get())
+        {
+            case PieceType::QUEEN:
+                legal_moves = rule::generate_queen_moves(*this);
+                break;
+            case PieceType::ROOK:
+                legal_moves = rule::generate_rook_moves(*this);
+                break;
+            case PieceType::BISHOP:
+                legal_moves = rule::generate_bishop_moves(*this);
+                break;
+            case PieceType::KNIGHT:
+                legal_moves = rule::generate_knight_moves(*this);
+                break;
+            case PieceType::PAWN:
+                legal_moves = rule::generate_pawn_moves(*this);
+                break;
+            case PieceType::KING:
+                legal_moves = rule::generate_king_moves(*this);
+                break;
+        };
+
+        return std::find(legal_moves.begin(), legal_moves.end(), move) !=
+            legal_moves.end();
     }
 
     bool Chessboard::is_check()

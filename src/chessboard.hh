@@ -5,6 +5,7 @@
 #include <bitset>
 #include <vector>
 #include <optional>
+#include <algorithm>
 
 #include "chessboard-interface.hh"
 #include "move.hh"

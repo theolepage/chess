@@ -26,6 +26,24 @@ namespace board
 
         PieceType piece_get() const;
 
+        bool operator==(const Move& move) const
+        {
+             return start_ == move.start_ &&
+                     end_ == move.end_ &&
+                     piece_ == move.piece_ &&
+                     promotion_.value() == move.promotion_.value() &&
+                     capture_ == move.capture_ &&
+                     double_pawn_push_ == move.double_pawn_push_ &&
+                     queen_castling_ == move.queen_castling_ &&
+                     king_castling_ == move.king_castling_ &&
+                     en_passant_ == move.en_passant_;
+        }
+
+        bool operator!=(const Move& move) const
+        {
+            return !(*this == move);
+        }
+
     private:
         // The original position of the piece
         const Position start_;
