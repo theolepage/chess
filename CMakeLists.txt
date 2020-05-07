@@ -40,7 +40,6 @@ set(OPT_FLAGS
 set(MAIN_ENGINE
     src/main.cc)
 set(SRC_ENGINE
-    src/move.cc
     src/rule.cc
     src/chessboard.cc
     )
@@ -52,6 +51,7 @@ include_directories(src
 set(SRC_TESTS
     tests/unit_tests/example_test.cc
     tests/unit_tests/example2_test.cc
+    tests/unit_tests/chessboard.cc
     #FIXME
     )
 
