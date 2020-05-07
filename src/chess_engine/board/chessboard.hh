@@ -8,7 +8,7 @@
 #include <algorithm>
 
 #include "chessboard-interface.hh"
-#include "../../parsing/perft_parser/fen-object.hh"
+#include "../../parsing/perft_parser/perft-parser.hh"
 #include "move.hh"
 
 // Il était tard et j'avais la flemme
@@ -34,6 +34,11 @@ namespace board
 
         Chessboard();
         Chessboard(const FenObject&);
+        Chessboard(const PerftObject& perft):
+            Chessboard(perft.fen_get()) {}
+        Chessboard(const std::string& fen_string):
+            Chessboard(parse_perft(fen_string + std::string(" w - - 0 0 0"))) {}
+
 
         std::vector<Move> generate_legal_moves();
 
