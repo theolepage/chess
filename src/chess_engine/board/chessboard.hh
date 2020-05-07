@@ -69,6 +69,10 @@ namespace board
 
         void init_end_ranks(PieceType piecetype, File file);
         void symetric_init_end_ranks(PieceType piecetype, File file);
+
+        bitboard_t& get_bitboard(PieceType piecetype, Color color);
+        void set_position(const Position& pos, PieceType piecetype, Color color);
+        void unset_position(const Position& pos, PieceType piecetype, Color color);
     };
 
     /*

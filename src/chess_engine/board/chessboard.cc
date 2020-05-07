@@ -68,26 +68,74 @@ namespace board
         return std::vector<Move>();
     }
 
-    // FIXME only works with simple moves (move to an empty cell)
-    void Chessboard::do_move(const Move& move)
+    Chessboard::bitboard_t& Chessboard::get_bitboard(PieceType piecetype, Color color)
     {
-        const Position& move_start = move.start_get();
-        const Position& move_end = move.end_get();
+        const auto piecetype_i = utils::utype(piecetype);
 
-        Color moved_piece_color = (*this)[move_start].value().second;
-        const auto piecetype_i = utils::utype(move.piece_get());
-
-        bitboard_t& piece_bitboard = moved_piece_color == Color::WHITE ?
+        return color == Color::WHITE ?
             white_bitboards_[piecetype_i] :
             black_bitboards_[piecetype_i];
+    }
 
-        const auto start_rank_i = utils::utype(move_start.get_rank());
-        const auto start_file_i = utils::utype(move_start.get_file());
-        const auto end_rank_i = utils::utype(move_end.get_rank());
-        const auto end_file_i = utils::utype(move_end.get_file());
+    void Chessboard::set_position(const Position& pos, PieceType piecetype, Color color)
+    {
+        bitboard_t& piece_bitboard = get_bitboard(piecetype, color);
 
-        piece_bitboard[start_rank_i].reset(start_file_i);
-        piece_bitboard[end_rank_i].set(end_file_i);
+        const auto pos_rank_i = utils::utype(pos.get_rank());
+        const auto pos_file_i = utils::utype(pos.get_file());
+
+        piece_bitboard[pos_rank_i].set(pos_file_i);
+    }
+
+    void Chessboard::unset_position(const Position& pos, PieceType piecetype, Color color)
+    {
+        bitboard_t& piece_bitboard = get_bitboard(piecetype, color);
+
+        const auto pos_rank_i = utils::utype(pos.get_rank());
+        const auto pos_file_i = utils::utype(pos.get_file());
+
+        piece_bitboard[pos_rank_i].reset(pos_file_i);
+    }
+
+    void Chessboard::do_move(const Move& move)
+    {
+        const Position& start = move.start_get();
+        const Position& end = move.end_get();
+        const Color color = (*this)[start].value().second;
+        const PieceType piecetype = move.piece_get();
+
+        unset_position(start, piecetype, color);
+        set_position(end, piecetype, color);
+
+        if (move.double_pawn_push_get())
+        {
+            // double pawn push handling
+            const auto start_rank_i = utils::utype(start.get_rank());
+            const auto en_passant_rank_i = start_rank_i + (color == Color::WHITE ? 1 : -1);
+            const auto en_passant_rank = static_cast<Rank>(en_passant_rank_i);
+
+            en_passant_ = opt_pos_t(Position(end.get_file(), en_passant_rank));
+        }
+        else
+        {
+            if (en_passant_.has_value())
+                en_passant_ = std::nullopt;
+
+            // erase the eaten pawn
+            if (move.en_passant_get())
+            {
+                const auto en_passant_rank_i = utils::utype(end.get_rank());
+                const auto eaten_pawn_rank_i = en_passant_rank_i +
+                    (color == Color::WHITE ? -1 : 1);
+                const auto eaten_pawn_rank = static_cast<Rank>(eaten_pawn_rank_i);
+
+                const auto eaten_pawn_color = color == Color::WHITE ?
+                    Color::BLACK : Color::WHITE;
+
+                unset_position(Position(end.get_file(), eaten_pawn_rank),
+                               PieceType::PAWN, eaten_pawn_color);
+            }
+        }
 
         white_turn_ = !white_turn_;
     }

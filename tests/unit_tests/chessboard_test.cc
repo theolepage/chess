@@ -18,6 +18,10 @@ using namespace board;
     EXPECT_COLOR(SidePiece, Color);\
 } while (0)
 
+#define EXPECT_NO_PIECE(SidePiece) do {\
+    EXPECT_FALSE(SidePiece.has_value());\
+} while (0)
+
 
 TEST(InitialPieces, PawnRankTypes)
 {
@@ -172,6 +176,23 @@ Move dummy_capture_move(const Position& start, const Position& end, PieceType pi
     return Move(start, end, piecetype, true, false, false, false, false, std::nullopt);
 }
 
+TEST(Checkboard, Copy)
+{
+    Chessboard board;
+    Chessboard board_copy = board;
+
+    auto start = Position(File::A, Rank::TWO);
+    auto end = Position(File::A, Rank::THREE);
+
+    board_copy.do_move(dummy_move(start, end, PieceType::PAWN));
+
+    EXPECT_PIECE(board_copy[end].value(), PieceType::PAWN, Color::WHITE);
+    EXPECT_FALSE(board_copy.get_white_turn());
+
+    EXPECT_FALSE(board[end].has_value());
+    EXPECT_TRUE(board.get_white_turn());
+}
+
 TEST(DoMove, SimplePawnMove)
 {
     Chessboard board;
@@ -253,7 +274,6 @@ TEST(DoMove, SimpleCapture)
 
 TEST(DoMove, ForgetEnPassant)
 {
-    GTEST_SKIP();
     Chessboard board;
 
     auto white_pawn_start = Position(File::B, Rank::TWO);
@@ -276,7 +296,6 @@ TEST(DoMove, ForgetEnPassant)
 
 TEST(DoMove, EnPassantCapture)
 {
-    GTEST_SKIP();
     Chessboard board;
 
     auto white_pawn_start = Position(File::C, Rank::TWO);
