@@ -45,7 +45,7 @@ namespace perft_parser
         }
 
         // Color
-        board::Color slide_to_move = ( (splited_input.at(1)[0] == 'w') ? board::Color::WHITE : board::Color::BLACK);
+        board::Color side_to_move = ( (splited_input.at(1)[0] == 'w') ? board::Color::WHITE : board::Color::BLACK);
 
         // Castling (switching with the rook)
         std::vector<char> castling;
@@ -65,6 +65,6 @@ namespace perft_parser
 
         // We don't care about the 2 last params
 
-        return FenObject(franks, slide_to_move, castling, en_passant);
+        return FenObject(franks, side_to_move, castling, en_passant);
     }
 }
