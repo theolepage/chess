@@ -2,6 +2,8 @@
 // - if king of color is checked => only move king
 // - king cannot put himself in check situation
 
+// To-Do: implement getters/setters in Move
+
 #include <vector>
 #include <cmath>
 
