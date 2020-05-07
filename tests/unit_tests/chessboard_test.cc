@@ -13,6 +13,11 @@ using namespace board;
     EXPECT_EQ(SidePiece.second, Color);\
 } while (0)
 
+#define EXPECT_PIECE(SidePiece, PieceType, Color) do {\
+    EXPECT_PIECETYPE(SidePiece, PieceType);\
+    EXPECT_COLOR(SidePiece, Color);\
+} while (0)
+
 
 TEST(InitialPieces, PawnRankTypes)
 {
@@ -157,7 +162,15 @@ Move dummy_double_pawn_push_move(const Position& start, const Position& end)
     return Move(start, end, PieceType::PAWN, false, true, false, false, false, std::nullopt);
 }
 
-//Move
+Move dummy_en_passant_move(const Position& start, const Position& end)
+{
+    return Move(start, end, PieceType::PAWN, true, false, false, false, true, std::nullopt);
+}
+
+Move dummy_capture_move(const Position& start, const Position& end, PieceType piecetype)
+{
+    return Move(start, end, piecetype, true, false, false, false, false, std::nullopt);
+}
 
 TEST(DoMove, SimplePawnMove)
 {
@@ -205,29 +218,87 @@ TEST(DoMove, DoublePawnPush)
     EXPECT_EQ(count_pieces(board), 32);
 }
 
-// FIXME
 TEST(DoMove, SimpleCapture)
 {
-    // Chessboard board;
+    Chessboard board;
 
-    // auto start_pos = Position(File::A, Rank::TWO);
-    // auto end_pos = Position(File::A, Rank::THREE);
+    auto start_pos = Position(File::A, Rank::TWO);
+    auto end_pos = Position(File::A, Rank::THREE);
 
-    // EXPECT_TRUE(board.white_turn_get());
+    EXPECT_TRUE(board.get_white_turn());
 
-    // //  Move the leftmost white pawn one rank up
-    // board.do_move(dummy_move(start_pos, end_pos, PieceType::PAWN));
+    //  Move the leftmost white pawn one rank up
+    board.do_move(dummy_move(start_pos, end_pos, PieceType::PAWN));
 
-    // EXPECT_FALSE(board.white_turn_get());
+    EXPECT_FALSE(board.get_white_turn());
 
-    // EXPECT_FALSE(board[start_pos].has_value());
+    EXPECT_FALSE(board[start_pos].has_value());
 
-    // auto moved_side_piece = board[end_pos].value();
-    // EXPECT_COLOR(moved_side_piece, Color::WHITE);
-    // EXPECT_PIECETYPE(moved_side_piece, PieceType::PAWN);
+    auto moved_side_pawn = board[end_pos].value();
+    EXPECT_COLOR(moved_side_pawn, Color::WHITE);
+    EXPECT_PIECETYPE(moved_side_pawn, PieceType::PAWN);
 
-    // EXPECT_EQ(count_pieces(board), 32);
+    auto left_black_rook_pos = Position(File::A, Rank::EIGHT);
+
+    board.do_move(dummy_capture_move(left_black_rook_pos, end_pos, PieceType::ROOK));
+
+    EXPECT_TRUE(board.get_white_turn());
+
+    EXPECT_FALSE(board[left_black_rook_pos].has_value());
+
+    EXPECT_PIECE(board[end_pos].value(), PieceType::ROOK, Color::BLACK);
+
+    EXPECT_EQ(count_pieces(board), 31);
 }
+
+TEST(DoMove, ForgetEnPassant)
+{
+    GTEST_SKIP();
+    Chessboard board;
+
+    auto white_pawn_start = Position(File::B, Rank::TWO);
+    auto white_pawn_end = Position(File::B, Rank::FOUR);
+    auto en_passant_pos = Position(File::B, Rank::THREE);
+
+    EXPECT_FALSE(board.get_en_passant().has_value());
+
+    board.do_move(dummy_double_pawn_push_move(white_pawn_start, white_pawn_end));
+
+    EXPECT_EQ(board.get_en_passant().value(), en_passant_pos);
+
+    auto black_knight_start = Position(File::G, Rank::EIGHT);
+    auto black_knight_end = Position(File::F, Rank::SIX);
+
+    board.do_move(dummy_move(black_knight_start, black_knight_end, PieceType::ROOK));
+
+    EXPECT_FALSE(board.get_en_passant().has_value());
+}
+
+TEST(DoMove, EnPassantCapture)
+{
+    GTEST_SKIP();
+    Chessboard board;
+
+    auto white_pawn_start = Position(File::C, Rank::TWO);
+    auto white_pawn_end = Position(File::C, Rank::FIVE);
+
+    board.do_move(dummy_move(white_pawn_start, white_pawn_end, PieceType::PAWN));
+
+    auto black_pawn_start = Position(File::B, Rank::SEVEN);
+    auto black_pawn_end = Position(File::B, Rank::FIVE);
+    auto en_passant_pos = Position(File::B, Rank::SIX);
+
+    board.do_move(dummy_double_pawn_push_move(black_pawn_start, black_pawn_end));
+
+    EXPECT_EQ(board.get_en_passant().value(), en_passant_pos);
+
+    board.do_move(dummy_en_passant_move(white_pawn_end, en_passant_pos));
+
+    EXPECT_FALSE(board.get_en_passant().has_value());
+
+    EXPECT_EQ(count_pieces(board), 31);
+}
+
 
 // To start tests
 int main(int argc, char **argv) {
