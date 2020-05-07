@@ -7,7 +7,7 @@ namespace board
 
     inline bool Position::operator==(const Position& pos) const
     {
-        return file_get() == pos.file_get() && rank_get() == pos.rank_get();
+        return get_file() == pos.get_file() && get_rank() == pos.get_rank();
     }
 
     inline bool Position::operator!=(const Position& pos) const
@@ -15,12 +15,12 @@ namespace board
         return !(*this == pos);
     }
 
-    inline File Position::file_get() const
+    inline File Position::get_file() const
     {
         return file_;
     }
 
-    inline Rank Position::rank_get() const
+    inline Rank Position::get_rank() const
     {
         return rank_;
     }
