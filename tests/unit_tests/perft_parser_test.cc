@@ -62,12 +62,12 @@ TEST(perft_parser_test, first_basic_case)
                             BACK_LINE(WH)
                             };
 
-    Color slide_to_move_ = WH;
+    Color side_to_move_ = WH;
     vector<char> castling_{'K', 'Q', 'k', 'q'};
     optional<Position> en_passant_target_ = nullopt;
     int depth = 1;
 
-    FenObject fen(ranks_, slide_to_move_, castling_, en_passant_target_);
+    FenObject fen(ranks_, side_to_move_, castling_, en_passant_target_);
     PerftObject expected(fen, depth);
 
     EXPECT_EQ(expected, parsed_obj);
@@ -88,12 +88,12 @@ FR(nullopt, SD(QUEEN, WH), nullopt, SD(QUEEN, WH), nullopt, SD(QUEEN, WH), nullo
 FR(nullopt, nullopt, nullopt, nullopt, nullopt, nullopt, SD(ROOK, BL),  nullopt)
 };
 
-    Color slide_to_move_ = BL;
+    Color side_to_move_ = BL;
     vector<char> castling_;
     optional<Position> en_passant_target_ = Position(File::F, Rank::SIX);
     int depth = 25;
 
-    FenObject fen(ranks_, slide_to_move_, castling_, en_passant_target_);
+    FenObject fen(ranks_, side_to_move_, castling_, en_passant_target_);
     PerftObject expected(fen, depth);
 
     EXPECT_EQ(expected, parsed_obj);
