@@ -1,5 +1,7 @@
 #include "gtest/gtest.h"
 
+#include <sstream>
+
 #include "chess_engine/board/chessboard.hh"
 #include "chess_engine/ai/utype.hh"
 
@@ -154,6 +156,58 @@ TEST(InitialPieces, PieceCount)
     Chessboard board;
 
     EXPECT_EQ(count_pieces(board), 32);
+}
+
+TEST(Constructor, FenString)
+{
+    // FIXME Black and white seems to be inverted in fen string parser
+    GTEST_SKIP();
+    Chessboard board = Chessboard("4B3/8/2Q1p3/1k3N2/8/b1n3R1/8/K7");
+
+    std::stringstream ss;
+    ss << board;
+
+    std::string expected_string =
+        "8         B      \n"
+        "7                \n"
+        "6     Q   p      \n"
+        "5   k       N    \n"
+        "4                \n"
+        "3 b   n       R  \n"
+        "2                \n"
+        "1 K              \n"
+        "  A B C D E F G H";
+
+    EXPECT_EQ(ss.str(), expected_string);
+}
+
+TEST(Constructor, PerftObjectCastling1)
+{
+    Chessboard castling_test_board = Chessboard(parse_perft("8/8/8/8/8/8/8/8 w kQ - 0 0 0"));
+
+    EXPECT_TRUE(castling_test_board.get_king_castling(Color::BLACK));
+    EXPECT_TRUE(castling_test_board.get_queen_castling(Color::WHITE));
+    EXPECT_FALSE(castling_test_board.get_king_castling(Color::WHITE));
+    EXPECT_FALSE(castling_test_board.get_queen_castling(Color::BLACK));
+}
+
+TEST(Constructor, PerftObjectCastling2)
+{
+    Chessboard castling_test_board = Chessboard(parse_perft("8/8/8/8/8/8/8/8 w kQKq - 0 0 0"));
+
+    EXPECT_TRUE(castling_test_board.get_king_castling(Color::BLACK));
+    EXPECT_TRUE(castling_test_board.get_queen_castling(Color::WHITE));
+    EXPECT_TRUE(castling_test_board.get_king_castling(Color::WHITE));
+    EXPECT_TRUE(castling_test_board.get_queen_castling(Color::BLACK));
+}
+
+TEST(Constructor, PerftObjectTurn)
+{
+    Chessboard white_turn_board = Chessboard(parse_perft("8/8/8/8/8/8/8/8 w - - 0 0 0"));
+    Chessboard black_turn_board = Chessboard(parse_perft("8/8/8/8/8/8/8/8 b - - 0 0 0"));
+
+    EXPECT_TRUE(white_turn_board.get_white_turn());
+    EXPECT_FALSE(black_turn_board.get_white_turn());
 }
 
 Move dummy_move(const Position& start, const Position& end, const PieceType& piece)
