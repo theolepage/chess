@@ -37,10 +37,9 @@ namespace perft_parser
                     && en_passant_target_ == rhs.en_passant_target_;
         }
 
-        opt_piece_t operator[](const board::Position& ) const
+        opt_piece_t operator[](const board::Position& pos) const
         {
-            // TODO really do it
-            return std::nullopt;
+            return ranks_.at(static_cast<int>(pos.rank_get()))[pos.file_get()];
         }
 
         board::Color side_to_move_to_get(void) const { return slide_to_move_; }

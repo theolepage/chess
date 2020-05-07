@@ -99,7 +99,7 @@ FR(nullopt, nullopt, nullopt, nullopt, nullopt, nullopt, SD(ROOK, BL),  nullopt)
     EXPECT_EQ(expected, parsed_obj);
 }
 
-
+// TODO ADD [] test for fenrank fenobject, ADD NEQ test
 
 int main(int argc, char *argv[])
 {

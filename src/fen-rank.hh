@@ -49,7 +49,7 @@ namespace perft_parser
 
         opt_piece_t operator[](const board::File& file) const
         {
-            return pieces_.at(static_cast<int>(file)); // TODO enum class arith
+            return pieces_.at(static_cast<int>(file));
         }
 
         // For test purpose
