@@ -91,12 +91,14 @@ namespace board
 
         for (int rank_i = Chessboard::width - 1; rank_i >= 0; rank_i--)
         {
-            std::cout << rank_i + 1 << sep;
+            os << rank_i + 1;
             for (size_t file_i = 0; file_i < Chessboard::width; file_i++)
             {
                 const auto file = static_cast<File>(file_i);
                 const auto rank = static_cast<Rank>(rank_i);
                 const auto curr_piece = board[Position(file, rank)];
+
+                os << sep;
 
                 if (curr_piece.has_value())
                 {
@@ -105,26 +107,22 @@ namespace board
 
                     const char piece_char = piece_to_char(piecetype);
 
-                    std::cout << char(piece_color == Color::WHITE ?
-                                      piece_char :
-                                      tolower(piece_char));
+                    os << char(piece_color == Color::WHITE ?
+                               piece_char :
+                               tolower(piece_char));
                 }
                 else
-                {
-                    std::cout << empty_cell_char;
-                }
-
-                std::cout << sep;
+                    os << empty_cell_char;
             }
 
-            std::cout << std::endl;
+            os << std::endl;
         }
 
-        std::cout << sep << sep;
+        os << sep << sep;
         for (size_t file_i = 0; file_i < Chessboard::width; file_i++)
-            std::cout << char('A' + file_i) << sep;
+            os << char('A' + file_i) << sep;
 
-        std::cout << std::endl;
+        os << std::endl;
 
         return os;
     }
