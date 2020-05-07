@@ -1,6 +1,9 @@
 #pragma once
 
 #include <utility>
+#include <cctype>
+#include <cassert>
+#include <iostream>
 
 #include "utype.hh"
 
@@ -8,30 +11,30 @@ namespace board
 {
     /* The file enum represent the colomns
      * on the board */
-    enum class File
+    enum class File : uint8_t
     {
         A = 0,
-        B,
-        C,
-        D,
-        E,
-        F,
-        G,
-        H,
+        B = 1,
+        C = 2,
+        D = 3,
+        E = 4,
+        F = 5,
+        G = 6,
+        H = 7,
     };
 
     /* The rank enum represent the lines
      * on the board */
-    enum class Rank
+    enum class Rank : uint8_t
     {
         ONE = 0,
-        TWO,
-        THREE,
-        FOUR,
-        FIVE,
-        SIX,
-        SEVEN,
-        EIGHT,
+        TWO = 1,
+        THREE = 2,
+        FOUR = 3,
+        FIVE = 4,
+        SIX = 5,
+        SEVEN = 6,
+        EIGHT = 7,
     };
 
     /* Position represent a coordinate on the board */
@@ -40,8 +43,15 @@ namespace board
     public:
         Position(File file, Rank rank);
 
-        File file_get() const;
-        Rank rank_get() const;
+        Position(char file, char rank)
+        {
+            assert(islower(file) && isdigit(rank));
+            file_ = static_cast<File>(file - 'a');
+            rank_ =  static_cast<Rank>(rank - '0' - 1); // + 1 cause ONE corresponds to 0
+        }
+
+        File get_file() const;
+        Rank get_rank() const;
 
         bool operator==(const Position& pos) const;
         bool operator!=(const Position& pos) const;

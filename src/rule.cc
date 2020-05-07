@@ -39,10 +39,10 @@ namespace rule
                                                        const Position& y)
     {
         std::vector<Position> res;
-        int x_file = static_cast<int>(x.file_get());
-        int x_rank = static_cast<int>(x.rank_get());
-        int y_file = static_cast<int>(y.file_get());
-        int y_rank = static_cast<int>(y.rank_get());
+        int x_file = static_cast<int>(x.get_file());
+        int x_rank = static_cast<int>(x.get_rank());
+        int y_file = static_cast<int>(y.get_file());
+        int y_rank = static_cast<int>(y.get_rank());
 
         // Determine shift_file and shift_rank
         int shift_file = (y_file - x_file) / abs(y_file - x_file);
@@ -205,7 +205,7 @@ namespace rule
                                    const Color& color)
     {
         // Have the pawn reached the end?
-        if (to.rank_get() != (color == Color::BLACK ? Rank::ONE : Rank::EIGHT))
+        if (to.get_rank() != (color == Color::BLACK ? Rank::ONE : Rank::EIGHT))
             return;
 
         // Create the moves
@@ -281,7 +281,7 @@ namespace rule
             std::optional<Position> to_forward_2 = (color == Color::BLACK)
                 ? from.move(0, -2)
                 : from.move(0,  2);
-            bool first_move = from.rank_get() == Rank::TWO || from.rank_get() == Rank::SEVEN;
+            bool first_move = from.get_rank() == Rank::TWO || from.get_rank() == Rank::SEVEN;
             if (first_move && to_forward_2 && !board[*to_forward_2])
                 res.emplace_back(from, *to_forward_2, piece,
                                  false, true, false, false, false);

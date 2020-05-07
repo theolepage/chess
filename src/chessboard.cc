@@ -81,10 +81,10 @@ namespace board
             white_bitboards_[piecetype_i] :
             black_bitboards_[piecetype_i];
 
-        const auto start_rank_i = utils::utype(move_start.rank_get());
-        const auto start_file_i = utils::utype(move_start.file_get());
-        const auto end_rank_i = utils::utype(move_end.rank_get());
-        const auto end_file_i = utils::utype(move_end.file_get());
+        const auto start_rank_i = utils::utype(move_start.get_rank());
+        const auto start_file_i = utils::utype(move_start.get_file());
+        const auto end_rank_i = utils::utype(move_end.get_rank());
+        const auto end_file_i = utils::utype(move_end.get_file());
 
         piece_bitboard[start_rank_i].reset(start_file_i);
         piece_bitboard[end_rank_i].set(end_file_i);
@@ -166,8 +166,8 @@ namespace board
 
     Chessboard::opt_piece_t Chessboard::operator[](const Position& pos) const
     {
-        size_t rank_i = utils::utype(pos.rank_get());
-        size_t file_i = utils::utype(pos.file_get());
+        size_t rank_i = utils::utype(pos.get_rank());
+        size_t file_i = utils::utype(pos.get_file());
 
         for (auto piecetype : piecetype_array)
         {

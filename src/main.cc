@@ -1,10 +1,8 @@
-#include <iostream>
+#include "option-parser.hh"
 
-int main(int argc, char* argv[])
+int main(int argc, const char* argv[])
 {
-    std::cout << "Welcome to chessengine!\n";
-    for (int i = 1; i < argc; i++)
-    {
-        std::cout << argv[i] << std::endl;
-    }
+    option_parser::handle_input_option(argc, argv);
+
+    return 0;
 }
