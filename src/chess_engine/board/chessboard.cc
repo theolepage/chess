@@ -3,16 +3,42 @@
 
 namespace board
 {
+    Chessboard::bitboard_t& Chessboard::get_bitboard(PieceType piecetype, Color color)
+    {
+        const auto piecetype_i = utils::utype(piecetype);
+
+        return color == Color::WHITE ?
+            white_bitboards_[piecetype_i] :
+            black_bitboards_[piecetype_i];
+    }
+
+    void Chessboard::set_position(const Position& pos, PieceType piecetype, Color color)
+    {
+        bitboard_t& piece_bitboard = get_bitboard(piecetype, color);
+
+        const auto pos_rank_i = utils::utype(pos.get_rank());
+        const auto pos_file_i = utils::utype(pos.get_file());
+
+        piece_bitboard[pos_rank_i].set(pos_file_i);
+    }
+
+    void Chessboard::unset_position(const Position& pos, PieceType piecetype, Color color)
+    {
+        bitboard_t& piece_bitboard = get_bitboard(piecetype, color);
+
+        const auto pos_rank_i = utils::utype(pos.get_rank());
+        const auto pos_file_i = utils::utype(pos.get_file());
+
+        piece_bitboard[pos_rank_i].reset(pos_file_i);
+    }
+
     void Chessboard::init_end_ranks(PieceType piecetype, File file)
     {
-        constexpr size_t white_end_rank_i = 0;
-        constexpr size_t black_end_rank_i = width - 1;
+        constexpr Rank white_end_rank = Rank::ONE;
+        constexpr Rank black_end_rank = Rank::EIGHT;
 
-        size_t bitboard_i = utils::utype(piecetype);
-        const size_t file_i = utils::utype(file);
-
-        white_bitboards_[bitboard_i][white_end_rank_i].set(file_i);
-        black_bitboards_[bitboard_i][black_end_rank_i].set(file_i);
+        set_position(Position(file, white_end_rank), piecetype, Color::WHITE);
+        set_position(Position(file, black_end_rank), piecetype, Color::BLACK);
     }
 
     File symetric_file(File file)
@@ -50,9 +76,26 @@ namespace board
     {
         white_turn_ = true;
 
+        white_king_castling_ = true;
+        white_queen_castling_ = true;
+        black_king_castling_ = true;
+        black_queen_castling_ = true;
+
+        en_passant_ = std::nullopt;
+
+        turn_ = 0;
+        last_fifty_turn_ = 0;
+
         const size_t pawn_i = utils::utype(PieceType::PAWN);
         white_bitboards_[pawn_i][1].set();
         black_bitboards_[pawn_i][width - 2].set();
+
+        for (size_t file_i = 0; file_i < width; file_i++)
+        {
+            auto file = static_cast<File>(file_i);
+            set_position(Position(file, Rank::TWO), PieceType::PAWN, Color::WHITE);
+            set_position(Position(file, Rank::SEVEN), PieceType::PAWN, Color::BLACK);
+        }
 
         symetric_init_end_ranks(PieceType::ROOK, File::A);
         symetric_init_end_ranks(PieceType::KNIGHT, File::B);
@@ -66,35 +109,6 @@ namespace board
         // FIXME
 
         return std::vector<Move>();
-    }
-
-    Chessboard::bitboard_t& Chessboard::get_bitboard(PieceType piecetype, Color color)
-    {
-        const auto piecetype_i = utils::utype(piecetype);
-
-        return color == Color::WHITE ?
-            white_bitboards_[piecetype_i] :
-            black_bitboards_[piecetype_i];
-    }
-
-    void Chessboard::set_position(const Position& pos, PieceType piecetype, Color color)
-    {
-        bitboard_t& piece_bitboard = get_bitboard(piecetype, color);
-
-        const auto pos_rank_i = utils::utype(pos.get_rank());
-        const auto pos_file_i = utils::utype(pos.get_file());
-
-        piece_bitboard[pos_rank_i].set(pos_file_i);
-    }
-
-    void Chessboard::unset_position(const Position& pos, PieceType piecetype, Color color)
-    {
-        bitboard_t& piece_bitboard = get_bitboard(piecetype, color);
-
-        const auto pos_rank_i = utils::utype(pos.get_rank());
-        const auto pos_file_i = utils::utype(pos.get_file());
-
-        piece_bitboard[pos_rank_i].reset(pos_file_i);
     }
 
     void Chessboard::do_move(const Move& move)
