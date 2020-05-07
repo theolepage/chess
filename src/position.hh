@@ -37,7 +37,6 @@ namespace board
         EIGHT = 7,
     };
 
-
     /* Position represent a coordinate on the board */
     class Position final
     {
@@ -56,6 +55,8 @@ namespace board
 
         bool operator==(const Position& pos) const;
         bool operator!=(const Position& pos) const;
+
+        std::optional<Position> move(int file, int rank) const;
 
     private:
         File file_;
