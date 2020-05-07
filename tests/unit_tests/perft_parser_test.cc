@@ -99,7 +99,31 @@ FR(nullopt, nullopt, nullopt, nullopt, nullopt, nullopt, SD(ROOK, BL),  nullopt)
     EXPECT_EQ(expected, parsed_obj);
 }
 
-// TODO ADD [] test for fenrank fenobject, ADD NEQ test
+TEST(perft_parser, hard_case_neq)
+{
+        PerftObject parsed_obj = parse_perft("rNb1kbNr/2pPPppp/7r/P4P2/3N4/8/1Q1Q1Q1Q/6r1 b - f6 999 999 25");
+
+    vector<FenRank> ranks_{
+FR(SD(ROOK, BL), SD(KNIGHT, BL), SD(BISHOP, BL), nullopt, SD(KING, BL), SD(BISHOP, BL), SD(KNIGHT, WH), SD(ROOK, BL)),
+FR(nullopt, nullopt, SD(PAWN, BL), SD(PAWN, WH), SD(PAWN, WH), SD(PAWN, BL), SD(PAWN, BL), SD(PAWN, BL)),
+FR(nullopt, nullopt, nullopt, nullopt, nullopt, nullopt, nullopt, SD(ROOK, BL)),
+FR(SD(PAWN, WH), nullopt, nullopt, nullopt, nullopt, SD(PAWN, WH), nullopt, nullopt),
+FR(nullopt, nullopt, nullopt, SD(KNIGHT, WH), nullopt, nullopt, nullopt, nullopt),
+EMPTY_LINE,
+FR(nullopt, SD(QUEEN, WH), nullopt, SD(QUEEN, WH), nullopt, SD(QUEEN, WH), nullopt, SD(QUEEN, WH)),
+FR(nullopt, nullopt, nullopt, nullopt, nullopt, nullopt, SD(ROOK, BL),  nullopt)
+};
+
+    Color side_to_move_ = BL;
+    vector<char> castling_;
+    optional<Position> en_passant_target_ = Position(File::F, Rank::SIX);
+    int depth = 25;
+
+    FenObject fen(ranks_, side_to_move_, castling_, en_passant_target_);
+    PerftObject expected(fen, depth);
+
+    EXPECT_NE(expected, parsed_obj);
+}
 
 int main(int argc, char *argv[])
 {

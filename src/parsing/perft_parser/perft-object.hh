@@ -29,6 +29,11 @@ namespace perft_parser
             return fen_ == rhs.fen_ && depth_ == rhs.depth_;
         }
 
+        bool operator!=(const PerftObject& rhs) const
+        {
+            return !(*this != rhs);
+        }
+
     private:
         FenObject fen_;
         int depth_;

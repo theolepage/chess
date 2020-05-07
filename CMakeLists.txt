@@ -58,6 +58,8 @@ set(SRC_TESTS
     tests/unit_tests/example2_test.cc
     tests/unit_tests/perft_parser_test.cc
     tests/unit_tests/chessboard_test.cc
+    tests/unit_tests/fenrank_test.cc
+    tests/unit_tests/fenobject_test.cc
     #FIXME
     )
 
