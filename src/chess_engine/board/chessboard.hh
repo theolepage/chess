@@ -123,11 +123,9 @@ namespace board
             os << std::endl;
         }
 
-        os << sep << sep;
+        os << sep;
         for (size_t file_i = 0; file_i < Chessboard::width; file_i++)
-            os << char('A' + file_i) << sep;
-
-        os << std::endl;
+            os << sep << char('A' + file_i);
 
         return os;
     }
