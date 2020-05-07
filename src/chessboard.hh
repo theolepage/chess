@@ -44,6 +44,8 @@ namespace board
 
         opt_pos_t get_en_passant() const;
 
+        bool get_white_turn() const;
+
         bool get_king_castling(const Color& color) const;
         bool get_queen_castling(const Color& color) const;
         

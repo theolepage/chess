@@ -140,15 +140,9 @@ namespace board
         return false;
     }
 
-    bool Chessboard::white_turn_get()
+    bool Chessboard::get_white_turn() const
     {
         return white_turn_;
-    }
-
-    Chessboard::opt_piece_t Chessboard::operator[](const Position&) const
-    {
-        // FIXME
-        return std::nullopt;
     }
 
     Chessboard::opt_pos_t Chessboard::get_en_passant() const
@@ -156,14 +150,14 @@ namespace board
         return en_passant_;
     }
 
-    bool Chessboard::king_castling_get(Color color)
+    bool Chessboard::get_king_castling(const Color& color) const
     {
         return color == Color::WHITE ?
             white_king_castling_:
             black_king_castling_;
     }
 
-    bool Chessboard::queen_castling_get(Color color)
+    bool Chessboard::get_queen_castling(const Color& color) const
     {
         return color == Color::WHITE ?
             white_queen_castling_:
@@ -189,17 +183,5 @@ namespace board
         }
 
         return std::nullopt;
-    }
-
-    bool Chessboard::get_king_castling(const Color&) const
-    {
-        // FIXME
-        return false;
-    }
-    
-    bool Chessboard::get_queen_castling(const Color&) const
-    {
-        // FIXME
-        return false;
     }
 }
