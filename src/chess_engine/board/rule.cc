@@ -32,14 +32,14 @@ namespace rule
                                                 const Position& y)
     {
         std::vector<Position> res;
-        int x_file = utils::utype(x.get_file());
-        int x_rank = utils::utype(x.get_rank());
-        int y_file = utils::utype(y.get_file());
-        int y_rank = utils::utype(y.get_rank());
+        const int x_file = utils::utype(x.get_file());
+        const int x_rank = utils::utype(x.get_rank());
+        const int y_file = utils::utype(y.get_file());
+        const int y_rank = utils::utype(y.get_rank());
 
         // Determine shift_file and shift_rank
-        int shift_file = (y_file - x_file) / (abs(y_file - x_file) == 0 ? 1 : abs(y_file - x_file));
-        int shift_rank = (y_rank - x_rank) / (abs(y_rank - x_rank) == 0 ? 1 : abs(y_rank - x_rank));
+        const int shift_file = (y_file - x_file) / (abs(y_file - x_file) == 0 ? 1 : abs(y_file - x_file));
+        const int shift_rank = (y_rank - x_rank) / (abs(y_rank - x_rank) == 0 ? 1 : abs(y_rank - x_rank));
 
         res.push_back(x);
         std::optional<Position> pos = x.move(shift_file, shift_rank);
@@ -160,14 +160,14 @@ namespace rule
                            bool king_castling)
     {
         // Find positions of king and rook
-        Rank rank = (color == Color::WHITE) ? Rank::ONE : Rank::EIGHT;
-        Position king = Position(File::E, rank);
-        Position rook = Position(king_castling ? File::H : File::A, rank);
-        Position new_king = Position(king_castling ? File::G : File::C, rank);
+        const Rank rank = (color == Color::WHITE) ? Rank::ONE : Rank::EIGHT;
+        const Position king = Position(File::E, rank);
+        const Position rook = Position(king_castling ? File::H : File::A, rank);
+        const Position new_king = Position(king_castling ? File::G : File::C, rank);
         // Position new_rook = Position(king_castling ? File::F : File::D, rank);
 
         // Check if allowed to do a king castling (RIGHT)
-        bool castling_allowed = king_castling
+        const bool castling_allowed = king_castling
             ? board.get_king_castling(color)
             : board.get_queen_castling(color);
         if (castling_allowed && count_pieces_between(board, king, rook) == 0)
@@ -176,7 +176,7 @@ namespace rule
             for (Position step : get_positions_between(king, new_king))
             {
                 // Create temp move
-                Move temp_move = Move(king, step, PieceType::KING, false, false, false, false, false);
+                const Move temp_move = Move(king, step, PieceType::KING, false, false, false, false, false);
                 
                 // If for temp move, king would be in check do not add move
                 if (!board.is_move_legal(temp_move))
@@ -224,8 +224,8 @@ namespace rule
                                      const PieceType& piece)
     {
         std::vector<Move> res;
-        Color color = board.get_white_turn() ? Color::WHITE : Color::BLACK;
-        auto pieces_positions = get_pieces_positions(board, piece, color);
+        const Color color = board.get_white_turn() ? Color::WHITE : Color::BLACK;
+        const auto pieces_positions = get_pieces_positions(board, piece, color);
 
         // Generate regular moves
         for (Position from : pieces_positions)
@@ -235,9 +235,7 @@ namespace rule
             for (auto to : authorized_pos)
             {
                 // Step 2: Possible (cell occupied, capture?)
-                std::optional<Move> move = get_possible_move(board, piece,
-                                                             color, from, to);
-
+                const auto move = get_possible_move(board, piece, color, from, to);
                 if (move)
                     res.emplace_back(*move);
 
@@ -260,25 +258,25 @@ namespace rule
     std::vector<Move> generate_pawn_moves(const Chessboard& board)
     {
         std::vector<Move> res;
-        Color color = board.get_white_turn() ? Color::WHITE : Color::BLACK;
-        PieceType piece = PieceType::PAWN;
-        auto pieces_positions = get_pieces_positions(board, piece, color);
+        const Color color = board.get_white_turn() ? Color::WHITE : Color::BLACK;
+        const PieceType piece = PieceType::PAWN;
+        const auto pieces_positions = get_pieces_positions(board, piece, color);
 
         for (Position from : pieces_positions)
         {
             // Pawn cannot capture a piece that is in front of it and
             // obviously cannot capture same color.
-            std::optional<Position> to_forward = (color == Color::BLACK)
+            const std::optional<Position> to_forward = (color == Color::BLACK)
                 ? from.move(0, -1)
                 : from.move(0,  1);
             if (to_forward && !board[*to_forward])
                 res.emplace_back(from, *to_forward, piece,
                                  false, false, false, false, false);
 
-            std::optional<Position> to_forward_2 = (color == Color::BLACK)
+            const std::optional<Position> to_forward_2 = (color == Color::BLACK)
                 ? from.move(0, -2)
                 : from.move(0,  2);
-            bool first_move = (color == Color::BLACK)
+            const bool first_move = (color == Color::BLACK)
                 ? from.get_rank() == Rank::TWO
                 : from.get_rank() == Rank::SEVEN;
             if (first_move && to_forward_2 && !board[*to_forward_2])
@@ -288,11 +286,10 @@ namespace rule
             // Pawn can move to a cell diagonally in front of it on an adjacent
             // file if (and only if) the cell already contains a piece of the
             // other color on it. In this case it is also a capture.
-            std::optional<Position> to_diag_left = (color == Color::BLACK)
+            const std::optional<Position> to_diag_left = (color == Color::BLACK)
                 ? from.move(-1, -1)
                 : from.move(-1,  1);
-
-            std::optional<Position> to_diag_right = (color == Color::BLACK)
+            const std::optional<Position> to_diag_right = (color == Color::BLACK)
                 ? from.move(1, -1)
                 : from.move(1,  1);
             
