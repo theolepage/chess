@@ -104,6 +104,46 @@ namespace board
         init_end_ranks(PieceType::KING, File::E);
     }
 
+    Chessboard::Chessboard(const FenObject& fen)
+    {
+        // TODO Ask Nicolas if I'm right
+        white_turn_ = fen.side_to_move_to_get() == Color::WHITE;
+
+        auto castling_chars = fen.castling_get();
+        auto chars_begin = castling_chars.begin();
+        auto chars_end = castling_chars.end();
+
+        white_king_castling_ = std::find(chars_begin, chars_end, 'K') != chars_end;
+        white_queen_castling_ = std::find(chars_begin, chars_end, 'Q') != chars_end;
+        black_king_castling_ = std::find(chars_begin, chars_end, 'k') != chars_end;
+        black_queen_castling_ = std::find(chars_begin, chars_end, 'q') != chars_end;
+
+        // NOTE especially here
+        en_passant_ = fen.en_passant_target_get();
+
+        // FIXME it should be an available data in the fen string
+        turn_ = 0;
+        last_fifty_turn_ = 0;
+
+        for (size_t rank_i = 0; rank_i < width; rank_i++)
+        {
+            auto rank = static_cast<Rank>(rank_i);
+
+            for (size_t file_i = 0; file_i < width; file_i++)
+            {
+                auto file = static_cast<File>(file_i);
+
+                auto pos = Position(file, rank);
+                auto opt_side_piece = fen[pos];
+                if (opt_side_piece.has_value())
+                {
+                    auto side_piece = opt_side_piece.value();
+                    set_position(pos, side_piece.first, side_piece.second);
+                }
+            }
+        }
+    }
+
     std::vector<Move> Chessboard::generate_legal_moves()
     {
         // FIXME

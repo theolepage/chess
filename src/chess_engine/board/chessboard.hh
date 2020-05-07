@@ -8,7 +8,12 @@
 #include <algorithm>
 
 #include "chessboard-interface.hh"
+#include "../../parsing/perft_parser/fen-object.hh"
 #include "move.hh"
+
+// Il était tard et j'avais la flemme
+// Kèstuvafér
+using namespace perft_parser;
 
 namespace board
 {
@@ -28,6 +33,7 @@ namespace board
         using opt_pos_t = std::optional<Position>;
 
         Chessboard();
+        Chessboard(const FenObject&);
 
         std::vector<Move> generate_legal_moves();
 
