@@ -5,7 +5,7 @@
 #include "color.hh"
 #include "piece-type.hh"
 #include "position.hh"
-#include "report-type.hh"
+#include "parsing/pgn_parser/report-type.hh"
 
 namespace board
 {

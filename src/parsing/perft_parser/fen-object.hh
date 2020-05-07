@@ -3,10 +3,9 @@
 #include <vector>
 #include <optional>
 
-#include "color.hh"
-#include "position.hh"
-#include "fen-rank.hh"
-#include "position.hh"
+#include "chess_engine/board/color.hh"
+#include "chess_engine/board/position.hh"
+#include "parsing/perft_parser/fen-rank.hh"
 
 namespace perft_parser
 {

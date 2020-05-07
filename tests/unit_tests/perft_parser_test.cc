@@ -5,11 +5,11 @@
 #include <fstream>
 #include <string>
 
-#include "../../src/perft-parser.hh"
-#include "../../src/perft-object.hh"
-#include "../../src/fen-object.hh"
-#include "../../src/fen-rank.hh"
-#include "../../src/position.hh"
+#include "parsing/perft_parser/perft-parser.hh"
+#include "parsing/perft_parser/perft-object.hh"
+#include "parsing/perft_parser/fen-object.hh"
+#include "parsing/perft_parser/fen-rank.hh"
+#include "chess_engine/board/position.hh"
 
 using namespace board;
 using namespace std;

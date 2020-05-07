@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 
-#include "chessboard.hh"
-#include "utype.hh"
+#include "chess_engine/board/chessboard.hh"
+#include "chess_engine/ai/utype.hh"
 
 using namespace board;
 

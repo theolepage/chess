@@ -5,9 +5,9 @@
 #include <vector>
 #include <dlfcn.h>
 
-#include "listener-manager.hh"
-#include "pgn-parser.hh"
-#include "listener.hh"
+#include "listener/listener-manager.hh"
+#include "parsing/pgn_parser/pgn-parser.hh"
+#include "listener/listener.hh"
 
 using namespace boost::program_options;
 

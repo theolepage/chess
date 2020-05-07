@@ -40,13 +40,13 @@ set(OPT_FLAGS
 set(MAIN_ENGINE
     src/main.cc)
 set(SRC_ENGINE
-    src/rule.cc
-    src/chessboard.cc
-    src/option-parser.cc
-    src/perft-parser.cc
-    src/pgn-exception.cc
-    src/pgn-move.cc
-    src/pgn-parser.cc
+    src/chess_engine/board/rule.cc
+    src/chess_engine/board/chessboard.cc
+    src/parsing/option_parser/option-parser.cc
+    src/parsing/perft_parser/perft-parser.cc
+    src/parsing/pgn_parser/pgn-exception.cc
+    src/parsing/pgn_parser/pgn-move.cc
+    src/parsing/pgn_parser/pgn-parser.cc
     )
 include_directories(src
                     #FIXME
@@ -57,7 +57,7 @@ set(SRC_TESTS
     tests/unit_tests/example_test.cc
     tests/unit_tests/example2_test.cc
     tests/unit_tests/perft_parser_test.cc
-    tests/unit_tests/chessboard.cc
+    tests/unit_tests/chessboard_test.cc
     #FIXME
     )
 
