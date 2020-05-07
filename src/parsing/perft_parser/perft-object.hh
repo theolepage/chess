@@ -31,7 +31,7 @@ namespace perft_parser
 
         bool operator!=(const PerftObject& rhs) const
         {
-            return !(*this != rhs);
+            return !(*this == rhs);
         }
 
     private:
