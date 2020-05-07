@@ -40,13 +40,13 @@ namespace board
         bool is_check_mate();
         bool is_draw();
 
-        bool white_turn_get();
-        opt_pos_t en_passant_get();
-        bool king_castling_get(Color color);
-        bool queen_castling_get(Color color);
+        opt_piece_t operator[](const Position& position) const override;
 
-        opt_piece_t operator[](const Position& pos) const override;
+        opt_pos_t get_en_passant() const;
 
+        bool get_king_castling(const Color& color) const;
+        bool get_queen_castling(const Color& color) const;
+        
         friend std::ostream& operator<<(std::ostream& os, const Chessboard& board);
 
     private:

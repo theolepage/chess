@@ -145,7 +145,13 @@ namespace board
         return white_turn_;
     }
 
-    Chessboard::opt_pos_t Chessboard::en_passant_get()
+    Chessboard::opt_piece_t Chessboard::operator[](const Position&) const
+    {
+        // FIXME
+        return std::nullopt;
+    }
+
+    Chessboard::opt_pos_t Chessboard::get_en_passant() const
     {
         return en_passant_;
     }
@@ -183,5 +189,17 @@ namespace board
         }
 
         return std::nullopt;
+    }
+
+    bool Chessboard::get_king_castling(const Color&) const
+    {
+        // FIXME
+        return false;
+    }
+    
+    bool Chessboard::get_queen_castling(const Color&) const
+    {
+        // FIXME
+        return false;
     }
 }
