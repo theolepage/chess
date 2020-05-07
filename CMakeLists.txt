@@ -60,6 +60,7 @@ set(SRC_TESTS
     tests/unit_tests/chessboard_test.cc
     tests/unit_tests/fenrank_test.cc
     tests/unit_tests/fenobject_test.cc
+    tests/unit_tests/rule_test.cc
     #FIXME
     )
 

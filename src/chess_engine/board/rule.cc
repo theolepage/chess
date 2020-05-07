@@ -1,30 +1,30 @@
 // To-Do: implement is_king_checked(Color, Position) => bool
 // - if king of color is checked => only move king
 // - king cannot put himself in check situation
+// - castling
 
-// To-Do: implement getters/setters in Move
+// To-Do: add unit tests
 
 #include <vector>
 #include <cmath>
 
-#include "chessboard.hh"
-#include "move.hh"
+#include "chess_engine/board/chessboard.hh"
+#include "chess_engine/board/move.hh"
+#include "chess_engine/board/rule.hh"
 
 using namespace board;
 
 namespace rule
 {
-    using piece_pos_t = std::pair<Position, Color>;
-
-    static std::vector<Position> get_pieces_positions(const Chessboard& board,
-                                                      const PieceType& piece,
-                                                      const Color& color)
+    std::vector<Position> get_pieces_positions(const Chessboard& board,
+                                               const PieceType& piece,
+                                               const Color& color)
     {
         std::vector<Position> res;
 
-        for (int file = 0; file < 8; file++)
+        for (size_t file = 0; file < Chessboard::width; file++)
         {
-            for (int rank = 0; rank < 8; rank++)
+            for (size_t rank = 0; rank < Chessboard::width; rank++)
             {
                 Position pos(static_cast<File>(file), static_cast<Rank>(rank));
                 if (board[pos]->first == piece && board[pos]->second == color)
@@ -35,8 +35,8 @@ namespace rule
         return res;
     }
 
-    static std::vector<Position> get_positions_between(const Position& x,
-                                                       const Position& y)
+    std::vector<Position> get_positions_between(const Position& x,
+                                                const Position& y)
     {
         std::vector<Position> res;
         int x_file = static_cast<int>(x.get_file());
@@ -48,23 +48,26 @@ namespace rule
         int shift_file = (y_file - x_file) / abs(y_file - x_file);
         int shift_rank = (y_rank - x_rank) / abs(y_rank - x_rank);
 
+        res.push_back(x);
         std::optional<Position> pos = x.move(shift_file, shift_rank);
-        while (pos)
+        while (pos && pos != y)
         {
             res.push_back(*pos);
             pos = pos->move(shift_file, shift_rank);
         }
+        res.push_back(y);
 
         return res;
     }
 
-    static std::vector<piece_pos_t> get_pieces_between(const Chessboard& board,
-                                                       const Position& x,
-                                                       const Position& y)
+    int count_pieces_between(const Chessboard& board,
+                             const Position& x,
+                             const Position& y)
     {
-        std::vector<piece_pos_t> res;
+        int res = 0;
         for (Position pos : get_positions_between(x, y))
-            res.emplace_back(pos, board[pos]->second);
+            if (board[pos])
+                res++;
         return res;
     }
 
@@ -89,8 +92,8 @@ namespace rule
         }
     }
 
-    static std::vector<Position> get_authorized_pos(const PieceType& piece,
-                                                    const Position& from)
+    std::vector<Position> get_authorized_pos(const PieceType& piece,
+                                             const Position& from)
     {
         std::vector<Position> res;
 
@@ -102,7 +105,7 @@ namespace rule
                 from.move(-1, -1), from.move(0, -1), from.move(1, -1)  // bottom
             });
         }
-        else if (piece == PieceType::KNIGHT)
+        if (piece == PieceType::KNIGHT)
         {
             register_pos(res, {
                 from.move(-1,  2), from.move(-2,  1),   // top left
@@ -111,14 +114,14 @@ namespace rule
                 from.move( 1, -2), from.move( 2, -1)    // bottom right
             });
         }
-        else if (piece == PieceType::ROOK || piece == PieceType::QUEEN)
+        if (piece == PieceType::ROOK || piece == PieceType::QUEEN)
         {
             register_pos_line(res, from, -1,  0);   // line left
             register_pos_line(res, from,  1,  0);   // line right
             register_pos_line(res, from,  0,  1);   // line up
             register_pos_line(res, from,  0, -1);   // line down
         }
-        else if (piece == PieceType::BISHOP || piece == PieceType::QUEEN)
+        if (piece == PieceType::BISHOP || piece == PieceType::QUEEN)
         {
             register_pos_line(res, from, -1,  1);   // diagonal up left
             register_pos_line(res, from,  1,  1);   // diagonal up right
@@ -129,11 +132,11 @@ namespace rule
         return res;
     }
 
-    static std::optional<Move> get_possible_move(const Chessboard& board,
-                                                 const PieceType& piece,
-                                                 const Color& color,
-                                                 const Position& from,
-                                                 const Position& to)
+    std::optional<Move> get_possible_move(const Chessboard& board,
+                                          const PieceType& piece,
+                                          const Color& color,
+                                          const Position& from,
+                                          const Position& to)
     {
         // Cannot move a piece to a cell that already
         // contains another piece of the same color.
@@ -144,11 +147,8 @@ namespace rule
         // piece to go through a cell that already contains another
         // piece - regardless of its color (except for the Knight).
         if (piece != PieceType::KNIGHT)
-        {
-            auto pieces_traversed = get_pieces_between(board, from, to);
-            if (!pieces_traversed.empty())
+            if (count_pieces_between(board, from, to) != 0)
                 return std::nullopt;
-        }
 
         // Handle "en passant": if cell is free and is
         // board.en_passant_ it is a capture.
@@ -161,9 +161,9 @@ namespace rule
         return Move(from, to, piece, capture, false, false, false, false);
     }
 
-    static void register_castling(const Chessboard& board,
-                                  std::vector<Move>&,
-                                  const Color& color)
+    void register_castling(const Chessboard& board,
+                           std::vector<Move>&,
+                           const Color& color)
     {
         // Find positions of king and the two rooks
         Position king = Position(File::E, (color == Color::WHITE) ? Rank::ONE : Rank::EIGHT);
@@ -172,7 +172,7 @@ namespace rule
 
         // Check if allowed to do a king castling (RIGHT)
         if (board.get_king_castling(color)
-            && get_pieces_between(board, king, right_rook).empty())
+            && count_pieces_between(board, king, right_rook) == 0)
         {
             // Determine new positions
             // Position new_king = Position(File::G, (color == Color::WHITE) ? Rank::ONE : Rank::EIGHT);
@@ -186,7 +186,7 @@ namespace rule
 
         // Check if allowed to do a queen castling (LEFT)
         if (board.get_queen_castling(color)
-            && get_pieces_between(board, king, left_rook).empty())
+            && count_pieces_between(board, king, left_rook) == 0)
         {
             // Determine new positions
             // Position new_king = Position(File::C, (color == Color::WHITE) ? Rank::ONE : Rank::EIGHT);
@@ -199,10 +199,10 @@ namespace rule
         }
     }
 
-    static void register_promotion(std::vector<Move>& moves,
-                                   const Position& from,
-                                   const Position& to,
-                                   const Color& color)
+    void register_promotion(std::vector<Move>& moves,
+                            const Position& from,
+                            const Position& to,
+                            const Color& color)
     {
         // Have the pawn reached the end?
         if (to.get_rank() != (color == Color::BLACK ? Rank::ONE : Rank::EIGHT))
@@ -226,8 +226,8 @@ namespace rule
                            PieceType::PAWN);
     }
 
-    static std::vector<Move> generate_moves(const Chessboard& board,
-                                            const PieceType& piece)
+    std::vector<Move> generate_moves(const Chessboard& board,
+                                     const PieceType& piece)
     {
         std::vector<Move> res;
         Color color = Color::WHITE; // FIXME: color depends on board.white_turn_
@@ -281,7 +281,9 @@ namespace rule
             std::optional<Position> to_forward_2 = (color == Color::BLACK)
                 ? from.move(0, -2)
                 : from.move(0,  2);
-            bool first_move = from.get_rank() == Rank::TWO || from.get_rank() == Rank::SEVEN;
+            bool first_move = (color == Color::BLACK)
+                ? from.get_rank() == Rank::TWO
+                : from.get_rank() == Rank::SEVEN;
             if (first_move && to_forward_2 && !board[*to_forward_2])
                 res.emplace_back(from, *to_forward_2, piece,
                                  false, true, false, false, false);
