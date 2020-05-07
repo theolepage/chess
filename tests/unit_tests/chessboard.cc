@@ -166,9 +166,12 @@ TEST(DoMove, SimplePawnMove)
     auto start_pos = Position(File::A, Rank::TWO);
     auto end_pos = Position(File::A, Rank::THREE);
 
+    EXPECT_TRUE(board.white_turn_get());
+
     //  Move the leftmost white pawn one rank up
     board.do_move(dummy_move(start_pos, end_pos, PieceType::PAWN));
 
+    EXPECT_FALSE(board.white_turn_get());
     EXPECT_FALSE(board[start_pos].has_value());
 
     auto moved_side_piece = board[end_pos].value();
@@ -186,7 +189,11 @@ TEST(DoMove, DoublePawnPush)
     auto start_pos_front = Position(File::B, Rank::THREE);
     auto end_pos = Position(File::B, Rank::FOUR);
 
+    EXPECT_TRUE(board.white_turn_get());
+
     board.do_move(dummy_double_pawn_push_move(start_pos, end_pos));
+
+    EXPECT_FALSE(board.white_turn_get());
 
     EXPECT_FALSE(board[start_pos].has_value());
     EXPECT_FALSE(board[start_pos_front].has_value());
@@ -196,6 +203,30 @@ TEST(DoMove, DoublePawnPush)
     EXPECT_PIECETYPE(moved_side_piece, PieceType::PAWN);
 
     EXPECT_EQ(count_pieces(board), 32);
+}
+
+// FIXME
+TEST(DoMove, SimpleCapture)
+{
+    // Chessboard board;
+
+    // auto start_pos = Position(File::A, Rank::TWO);
+    // auto end_pos = Position(File::A, Rank::THREE);
+
+    // EXPECT_TRUE(board.white_turn_get());
+
+    // //  Move the leftmost white pawn one rank up
+    // board.do_move(dummy_move(start_pos, end_pos, PieceType::PAWN));
+
+    // EXPECT_FALSE(board.white_turn_get());
+
+    // EXPECT_FALSE(board[start_pos].has_value());
+
+    // auto moved_side_piece = board[end_pos].value();
+    // EXPECT_COLOR(moved_side_piece, Color::WHITE);
+    // EXPECT_PIECETYPE(moved_side_piece, PieceType::PAWN);
+
+    // EXPECT_EQ(count_pieces(board), 32);
 }
 
 // To start tests
