@@ -32,10 +32,10 @@ namespace rule
                                                 const Position& y)
     {
         std::vector<Position> res;
-        int x_file = static_cast<int>(x.get_file());
-        int x_rank = static_cast<int>(x.get_rank());
-        int y_file = static_cast<int>(y.get_file());
-        int y_rank = static_cast<int>(y.get_rank());
+        int x_file = utils::utype(x.get_file());
+        int x_rank = utils::utype(x.get_rank());
+        int y_file = utils::utype(y.get_file());
+        int y_rank = utils::utype(y.get_rank());
 
         // Determine shift_file and shift_rank
         int shift_file = (y_file - x_file) / (abs(y_file - x_file) == 0 ? 1 : abs(y_file - x_file));

@@ -5,7 +5,7 @@
 #include <cassert>
 #include <iostream>
 
-#include "chess_engine/ai/utype.hh"
+#include "utils/utype.hh"
 
 namespace board
 {

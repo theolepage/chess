@@ -1,5 +1,6 @@
-#include "chessboard.hh"
-#include "rule.hh"
+#include "chess_engine/board/chessboard.hh"
+#include "chess_engine/board/rule.hh"
+#include "utils/utype.hh"
 
 namespace board
 {
