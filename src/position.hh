@@ -3,6 +3,7 @@
 #include <utility>
 #include <cctype>
 #include <cassert>
+#include <iostream>
 
 #include "utype.hh"
 
@@ -13,13 +14,13 @@ namespace board
     enum class File : uint8_t
     {
         A = 0,
-        B,
-        C,
-        D,
-        E,
-        F,
-        G,
-        H,
+        B = 1,
+        C = 2,
+        D = 3,
+        E = 4,
+        F = 5,
+        G = 6,
+        H = 7,
     };
 
     /* The rank enum represent the lines
@@ -27,13 +28,13 @@ namespace board
     enum class Rank : uint8_t
     {
         ONE = 0,
-        TWO,
-        THREE,
-        FOUR,
-        FIVE,
-        SIX,
-        SEVEN,
-        EIGHT,
+        TWO = 1,
+        THREE = 2,
+        FOUR = 3,
+        FIVE = 4,
+        SIX = 5,
+        SEVEN = 6,
+        EIGHT = 7,
     };
 
 
@@ -47,7 +48,7 @@ namespace board
         {
             assert(islower(file) && isdigit(rank));
             file_ = static_cast<File>(file - 'a');
-            rank_ =  static_cast<Rank>(rank - '0');
+            rank_ =  static_cast<Rank>(rank - '0' - 1); // + 1 cause ONE corresponds to 0
         }
 
         File file_get() const;

@@ -41,10 +41,19 @@ namespace perft_parser
             }
         }
 
+        /** 
+        * For tests purpose
+        */
+        FenRank(const std::vector<opt_piece_t>& pieces) : pieces_(pieces) {}
+        bool operator==(const FenRank& rhs) const { return pieces_ == rhs.pieces_; }
+
         opt_piece_t operator[](const board::File& file) const
         {
             return pieces_.at(static_cast<int>(file)); // TODO enum class arith
         }
+
+        // For test purpose
+        int get_size(void) const { return pieces_.size(); }
 
     private:
         board::PieceType getPiece(char c)

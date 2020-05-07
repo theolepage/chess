@@ -28,6 +28,15 @@ namespace perft_parser
         FenObject() = default;
         FenObject& operator=(const FenObject&) = default;
 
+        // For test purpose
+        bool operator==(const FenObject& rhs) const
+        {
+            return ranks_ == rhs.ranks_
+                    && slide_to_move_ == rhs.slide_to_move_
+                    && castling_ == rhs.castling_
+                    && en_passant_target_ == rhs.en_passant_target_;
+        }
+
         opt_piece_t operator[](const board::Position& ) const
         {
             // TODO really do it
