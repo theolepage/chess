@@ -115,9 +115,9 @@ TEST(rule, get_possible_move_pawn_simple)
     EXPECT_EQ(forward_3.has_value(), false);
 }
 
-// register castling
-// register promotion
-// generate_moves
+// To-Do: register castling
+// To-Do: register promotion
+// To-Do: generate_moves
 
 int main(int argc, char *argv[])
 {

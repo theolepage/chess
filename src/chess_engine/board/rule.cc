@@ -1,5 +1,4 @@
 #include <vector>
-#include <cmath>
 
 #include "chess_engine/board/chessboard.hh"
 #include "chess_engine/board/move.hh"
@@ -38,8 +37,13 @@ namespace rule
         const int y_rank = utils::utype(y.get_rank());
 
         // Determine shift_file and shift_rank
-        const int shift_file = (y_file - x_file) / (abs(y_file - x_file) == 0 ? 1 : abs(y_file - x_file));
-        const int shift_rank = (y_rank - x_rank) / (abs(y_rank - x_rank) == 0 ? 1 : abs(y_rank - x_rank));
+        int shift_file = y_file - x_file;
+        if (shift_file > 0) shift_file = 1;
+        else if (shift_file < 0) shift_file = -1;
+        
+        int shift_rank = y_rank - x_rank;
+        if (shift_rank > 0) shift_rank = 1;
+        else if (shift_rank < 0) shift_rank = -1;
 
         res.push_back(x);
         std::optional<Position> pos = x.move(shift_file, shift_rank);
