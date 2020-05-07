@@ -39,7 +39,7 @@ namespace perft_parser
 
         opt_piece_t operator[](const board::Position& pos) const
         {
-            return ranks_.at(static_cast<int>(pos.rank_get()))[pos.file_get()];
+            return ranks_.at(static_cast<int>(pos.get_rank()))[pos.get_file()];
         }
 
         board::Color side_to_move_to_get(void) const { return slide_to_move_; }

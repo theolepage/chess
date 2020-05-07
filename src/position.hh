@@ -51,8 +51,8 @@ namespace board
             rank_ =  static_cast<Rank>(rank - '0' - 1); // + 1 cause ONE corresponds to 0
         }
 
-        File file_get() const;
-        Rank rank_get() const;
+        File get_file() const;
+        Rank get_rank() const;
 
         bool operator==(const Position& pos) const;
         bool operator!=(const Position& pos) const;
