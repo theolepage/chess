@@ -23,6 +23,15 @@ namespace rule
                              const Position& x,
                              const Position& y);
 
+    std::vector<Position> get_authorized_pos(const PieceType& piece,
+                                             const Position& from);
+
+    std::optional<Move> get_possible_move(const Chessboard& board,
+                                          const PieceType& piece,
+                                          const Color& color,
+                                          const Position& from,
+                                          const Position& to);
+
     std::vector<Move> generate_pawn_moves(const Chessboard& board);
     std::vector<Move> generate_king_moves(const Chessboard& board);
     std::vector<Move> generate_bishop_moves(const Chessboard& board);

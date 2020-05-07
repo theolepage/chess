@@ -51,7 +51,7 @@ TEST(rule, get_positions_between_hard)
     EXPECT_EQ(res.at(3), b);
 }
 
-TEST(rule, get_pieces_between_simple)
+TEST(rule, count_pieces_between_simple)
 {
     Chessboard board = Chessboard();
     Position a = Position(File::A, Rank::SEVEN);
@@ -59,8 +59,65 @@ TEST(rule, get_pieces_between_simple)
 
     int res = count_pieces_between(board, a, b);
 
-    EXPECT_EQ(res, 1);
+    EXPECT_EQ(res, 0);
 }
+
+TEST(rule, count_pieces_between_simple_2)
+{
+    Chessboard board = Chessboard();
+    Position a = Position(File::C, Rank::SEVEN);
+    Position b = Position(File::C, Rank::SIX);
+
+    int res = count_pieces_between(board, a, b);
+
+    EXPECT_EQ(0, res);
+}
+
+TEST(rule, get_authorized_pos_simple)
+{
+    Chessboard board = Chessboard();
+    
+    std::vector<Position> rook = get_authorized_pos(PieceType::ROOK, Position(File::A, Rank::ONE));
+    std::vector<Position> knight = get_authorized_pos(PieceType::KNIGHT, Position(File::B, Rank::ONE));
+    std::vector<Position> king = get_authorized_pos(PieceType::KING, Position(File::E, Rank::ONE));
+    std::vector<Position> queen = get_authorized_pos(PieceType::QUEEN, Position(File::D, Rank::ONE));
+
+    EXPECT_EQ(rook.size(), 14);
+    EXPECT_EQ(knight.size(), 3);
+    EXPECT_EQ(king.size(), 5);
+    EXPECT_EQ(queen.size(), 21);
+}
+
+TEST(rule, get_possible_move_pawn_simple)
+{
+    Chessboard board = Chessboard();
+    
+    std::optional<Move> forward_1 = get_possible_move(board,
+        PieceType::PAWN,
+        Color::BLACK,
+        Position(File::C, Rank::SEVEN),
+        Position(File::C, Rank::SIX));
+
+    std::optional<Move> forward_2 = get_possible_move(board,
+        PieceType::PAWN,
+        Color::BLACK,
+        Position(File::C, Rank::SEVEN),
+        Position(File::C, Rank::FIVE));
+
+    std::optional<Move> forward_3 = get_possible_move(board,
+        PieceType::PAWN,
+        Color::BLACK,
+        Position(File::C, Rank::FIVE),
+        Position(File::C, Rank::THREE));
+
+    EXPECT_EQ(forward_1.has_value(), true);
+    EXPECT_EQ(forward_2.has_value(), true);
+    EXPECT_EQ(forward_3.has_value(), false);
+}
+
+// register castling
+// register promotion
+// generate_moves
 
 int main(int argc, char *argv[])
 {

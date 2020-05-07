@@ -34,7 +34,7 @@ namespace board
         // Assume that move is legal
         void do_move(const Move& move);
 
-        bool is_move_legal(const Move& move);
+        bool is_move_legal(const Move& move) const;
 
         bool is_check();
         bool is_check_mate();

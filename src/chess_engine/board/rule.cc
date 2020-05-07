@@ -1,10 +1,3 @@
-// To-Do: implement is_king_checked(Color, Position) => bool
-// - if king of color is checked => only move king
-// - king cannot put himself in check situation
-// - castling
-
-// To-Do: add unit tests
-
 #include <vector>
 #include <cmath>
 
@@ -45,8 +38,8 @@ namespace rule
         int y_rank = static_cast<int>(y.get_rank());
 
         // Determine shift_file and shift_rank
-        int shift_file = (y_file - x_file) / abs(y_file - x_file);
-        int shift_rank = (y_rank - x_rank) / abs(y_rank - x_rank);
+        int shift_file = (y_file - x_file) / (abs(y_file - x_file) == 0 ? 1 : abs(y_file - x_file));
+        int shift_rank = (y_rank - x_rank) / (abs(y_rank - x_rank) == 0 ? 1 : abs(y_rank - x_rank));
 
         res.push_back(x);
         std::optional<Position> pos = x.move(shift_file, shift_rank);
@@ -64,9 +57,9 @@ namespace rule
                              const Position& x,
                              const Position& y)
     {
-        int res = 0;
+        int res = -1;
         for (Position pos : get_positions_between(x, y))
-            if (board[pos])
+            if (board[pos].has_value())
                 res++;
         return res;
     }
@@ -162,40 +155,41 @@ namespace rule
     }
 
     void register_castling(const Chessboard& board,
-                           std::vector<Move>&,
-                           const Color& color)
+                           std::vector<Move>& moves,
+                           const Color& color,
+                           bool king_castling)
     {
-        // Find positions of king and the two rooks
-        Position king = Position(File::E, (color == Color::WHITE) ? Rank::ONE : Rank::EIGHT);
-        Position left_rook = Position(File::A, (color == Color::WHITE) ? Rank::ONE : Rank::EIGHT);
-        Position right_rook = Position(File::H, (color == Color::WHITE) ? Rank::ONE : Rank::EIGHT);
+        // Find positions of king and rook
+        Rank rank = (color == Color::WHITE) ? Rank::ONE : Rank::EIGHT;
+        Position king = Position(File::E, rank);
+        Position rook = Position(king_castling ? File::H : File::A, rank);
+        Position new_king = Position(king_castling ? File::G : File::C, rank);
+        // Position new_rook = Position(king_castling ? File::F : File::D, rank);
 
         // Check if allowed to do a king castling (RIGHT)
-        if (board.get_king_castling(color)
-            && count_pieces_between(board, king, right_rook) == 0)
+        bool castling_allowed = king_castling
+            ? board.get_king_castling(color)
+            : board.get_queen_castling(color);
+        if (castling_allowed && count_pieces_between(board, king, rook) == 0)
         {
-            // Determine new positions
-            // Position new_king = Position(File::G, (color == Color::WHITE) ? Rank::ONE : Rank::EIGHT);
-            // Position new_right_rook = Position(File::F, (color == Color::WHITE) ? Rank::ONE : Rank::EIGHT);
+            bool not_in_check = true;
+            for (Position step : get_positions_between(king, new_king))
+            {
+                // Create temp move
+                Move temp_move = Move(king, step, PieceType::KING, false, false, false, false, false);
+                
+                // If for temp move, king would be in check do not add move
+                if (!board.is_move_legal(temp_move))
+                    not_in_check = false;
+            }
 
-            // for (Position pos : get_positions_between(king, new_king))
-            // {
-            //      if king at pos would be in check => do not add move
-            // }
-        }
-
-        // Check if allowed to do a queen castling (LEFT)
-        if (board.get_queen_castling(color)
-            && count_pieces_between(board, king, left_rook) == 0)
-        {
-            // Determine new positions
-            // Position new_king = Position(File::C, (color == Color::WHITE) ? Rank::ONE : Rank::EIGHT);
-            // Position new_left_rook = Position(File::D, (color == Color::WHITE) ? Rank::ONE : Rank::EIGHT);
-
-            // for (Position pos : get_positions_between(king, new_king))
-            // {
-            //     if king at pos would be in check => do not add move
-            // }
+            if (not_in_check)
+            {
+                if (king_castling)
+                    moves.emplace_back(king, new_king, PieceType::KING, false, false, false, true, false);
+                else
+                    moves.emplace_back(king, new_king, PieceType::KING, false, false, true, false, false);
+            }
         }
     }
 
@@ -230,7 +224,7 @@ namespace rule
                                      const PieceType& piece)
     {
         std::vector<Move> res;
-        Color color = Color::WHITE; // FIXME: color depends on board.white_turn_
+        Color color = board.get_white_turn() ? Color::WHITE : Color::BLACK;
         auto pieces_positions = get_pieces_positions(board, piece, color);
 
         // Generate regular moves
@@ -254,7 +248,10 @@ namespace rule
 
             // Handle castling moves
             if (piece == PieceType::KING)
-                register_castling(board, res, color);
+            {
+                register_castling(board, res, color, true);
+                register_castling(board, res, color, false);
+            }
         }
 
         return res;
@@ -263,7 +260,7 @@ namespace rule
     std::vector<Move> generate_pawn_moves(const Chessboard& board)
     {
         std::vector<Move> res;
-        Color color = Color::WHITE; // FIXME: color depends on board.white_turn_
+        Color color = board.get_white_turn() ? Color::WHITE : Color::BLACK;
         PieceType piece = PieceType::PAWN;
         auto pieces_positions = get_pieces_positions(board, piece, color);
 

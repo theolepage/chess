@@ -92,7 +92,7 @@ namespace board
         white_turn_ = !white_turn_;
     }
 
-    bool Chessboard::is_move_legal(const Move& move)
+    bool Chessboard::is_move_legal(const Move& move) const
     {
         std::vector<Move> legal_moves;
 
