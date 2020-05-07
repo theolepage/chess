@@ -140,6 +140,11 @@ namespace board
         return false;
     }
 
+    bool Chessboard::white_turn_get()
+    {
+        return white_turn_;
+    }
+
     Chessboard::opt_pos_t Chessboard::en_passant_get()
     {
         return en_passant_;

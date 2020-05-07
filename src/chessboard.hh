@@ -40,6 +40,7 @@ namespace board
         bool is_check_mate();
         bool is_draw();
 
+        bool white_turn_get();
         opt_pos_t en_passant_get();
         bool king_castling_get(Color color);
         bool queen_castling_get(Color color);
