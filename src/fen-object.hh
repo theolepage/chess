@@ -17,10 +17,10 @@ namespace perft_parser
         using opt_piece_t = std::optional<side_piece_t>;
 
         FenObject(std::vector<FenRank>& ranks,
-                    board::Color& slide_to_move,
+                    board::Color& side_to_move,
                     std::vector<char>& castling,
                     std::optional<board::Position> en_passant) : ranks_(ranks),
-                                                          slide_to_move_(slide_to_move),
+                                                          side_to_move_(side_to_move),
                                                           castling_(castling),
                                                           en_passant_target_(en_passant)
                                                           {}
@@ -32,7 +32,7 @@ namespace perft_parser
         bool operator==(const FenObject& rhs) const
         {
             return ranks_ == rhs.ranks_
-                    && slide_to_move_ == rhs.slide_to_move_
+                    && side_to_move_ == rhs.side_to_move_
                     && castling_ == rhs.castling_
                     && en_passant_target_ == rhs.en_passant_target_;
         }
@@ -42,14 +42,14 @@ namespace perft_parser
             return ranks_.at(static_cast<int>(pos.get_rank()))[pos.get_file()];
         }
 
-        board::Color side_to_move_to_get(void) const { return slide_to_move_; }
+        board::Color side_to_move_to_get(void) const { return side_to_move_; }
         std::vector<char> castling_get(void) const { return castling_; }
         std::optional<board::Position> en_passant_target_get(void) const { return en_passant_target_; }
 
 
     private:
         std::vector<FenRank> ranks_;
-        board::Color slide_to_move_;
+        board::Color side_to_move_;
         std::vector<char> castling_;
         std::optional<board::Position> en_passant_target_;
     };
