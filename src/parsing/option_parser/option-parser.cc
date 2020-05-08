@@ -15,14 +15,13 @@ namespace option_parser
 {
     static void handle_dl_error(void)
     {
-        fprintf(stderr, "%s\n", dlerror()); // TODO do whaaat ?
-        exit(0);
+        fprintf(stderr, "%s\n", dlerror());
     }
 
     static void* safe_dl_call(void* result)
     {
         if (result == nullptr)
-            handle_dl_error(); // Will kill the program
+            handle_dl_error();
         dlerror(); // No error, need to clear the error buffer before next call
         return result;
     }
@@ -33,7 +32,11 @@ namespace option_parser
         for (const std::string& listener_path : listeners_path)
         {
             void* handle = safe_dl_call(dlopen(listener_path.c_str(), RTLD_NOW | RTLD_GLOBAL)); // TODO correct flags ?
+            if (handle == nullptr)
+                continue;
             void* symbol = safe_dl_call(dlsym(handle, symbol_name));
+            if (symbol == nullptr)
+                continue;
             listener::Listener* listener = reinterpret_cast<listener::Listener*(*)()>(symbol)();
             manager.add_listener(handle, listener);
         }
