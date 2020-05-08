@@ -158,10 +158,9 @@ TEST(InitialPieces, PieceCount)
     EXPECT_EQ(count_pieces(board), 32);
 }
 
-TEST(Constructor, FenString)
+// FIXME Black and white seems to be inverted in fen string parser
+TEST(Constructor, DISABLED_FenString)
 {
-    // FIXME Black and white seems to be inverted in fen string parser
-    GTEST_SKIP();
     Chessboard board = Chessboard("4B3/8/2Q1p3/1k3N2/8/b1n3R1/8/K7");
 
     std::stringstream ss;
@@ -373,19 +372,17 @@ TEST(DoMove, EnPassantCapture)
 }
 
 
-TEST(Draw, InitialState)
+// FIXME
+TEST(Draw, DISABLED_InitialState)
 {
-    // FIXME
-    GTEST_SKIP();
     Chessboard board;
 
     EXPECT_FALSE(board.is_draw());
 }
 
-TEST(Draw, Stalemate)
+// FIXME
+TEST(Draw, DISABLED_Stalemate)
 {
-    // FIXME
-    GTEST_SKIP();
     // This is the subject example
     Chessboard board = Chessboard("8/8/8/1k6/8/b1n5/8/K7");
 
@@ -393,10 +390,9 @@ TEST(Draw, Stalemate)
 }
 
 // NOTE Will not pass anymore if we implement the threefold repetition bonus
-TEST(Draw, FiftyLastTurns1)
+// FIXME
+TEST(Draw, DISABLED_FiftyLastTurns1)
 {
-    // FIXME
-    GTEST_SKIP();
     Chessboard board;
 
     auto white_rook_pos_1 = Position(File::B, Rank::ONE);
@@ -433,10 +429,9 @@ TEST(Draw, FiftyLastTurns1)
 }
 
 // NOTE Will not pass anymore if we implement the threefold repetition bonus
-TEST(Draw, FiftyLastTurns2)
+// FIXME
+TEST(Draw, DISABLED_FiftyLastTurns2)
 {
-    // FIXME
-    GTEST_SKIP();
     Chessboard board;
 
     auto white_rook_pos_1 = Position(File::B, Rank::ONE);
