@@ -348,6 +348,7 @@ namespace board
         // TODO try do undo
         Chessboard board_copy = *this;
         board_copy.do_move(move);
+        board_copy.white_turn_ = !board_copy.white_turn_;
 
         return !board_copy.is_check();
     }
@@ -380,12 +381,19 @@ namespace board
         // little hack to get the opponent turns
         white_turn_ = !white_turn_;
         auto possible_moves = rule::generate_all_moves(*this);
+
         white_turn_ = !white_turn_;
 
-        for (Move move : possible_moves)
+        for (const Move& move : possible_moves)
             if (move.end_get() == king_pos)
                 return true;
 
+        return false;
+    }
+
+    bool Chessboard::is_pat(void)
+    {
+        // FIXME
         return false;
     }
 

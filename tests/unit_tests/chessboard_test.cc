@@ -25,6 +25,60 @@ using namespace board;
     EXPECT_FALSE(OptSidePiece.has_value());\
 } while (0)
 
+Move dummy_move(const Position& start, const Position& end, const PieceType& piece)
+{
+    return Move(start, end, piece, false, false, false, false, false, std::nullopt);
+}
+
+Move dummy_double_pawn_push_move(const Position& start, const Position& end)
+{
+    return Move(start, end, PieceType::PAWN, false, true, false, false, false, std::nullopt);
+}
+
+Move dummy_en_passant_move(const Position& start, const Position& end)
+{
+    return Move(start, end, PieceType::PAWN, true, false, false, false, true, std::nullopt);
+}
+
+Move dummy_capture_move(const Position& start, const Position& end, PieceType piecetype)
+{
+    return Move(start, end, piecetype, true, false, false, false, false, std::nullopt);
+}
+
+Move dummy_promotion_move(const Position& start, const Position& end, PieceType promotion)
+{
+    return Move(start, end, PieceType::PAWN, false, false, false, false, false, promotion);
+}
+
+Move dummy_promotion_capture(const Position& start, const Position& end, PieceType promotion)
+{
+    return Move(start, end, PieceType::PAWN, true, false, false, false, false, promotion);
+}
+
+Move dummy_castling_move(const Position& king_start, const Position& king_end, bool king_side)
+{
+    return Move(king_start, king_end, PieceType::KING, false, false, !king_side, king_side, false, std::nullopt);
+}
+
+size_t count_pieces(const Chessboard& board)
+{
+    auto count = 0;
+
+    for (size_t rank_i = 0; rank_i < Chessboard::width; rank_i++)
+    {
+        auto rank = static_cast<Rank>(rank_i);
+
+        for (size_t file_i = 0; file_i < Chessboard::width; file_i++)
+        {
+            auto file = static_cast<File>(file_i);
+
+            if (board[Position(file, rank)].has_value())
+                count++;
+        }
+    }
+
+    return count;
+}
 
 TEST(InitialPieces, PawnRankTypes)
 {
@@ -131,26 +185,6 @@ TEST(InitialPieces, EmptyMid)
     }
 }
 
-size_t count_pieces(const Chessboard& board)
-{
-    auto count = 0;
-
-    for (size_t rank_i = 0; rank_i < Chessboard::width; rank_i++)
-    {
-        auto rank = static_cast<Rank>(rank_i);
-
-        for (size_t file_i = 0; file_i < Chessboard::width; file_i++)
-        {
-            auto file = static_cast<File>(file_i);
-
-            if (board[Position(file, rank)].has_value())
-                count++;
-        }
-    }
-
-    return count;
-}
-
 TEST(InitialPieces, PieceCount)
 {
     Chessboard board;
@@ -207,41 +241,6 @@ TEST(Constructor, PerftObjectTurn)
 
     EXPECT_TRUE(white_turn_board.get_white_turn());
     EXPECT_FALSE(black_turn_board.get_white_turn());
-}
-
-Move dummy_move(const Position& start, const Position& end, const PieceType& piece)
-{
-    return Move(start, end, piece, false, false, false, false, false, std::nullopt);
-}
-
-Move dummy_double_pawn_push_move(const Position& start, const Position& end)
-{
-    return Move(start, end, PieceType::PAWN, false, true, false, false, false, std::nullopt);
-}
-
-Move dummy_en_passant_move(const Position& start, const Position& end)
-{
-    return Move(start, end, PieceType::PAWN, true, false, false, false, true, std::nullopt);
-}
-
-Move dummy_capture_move(const Position& start, const Position& end, PieceType piecetype)
-{
-    return Move(start, end, piecetype, true, false, false, false, false, std::nullopt);
-}
-
-Move dummy_promotion_move(const Position& start, const Position& end, PieceType promotion)
-{
-    return Move(start, end, PieceType::PAWN, false, false, false, false, false, promotion);
-}
-
-Move dummy_promotion_capture(const Position& start, const Position& end, PieceType promotion)
-{
-    return Move(start, end, PieceType::PAWN, true, false, false, false, false, promotion);
-}
-
-Move dummy_castling_move(const Position& king_start, const Position& king_end, bool king_side)
-{
-    return Move(king_start, king_end, PieceType::KING, false, false, !king_side, king_side, false, std::nullopt);
 }
 
 TEST(Checkboard, Copy)
@@ -416,7 +415,7 @@ TEST(Draw, InitialState)
 TEST(Draw, Stalemate)
 {
     // This is the subject example
-    Chessboard board = Chessboard("8/8/8/1k6/8/b1n5/8/K7");
+    Chessboard board = Chessboard("8/8/8/1k6/8/b1n5/8/K7", Color::WHITE);
 
     EXPECT_TRUE(board.is_draw());
 }

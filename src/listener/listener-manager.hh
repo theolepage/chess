@@ -1,49 +1,37 @@
 #pragma once
 
-#include <optional>
-#include <vector>
-#include <dlfcn.h>
-
-#include "chess_engine/board/chessboard-interface.hh"
-#include "chess_engine/board/color.hh"
-#include "chess_engine/board/piece-type.hh"
-#include "chess_engine/board/position.hh"
 #include "listener.hh"
+#include "chess_engine/board/chessboard-interface.hh"
 #include "chess_engine/board/chessboard.hh"
+#include "chess_engine/board/position.hh"
+#include "parsing/pgn_parser/pgn-move.hh"
 
 namespace listener
 {
-
     class ListenerManager : public board::ChessboardInterface
     {
     public:
-        virtual opt_piece_t operator[](const board::Position& /*position*/) const
+        virtual opt_piece_t operator[](const board::Position& position) const override
         {
-            // TODO need board
-            return opt_piece_t();
+            return chessboard_[position];
         }
 
-        void play_ai(void) const
-        {
-            // TODO need ai
-        }
+        void play_ai(void);
 
-        void add_listener(void* dll, Listener* listener)
-        {
-            dlls_.emplace_back(dll);
-            listeners_.emplace_back(listener);
-        }
+        void play_pgn_moves(const std::vector<board::PgnMove> moves);
 
-        void close_listeners(void)
-        {
-            for (void* dll : dlls_)
-                dlclose(dll); // Do what on fail close
-        }
+        void add_listener(void* dll, Listener* listener);
+
+        void close_listeners(void);
 
     private:
         std::vector<Listener*> listeners_;
-        board::Chessboard chessboard;
+        board::Chessboard chessboard_;
         std::vector<void*> dlls_;
+
+        void notify_move(board::Move move, opt_piece_t taken_piece) const;
+        bool notify_board_state();
+        bool do_move_and_notify(board::Move move);
     };
 
 }

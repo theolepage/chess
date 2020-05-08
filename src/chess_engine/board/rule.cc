@@ -61,14 +61,14 @@ namespace rule
         return res;
     }
 
-    int count_pieces_between(const Chessboard& board,
+    bool have_pieces_between(const Chessboard& board,
                              const Position& x,
                              const Position& y)
     {
-        int res = -1;
+        bool res = false;
         for (Position pos : get_positions_between(x, y))
-            if (board[pos].has_value())
-                res++;
+            if (board[pos].has_value() && pos != y && pos != x)
+                res = true;
         return res;
     }
 
@@ -148,7 +148,7 @@ namespace rule
         // piece to go through a cell that already contains another
         // piece - regardless of its color (except for the Knight).
         if (piece != PieceType::KNIGHT)
-            if (count_pieces_between(board, from, to) != 0)
+            if (have_pieces_between(board, from, to))
                 return std::nullopt;
 
         // Handle "en passant": if cell is free and is
@@ -177,7 +177,7 @@ namespace rule
         const bool castling_allowed = king_castling
             ? board.get_king_castling(color)
             : board.get_queen_castling(color);
-        if (castling_allowed && count_pieces_between(board, king, rook) == 0)
+        if (castling_allowed && !have_pieces_between(board, king, rook))
         {
             bool not_in_check = true;
             for (Position step : get_positions_between(king, new_king))
@@ -203,7 +203,8 @@ namespace rule
     bool register_promotion(std::vector<Move>& moves,
                             const Position& from,
                             const Position& to,
-                            const Color& color)
+                            const Color& color,
+                            bool capture)
     {
         // Have the pawn reached the end?
         if (to.get_rank() != (color == Color::BLACK ? Rank::ONE : Rank::EIGHT))
@@ -211,20 +212,17 @@ namespace rule
 
         // Create the moves
         moves.emplace_back(from, to, PieceType::PAWN,
-                           false, false, false, false, false,
+                           capture, false, false, false, false,
                            PieceType::QUEEN);
         moves.emplace_back(from, to, PieceType::PAWN,
-                           false, false, false, false, false,
+                           capture, false, false, false, false,
                            PieceType::ROOK);
         moves.emplace_back(from, to, PieceType::PAWN,
-                           false, false, false, false, false,
+                           capture, false, false, false, false,
                            PieceType::BISHOP);
         moves.emplace_back(from, to, PieceType::PAWN,
-                           false, false, false, false, false,
+                           capture, false, false, false, false,
                            PieceType::KNIGHT);
-        moves.emplace_back(from, to, PieceType::PAWN,
-                           false, false, false, false, false,
-                           PieceType::PAWN);
         return true;
     }
 
@@ -279,7 +277,7 @@ namespace rule
                 : from.move(0,  1);
             if (to_forward && !board[*to_forward])
             {
-                if (!register_promotion(res, from, *to_forward, color))
+                if (!register_promotion(res, from, *to_forward, color, false))
                     res.emplace_back(from, *to_forward, piece,
                                      false, false, false, false, false);
             }
@@ -308,16 +306,18 @@ namespace rule
                     (board[*to_diag_left] && board[*to_diag_left]->second != color)
                     || (board.get_en_passant() == *to_diag_left)))
             {
-                res.emplace_back(from, *to_diag_left, piece,
-                                 true, false, false, false, false);
+                if (!register_promotion(res, from, *to_diag_left, color, true))
+                    res.emplace_back(from, *to_diag_left, piece,
+                                     true, false, false, false, false);
             }
 
             if (to_diag_right && (
                     (board[*to_diag_right] && board[*to_diag_right]->second != color)
                     || (board.get_en_passant() == *to_diag_right)))
             {
-                res.emplace_back(from, *to_diag_right, piece,
-                                 true, false, false, false, false);
+                if (!register_promotion(res, from, *to_diag_right, color, true))
+                    res.emplace_back(from, *to_diag_right, piece,
+                                     true, false, false, false, false);
             }
         }
 

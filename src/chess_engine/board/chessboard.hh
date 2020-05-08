@@ -40,6 +40,8 @@ namespace board
 
         Chessboard();
         Chessboard(const FenObject&);
+        Chessboard(const std::string& str, const Color& color):
+            Chessboard(parse_perft(str + ((color == Color::WHITE) ? std::string(" w - - 0 0 0") : std::string(" b - - 0 0 0")))) {}
         Chessboard(const PerftObject& perft):
             Chessboard(perft.get_fen()) {}
         Chessboard(const std::string& fen_string):
@@ -57,6 +59,7 @@ namespace board
         bool is_check(void);
         bool is_checkmate(void);
         bool is_draw(void);
+        bool is_pat(void);
 
         opt_piece_t operator[](const Position& position) const override;
 
@@ -68,7 +71,7 @@ namespace board
         bool get_queen_castling(const Color& color) const;
 
         Position get_king_position(void) const;
-        
+
         friend std::ostream& operator<<(std::ostream& os, const Chessboard& board);
 
     private:
