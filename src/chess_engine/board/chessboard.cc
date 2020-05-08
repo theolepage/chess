@@ -286,7 +286,7 @@ namespace board
     // TODO handle threefold repetition
     bool Chessboard::is_draw()
     {
-        return last_fifty_turn_ >= 50 || generate_legal_moves().empty();
+        return last_fifty_turn_ >= 50 || (!is_check() && generate_legal_moves().empty());
     }
 
     bool Chessboard::get_white_turn() const
