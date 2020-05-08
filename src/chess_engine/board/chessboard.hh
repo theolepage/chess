@@ -102,7 +102,6 @@ namespace board
 
         void init_end_ranks(PieceType piecetype, File file);
         void symetric_init_end_ranks(PieceType piecetype, File file);
-        void set_piece(const PieceType& piece_type, const Color& color, const Position& move);
 
         bool is_move_possible(const Move& move) const;
         bool is_possible_move_legal(const Move& move) const;
