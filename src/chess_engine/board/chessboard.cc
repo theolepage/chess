@@ -356,7 +356,7 @@ namespace board
         return false;
     }
 
-    bool Chessboard::is_check_mate(void)
+    bool Chessboard::is_checkmate(void)
     {
         return is_check() && generate_legal_moves().empty();
     }

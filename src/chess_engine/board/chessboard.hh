@@ -55,7 +55,7 @@ namespace board
         bool is_move_legal(const Move& move) const;
 
         bool is_check(void);
-        bool is_check_mate(void);
+        bool is_checkmate(void);
         bool is_draw(void);
 
         opt_piece_t operator[](const Position& position) const override;
