@@ -239,6 +239,11 @@ Move dummy_promotion_capture(const Position& start, const Position& end, PieceTy
     return Move(start, end, PieceType::PAWN, true, false, false, false, false, promotion);
 }
 
+Move dummy_castling_move(const Position& king_start, const Position& king_end, bool king_side)
+{
+    return Move(king_start, king_end, PieceType::KING, false, false, !king_side, king_side, false, std::nullopt);
+}
+
 TEST(Checkboard, Copy)
 {
     Chessboard board;
@@ -567,6 +572,32 @@ TEST(Castling, Illegal)
         EXPECT_FALSE(move.king_castling_get());
         EXPECT_FALSE(move.queen_castling_get());
     }
+}
+
+TEST(Castling, WhiteKingSideBlackQueenSide)
+{
+    Chessboard board = Chessboard(parse_perft("r3k3/8/8/8/8/8/8/4K2R w Kq - 0 0 0"));
+
+    auto black_king_start = Position(File::E, Rank::EIGHT);
+    auto black_rook_start = Position(File::A, Rank::EIGHT);
+    auto white_king_start = Position(File::E, Rank::ONE);
+    auto white_rook_start = Position(File::H, Rank::ONE);
+
+    auto black_king_end = Position(File::C, Rank::EIGHT);
+    auto black_rook_end = Position(File::D, Rank::EIGHT);
+    auto white_king_end = Position(File::G, Rank::ONE);
+    auto white_rook_end = Position(File::F, Rank::ONE);
+
+    board.do_move(dummy_castling_move(white_king_start, white_king_end, true));
+    board.do_move(dummy_castling_move(black_king_start, black_king_end, false));
+
+    EXPECT_PIECE(board[black_king_end], PieceType::KING, Color::BLACK);
+    EXPECT_PIECE(board[black_rook_end], PieceType::ROOK, Color::BLACK);
+    EXPECT_PIECE(board[white_king_end], PieceType::KING, Color::WHITE);
+    EXPECT_PIECE(board[white_rook_end], PieceType::ROOK, Color::WHITE);
+
+    for (auto pos : {black_king_start, black_rook_start, white_king_start, white_rook_start})
+        EXPECT_NO_PIECE(board[pos]);
 }
 
 
