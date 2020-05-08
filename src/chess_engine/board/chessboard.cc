@@ -146,9 +146,15 @@ namespace board
 
     std::vector<Move> Chessboard::generate_legal_moves()
     {
-        // FIXME
+        std::vector<Move> legal_moves;
 
-        return std::vector<Move>();
+        std::vector<Move> possible_moves = rule::generate_moves(*this);
+
+        for (Move move : possible_moves)
+            if (is_move_legal(move))
+                legal_moves.push_back(move);
+
+        return legal_moves;
     }
 
     void Chessboard::do_move(const Move& move)
