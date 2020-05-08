@@ -122,6 +122,8 @@ namespace board
         // First make the move but in the opposite direction
         const Move reversed = move.get_reverse();
         do_move(reversed);
+        // After the first do_move, the turn changed
+        white_turn_ = !white_turn_; // We restore it cause we need to know who was playing
 
         // Then restore any eaten piece that was at end position
         if (state.ate)
@@ -147,6 +149,16 @@ namespace board
         {
             en_passant_ = Position(state.x, state.y);
         }
+
+        /**
+        * The white_turn is already good exemple:
+        * The white are playing, white_turn_ == white, we make do move
+        * Now white_turn == black
+        * We calculate the number of valide move
+        * The call undomove which stat by toggeling white_turn, so back to white
+        * Thus, we started with the white playing, at the end it's still their turn
+        * We can then process to inspect the number of possibilites with the next move
+        */
     }
 
     bool Chessboard::is_move_legal(const Move& move)

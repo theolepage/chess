@@ -60,6 +60,7 @@ namespace option_parser
         return buffer.str();
     }
 
+    // Would be better in it's own file but fails when I try
     static uint64_t get_perft_value(board::Chessboard& board, int depth) // TODO generate legal moves shoudld be const
     {
         if (depth == 0)
