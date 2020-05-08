@@ -106,11 +106,11 @@ namespace board
         bool is_move_possible(const Move& move) const;
         bool is_possible_move_legal(const Move& move) const;
 
-        void register_double_pawn_push(const Move& move);
+        void register_double_pawn_push(const Move& move, Color color);
         void forget_en_passant();
         void update_last_fifty_turn(const Move& move);
-        void eat_en_passant(const Move& move);
-        void move_castling_rook(const Move& move);
+        void eat_en_passant(const Move& move, Color color);
+        void move_castling_rook(const Move& move, Color color);
     };
 
     /*

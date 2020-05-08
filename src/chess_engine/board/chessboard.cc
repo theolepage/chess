@@ -178,11 +178,10 @@ namespace board
         return legal_moves;
     }
 
-    void Chessboard::register_double_pawn_push(const Move& move)
+    void Chessboard::register_double_pawn_push(const Move& move, Color color)
     {
         const Position& start = move.start_get();
         const Position& end = move.end_get();
-        const Color color = (*this)[start].value().second;
 
         const auto start_rank_i = utils::utype(start.get_rank());
         const auto en_passant_rank_i = start_rank_i + (color == Color::WHITE ? 1 : -1);
@@ -205,11 +204,9 @@ namespace board
             last_fifty_turn_++;
     }
 
-    void Chessboard::eat_en_passant(const Move& move)
+    void Chessboard::eat_en_passant(const Move& move, Color color)
     {
-        const Position& start = move.start_get();
         const Position& end = move.end_get();
-        const Color color = (*this)[start].value().second;
 
         const auto en_passant_rank_i = utils::utype(end.get_rank());
         const auto eaten_pawn_rank_i = en_passant_rank_i +
@@ -223,11 +220,9 @@ namespace board
                        PieceType::PAWN, eaten_pawn_color);
     }
 
-    void Chessboard::move_castling_rook(const Move& move)
+    void Chessboard::move_castling_rook(const Move& move, Color color)
     {
-        const Position& start = move.start_get();
         const Position& end = move.end_get();
-        const Color color = (*this)[start].value().second;
 
         const auto king_file_i = utils::utype(end.get_file());
         const auto king_rank = end.get_rank();
@@ -253,16 +248,16 @@ namespace board
 
         // NOTE if a move is a double pawn push, then it cannot be a capture
         if (move.double_pawn_push_get())
-            register_double_pawn_push(move);
+            register_double_pawn_push(move, color);
         else
         {
             forget_en_passant();
             update_last_fifty_turn(move);
 
             if (move.en_passant_get())
-                eat_en_passant(move);
+                eat_en_passant(move, color);
             else if (move.castling_get())
-                move_castling_rook(move);
+                move_castling_rook(move, color);
             else if (move.promotion_get().has_value())
             {
                 const auto new_piecetype = move.promotion_get().value();
