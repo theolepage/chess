@@ -9,6 +9,7 @@
 
 #define NOTIFY(FUNC) for (auto listener : listeners_) listener->FUNC
 #define GET_COLOR() chessboard_.get_white_turn() ? board::Color::WHITE : board::Color::BLACK
+#define GET_OTHER_COLOR() chessboard_.get_white_turn() ? board::Color::BLACK : board::Color::WHITE
 
 namespace listener
 {
@@ -23,9 +24,10 @@ namespace listener
             NOTIFY(on_piece_promoted(move.promotion_get().value(),
                                         move.end_get()));
         if (move.king_castling_get())
-            NOTIFY(on_kingside_castling(GET_COLOR()));
+            NOTIFY(on_kingside_castling(GET_OTHER_COLOR()));
+            // move already done so color changed
         if (move.queen_castling_get())
-            NOTIFY(on_queenside_castling(GET_COLOR()));
+            NOTIFY(on_queenside_castling(GET_OTHER_COLOR()));
     }
 
     bool ListenerManager::notify_board_state()
@@ -60,7 +62,7 @@ namespace listener
         else
         {
             NOTIFY(on_player_disqualified(GET_COLOR()));
-            return false;
+            return false; // FIXME what should I do
         }
         return notify_board_state();
     }
@@ -68,14 +70,14 @@ namespace listener
     void ListenerManager::play_ai(void)
     {
         // FIXME
-        ai::init("NameOfOurBeautifulAi");
+        ai::init("NameOfOurBeautifulAi"); // change namespace
 
         /* TODO draft
         register_board(ai::get_board()) // FIXME do not call get board twice
         while( ? True ? ):
-            board = ai::get_board
+            board = ai::get_board()
             if (board.is_checkmate())
-                break;
+                break; //FIXME
             Move move = ai.search(board)
             ai::play_move(move_to_str(move))
             notify_move(move)
@@ -97,7 +99,7 @@ namespace listener
         board::Move move = moves[0].to_Move();
         if (!do_move_and_notify(move))
         {
-            NOTIFY(on_game_finished());
+            NOTIFY(on_game_finished()); // FIXME should I quit after a disqualified
             return;
         }
 
@@ -108,7 +110,7 @@ namespace listener
             if (!do_move_and_notify(move))
             {
                 NOTIFY(on_game_finished());
-                break;
+                break; // FIXME should I end game
             }
         }
     }

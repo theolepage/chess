@@ -11,7 +11,10 @@ namespace listener
     class ListenerManager : public board::ChessboardInterface
     {
     public:
-        virtual opt_piece_t operator[](const board::Position& /*position*/) const;
+        virtual opt_piece_t operator[](const board::Position& position) const override
+        {
+            return chessboard_[position];
+        }
 
         void play_ai(void);
 
