@@ -200,34 +200,37 @@ namespace board
         white_turn_ = !white_turn_;
     }
 
+    // TODO make sure to do some tests with malformed moves
     bool Chessboard::is_move_legal(const Move& move)
     {
-        std::vector<Move> legal_moves;
+        std::vector<Move> possible_piecetype_moves;
 
         switch (move.piece_get())
         {
             case PieceType::QUEEN:
-                legal_moves = rule::generate_queen_moves(*this);
+                possible_piecetype_moves = rule::generate_queen_moves(*this);
                 break;
             case PieceType::ROOK:
-                legal_moves = rule::generate_rook_moves(*this);
+                possible_piecetype_moves = rule::generate_rook_moves(*this);
                 break;
             case PieceType::BISHOP:
-                legal_moves = rule::generate_bishop_moves(*this);
+                possible_piecetype_moves = rule::generate_bishop_moves(*this);
                 break;
             case PieceType::KNIGHT:
-                legal_moves = rule::generate_knight_moves(*this);
+                possible_piecetype_moves = rule::generate_knight_moves(*this);
                 break;
             case PieceType::PAWN:
-                legal_moves = rule::generate_pawn_moves(*this);
+                possible_piecetype_moves = rule::generate_pawn_moves(*this);
                 break;
             case PieceType::KING:
-                legal_moves = rule::generate_king_moves(*this);
+                possible_piecetype_moves = rule::generate_king_moves(*this);
                 break;
         };
 
-        return std::find(legal_moves.begin(), legal_moves.end(), move) !=
-            legal_moves.end();
+        auto start = possible_piecetype_moves.begin();
+        auto end = possible_piecetype_moves.end();
+
+        return std::find(start, end, move) != end;
     }
 
     bool Chessboard::is_check()
