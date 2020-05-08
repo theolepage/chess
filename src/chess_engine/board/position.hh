@@ -20,7 +20,7 @@ namespace board
         E = 4,
         F = 5,
         G = 6,
-        H = 7,
+        H = 7
     };
 
     /* The rank enum represent the lines
@@ -34,13 +34,14 @@ namespace board
         FIVE = 4,
         SIX = 5,
         SEVEN = 6,
-        EIGHT = 7,
+        EIGHT = 7
     };
 
     /* Position represent a coordinate on the board */
     class Position final
     {
     public:
+        // (x, y)
         Position(File file, Rank rank);
 
         Position(char file, char rank)
@@ -59,8 +60,8 @@ namespace board
         std::optional<Position> move(int file, int rank) const;
 
     private:
-        File file_;
-        Rank rank_;
+        File file_; // col / x
+        Rank rank_; // line / y
     };
 
 } // namespace board
