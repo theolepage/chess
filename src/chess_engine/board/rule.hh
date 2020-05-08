@@ -12,9 +12,9 @@ using namespace board;
 
 namespace rule
 {
-    int count_pieces_between(const Chessboard& board,
-                             const Position& x,
-                             const Position& y);
+    bool count_pieces_between(const Chessboard& board,
+                              const Position& x,
+                              const Position& y);
 
     std::vector<Position> get_pieces_positions(const Chessboard& board,
                                                const PieceType& piece,

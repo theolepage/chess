@@ -66,9 +66,9 @@ TEST(rule, count_pieces_between_simple)
     Position a = Position(File::A, Rank::SEVEN);
     Position b = Position(File::D, Rank::FOUR);
 
-    int res = count_pieces_between(board, a, b);
+    bool res = count_pieces_between(board, a, b);
 
-    EXPECT_EQ(res, 0);
+    EXPECT_EQ(false, res);
 }
 
 TEST(rule, count_pieces_between_simple_2)
@@ -77,9 +77,9 @@ TEST(rule, count_pieces_between_simple_2)
     Position a = Position(File::C, Rank::SEVEN);
     Position b = Position(File::C, Rank::SIX);
 
-    int res = count_pieces_between(board, a, b);
+    bool res = count_pieces_between(board, a, b);
 
-    EXPECT_EQ(0, res);
+    EXPECT_EQ(false, res);
 }
 
 TEST(rule, get_authorized_pos_simple)

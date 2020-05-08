@@ -61,15 +61,15 @@ namespace rule
         return res;
     }
 
-    int count_pieces_between(const Chessboard& board,
+    bool count_pieces_between(const Chessboard& board,
                              const Position& x,
                              const Position& y)
     {
-        int res = -1;
+        int res = -2;
         for (Position pos : get_positions_between(x, y))
             if (board[pos].has_value())
                 res++;
-        return res;
+        return res > 0;
     }
 
     static void register_pos(std::vector<Position>& v,
@@ -148,7 +148,7 @@ namespace rule
         // piece to go through a cell that already contains another
         // piece - regardless of its color (except for the Knight).
         if (piece != PieceType::KNIGHT)
-            if (count_pieces_between(board, from, to) != 0)
+            if (!count_pieces_between(board, from, to))
                 return std::nullopt;
 
         // Handle "en passant": if cell is free and is
@@ -177,7 +177,7 @@ namespace rule
         const bool castling_allowed = king_castling
             ? board.get_king_castling(color)
             : board.get_queen_castling(color);
-        if (castling_allowed && count_pieces_between(board, king, rook) == 0)
+        if (castling_allowed && !count_pieces_between(board, king, rook))
         {
             bool not_in_check = true;
             for (Position step : get_positions_between(king, new_king))
