@@ -12,17 +12,17 @@ using namespace board;
 
 namespace rule
 {
+    int count_pieces_between(const Chessboard& board,
+                             const Position& x,
+                             const Position& y);
+
     std::vector<Position> get_pieces_positions(const Chessboard& board,
                                                const PieceType& piece,
                                                const Color& color);
 
     std::vector<Position> get_positions_between(const Position& x,
                                                 const Position& y);
-
-    int count_pieces_between(const Chessboard& board,
-                             const Position& x,
-                             const Position& y);
-
+    
     std::vector<Position> get_authorized_pos(const PieceType& piece,
                                              const Position& from);
 
@@ -31,6 +31,18 @@ namespace rule
                                           const Color& color,
                                           const Position& from,
                                           const Position& to);
+
+    std::optional<Move> register_castling(const Chessboard& board,
+                                          const Color& color,
+                                          bool king_castling);
+
+    void register_promotion(std::vector<Move>& moves,
+                            const Position& from,
+                            const Position& to,
+                            const Color& color);
+
+    std::vector<Move> generate_moves(const Chessboard& board,
+                                     const PieceType& piece);
 
     std::vector<Move> generate_pawn_moves(const Chessboard& board);
     std::vector<Move> generate_king_moves(const Chessboard& board);

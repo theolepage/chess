@@ -19,8 +19,12 @@ namespace rule
             for (size_t rank = 0; rank < Chessboard::width; rank++)
             {
                 Position pos(static_cast<File>(file), static_cast<Rank>(rank));
-                if (board[pos]->first == piece && board[pos]->second == color)
+                if (board[pos].has_value()
+                    && board[pos]->first == piece
+                    && board[pos]->second == color)
+                {
                     res.push_back(pos);
+                }
             }
         }
 
@@ -158,10 +162,9 @@ namespace rule
         return Move(from, to, piece, capture, false, false, false, false);
     }
 
-    void register_castling(const Chessboard& board,
-                           std::vector<Move>& moves,
-                           const Color& color,
-                           bool king_castling)
+    std::optional<Move> register_castling(const Chessboard& board,
+                                          const Color& color,
+                                          bool king_castling)
     {
         // Find positions of king and rook
         const Rank rank = (color == Color::WHITE) ? Rank::ONE : Rank::EIGHT;
@@ -190,11 +193,12 @@ namespace rule
             if (not_in_check)
             {
                 if (king_castling)
-                    moves.emplace_back(king, new_king, PieceType::KING, false, false, false, true, false);
+                    return Move(king, new_king, PieceType::KING, false, false, false, true, false);
                 else
-                    moves.emplace_back(king, new_king, PieceType::KING, false, false, true, false, false);
+                    return Move(king, new_king, PieceType::KING, false, false, true, false, false);
             }
         }
+        return std::nullopt;
     }
 
     void register_promotion(std::vector<Move>& moves,
@@ -241,7 +245,7 @@ namespace rule
                 // Step 2: Possible (cell occupied, capture?)
                 const auto move = get_possible_move(board, piece, color, from, to);
                 if (move)
-                    res.emplace_back(*move);
+                    res.push_back(*move);
 
                 // Handle promotion
                 if (piece == PieceType::PAWN)
@@ -251,8 +255,12 @@ namespace rule
             // Handle castling moves
             if (piece == PieceType::KING)
             {
-                register_castling(board, res, color, true);
-                register_castling(board, res, color, false);
+                const auto king_castling = register_castling(board, color, true);
+                const auto queen_castling = register_castling(board, color, false);
+                if (king_castling)
+                    res.push_back(*king_castling);
+                if (queen_castling)
+                    res.push_back(*queen_castling);
             }
         }
 
@@ -281,8 +289,8 @@ namespace rule
                 ? from.move(0, -2)
                 : from.move(0,  2);
             const bool first_move = (color == Color::BLACK)
-                ? from.get_rank() == Rank::TWO
-                : from.get_rank() == Rank::SEVEN;
+                ? from.get_rank() == Rank::SEVEN
+                : from.get_rank() == Rank::TWO;
             if (first_move && to_forward_2 && !board[*to_forward_2])
                 res.emplace_back(from, *to_forward_2, piece,
                                  false, true, false, false, false);

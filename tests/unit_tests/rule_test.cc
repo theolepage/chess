@@ -6,6 +6,15 @@
 using namespace board;
 using namespace rule;
 
+TEST(rule, get_pieces_positions_pawn)
+{
+    Chessboard board = Chessboard();
+
+    std::vector<Position> res = get_pieces_positions(board, PieceType::PAWN, Color::WHITE);
+
+    EXPECT_EQ(res.size(), 8);
+}
+
 TEST(rule, get_pieces_positions_king)
 {
     Chessboard board = Chessboard();
@@ -88,7 +97,7 @@ TEST(rule, get_authorized_pos_simple)
     EXPECT_EQ(queen.size(), 21);
 }
 
-TEST(rule, get_possible_move_pawn_simple)
+TEST(rule, get_possible_move_pawn)
 {
     Chessboard board = Chessboard();
     
@@ -107,17 +116,96 @@ TEST(rule, get_possible_move_pawn_simple)
     std::optional<Move> forward_3 = get_possible_move(board,
         PieceType::PAWN,
         Color::BLACK,
-        Position(File::C, Rank::FIVE),
-        Position(File::C, Rank::THREE));
+        Position(File::C, Rank::SIX),
+        Position(File::C, Rank::FOUR));
 
     EXPECT_EQ(forward_1.has_value(), true);
     EXPECT_EQ(forward_2.has_value(), true);
     EXPECT_EQ(forward_3.has_value(), false);
 }
 
-// To-Do: register castling
-// To-Do: register promotion
-// To-Do: generate_moves
+TEST(rule, get_possible_move_knight)
+{
+    Chessboard board = Chessboard();
+    
+    std::optional<Move> forward_1 = get_possible_move(board,
+        PieceType::KNIGHT,
+        Color::BLACK,
+        Position(File::B, Rank::EIGHT),
+        Position(File::C, Rank::SIX));
+
+    std::optional<Move> forward_2 = get_possible_move(board,
+        PieceType::KNIGHT,
+        Color::BLACK,
+        Position(File::B, Rank::EIGHT),
+        Position(File::D, Rank::SEVEN));
+
+    EXPECT_EQ(forward_1.has_value(), true);
+    EXPECT_EQ(forward_2.has_value(), false);
+}
+
+TEST(rule, get_possible_move_queen)
+{
+    Chessboard board = Chessboard();
+    
+    std::optional<Move> forward_1 = get_possible_move(board,
+        PieceType::QUEEN,
+        Color::BLACK,
+        Position(File::D, Rank::EIGHT),
+        Position(File::F, Rank::SIX));
+
+    std::optional<Move> forward_2 = get_possible_move(board,
+        PieceType::QUEEN,
+        Color::BLACK,
+        Position(File::D, Rank::EIGHT),
+        Position(File::D, Rank::SIX));
+
+    EXPECT_EQ(forward_1.has_value(), false);
+    EXPECT_EQ(forward_2.has_value(), false);
+}
+
+TEST(rule, register_castling_simple)
+{
+    Chessboard board = Chessboard();
+    
+    std::optional<Move> king = register_castling(board, Color::BLACK, true);
+    std::optional<Move> queen = register_castling(board, Color::BLACK, false);
+
+    EXPECT_EQ(king.has_value(), false);
+    EXPECT_EQ(queen.has_value(), false);
+}
+
+TEST(rule, register_promotion_simple)
+{
+    std::vector<Move> res;
+
+    register_promotion(res,
+        Position(File::C, Rank::SEVEN),
+        Position(File::C, Rank::EIGHT),
+        Color::WHITE);
+
+    EXPECT_EQ(res.size(), 5);
+}
+
+TEST(rule, generate_moves_simple)
+{
+    Chessboard board = Chessboard();
+
+    auto bishop = generate_moves(board, PieceType::BISHOP);
+    auto knight = generate_moves(board, PieceType::KNIGHT);
+
+    EXPECT_EQ(bishop.size(), 0);
+    EXPECT_EQ(knight.size(), 4);
+}
+
+TEST(rule, generate_pawn_moves_simple)
+{
+    Chessboard board = Chessboard();
+
+    auto res = generate_pawn_moves(board);
+
+    EXPECT_EQ(res.size(), 16);
+}
 
 int main(int argc, char *argv[])
 {
