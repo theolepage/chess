@@ -509,6 +509,37 @@ TEST(Draw, FiftyLastTurns2)
     EXPECT_FALSE(board.is_draw());
 }
 
+TEST(Checkmate, True)
+{
+    // This is the subject example
+    Chessboard white_checkmate_board = Chessboard(parse_perft("8/8/8/8/1k6/8/3q2r1/3K4 w - - 0 0 0"));
+
+    EXPECT_TRUE(white_checkmate_board.is_checkmate());
+}
+
+TEST(Checkmate, False)
+{
+    // Slightly modified subject example
+    Chessboard white_check_board = Chessboard(parse_perft("8/8/8/8/1k6/8/3q2r1/2K5 w - - 0 0 0"));
+
+    EXPECT_FALSE(white_check_board.is_checkmate());
+}
+
+TEST(Check, True)
+{
+    // Slightly modified subject example
+    Chessboard white_check_board = Chessboard(parse_perft("8/8/8/8/1k6/8/3q2r1/2K5 w - - 0 0 0"));
+
+    EXPECT_TRUE(white_check_board.is_check());
+}
+
+TEST(Check, False)
+{
+    Chessboard white_check_board = Chessboard(parse_perft("8/5K2/5P2/8/1k6/5r2/3q4/8 w - - 0 0 0"));
+
+    EXPECT_FALSE(white_check_board.is_check());
+}
+
 
 // To start tests
 int main(int argc, char **argv) {
