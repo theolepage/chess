@@ -38,10 +38,12 @@ namespace perft_parser
         std::vector<std::string> ranks;
         boost::split(ranks, splited_input.at(0), boost::is_any_of("/"));
 
+        // TODO find more opti than that
+        // Need to push front since ranks are given from 8 to 1
         std::vector<FenRank> franks;
         for (const std::string& rank : ranks)
         {
-            franks.emplace_back(FenRank(rank));
+            franks.insert(franks.begin(), FenRank(rank));
         }
 
         // Color

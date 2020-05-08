@@ -1,7 +1,6 @@
 #pragma once
 
 #include "fen-object.hh"
-#include "chess_engine/board/chessboard.hh"
 
 namespace perft_parser
 {
@@ -33,11 +32,6 @@ namespace perft_parser
         bool operator!=(const PerftObject& rhs) const
         {
             return !(*this == rhs);
-        }
-
-        board::Chessboard get_board() const
-        {
-            return board::Chessboard(); // TODO replace with alan implem
         }
 
     private:

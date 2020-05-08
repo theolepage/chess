@@ -101,7 +101,7 @@ namespace option_parser
     static void on_perft(std::string path)
     {
         perft_parser::PerftObject perftobj = perft_parser::parse_perft(get_file_content(path));
-        board::Chessboard chessboard = perftobj.get_board();
+        board::Chessboard chessboard(perftobj);
         std::cout << get_perft_value(chessboard, perftobj.get_depth()) << std::endl;
     }
 
