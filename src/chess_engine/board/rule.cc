@@ -1,3 +1,5 @@
+// To-Do: handle en passant capture for pawns
+
 #include <vector>
 
 #include "chess_engine/board/chessboard.hh"
@@ -201,14 +203,14 @@ namespace rule
         return std::nullopt;
     }
 
-    void register_promotion(std::vector<Move>& moves,
+    bool register_promotion(std::vector<Move>& moves,
                             const Position& from,
                             const Position& to,
                             const Color& color)
     {
         // Have the pawn reached the end?
         if (to.get_rank() != (color == Color::BLACK ? Rank::ONE : Rank::EIGHT))
-            return;
+            return false;
 
         // Create the moves
         moves.emplace_back(from, to, PieceType::PAWN,
@@ -226,6 +228,7 @@ namespace rule
         moves.emplace_back(from, to, PieceType::PAWN,
                            false, false, false, false, false,
                            PieceType::PAWN);
+        return true;
     }
 
     std::vector<Move> generate_moves(const Chessboard& board,
@@ -246,10 +249,6 @@ namespace rule
                 const auto move = get_possible_move(board, piece, color, from, to);
                 if (move)
                     res.push_back(*move);
-
-                // Handle promotion
-                if (piece == PieceType::PAWN)
-                    register_promotion(res, from, to, color);
             }
 
             // Handle castling moves
@@ -282,8 +281,11 @@ namespace rule
                 ? from.move(0, -1)
                 : from.move(0,  1);
             if (to_forward && !board[*to_forward])
-                res.emplace_back(from, *to_forward, piece,
-                                 false, false, false, false, false);
+            {
+                if (!register_promotion(res, from, *to_forward, color))
+                    res.emplace_back(from, *to_forward, piece,
+                                     false, false, false, false, false);
+            }
 
             const std::optional<Position> to_forward_2 = (color == Color::BLACK)
                 ? from.move(0, -2)
@@ -308,14 +310,18 @@ namespace rule
             if (to_diag_left
                 && board[*to_diag_left]
                 && board[*to_diag_left]->second != color)
+            {
                 res.emplace_back(from, *to_diag_left, piece,
                                  true, false, false, false, false);
+            }
 
             if (to_diag_right
                 && board[*to_diag_right]
                 && board[*to_diag_right]->second != color)
+            {
                 res.emplace_back(from, *to_diag_right, piece,
                                  true, false, false, false, false);
+            }
         }
 
         return res;

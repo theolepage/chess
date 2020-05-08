@@ -36,7 +36,7 @@ namespace rule
                                           const Color& color,
                                           bool king_castling);
 
-    void register_promotion(std::vector<Move>& moves,
+    bool register_promotion(std::vector<Move>& moves,
                             const Position& from,
                             const Position& to,
                             const Color& color);
