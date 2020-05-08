@@ -8,8 +8,14 @@
 #include <algorithm>
 
 #include "chessboard-interface.hh"
-#include "../../parsing/perft_parser/perft-parser.hh"
+#include "parsing/perft_parser/perft-parser.hh"
+#include "parsing/perft_parser/fen-object.hh"
+#include "parsing/perft_parser/perft-object.hh"
 #include "move.hh"
+#include "parsing/option_parser/option-parser.hh"
+#include "position.hh"
+#include "piece-type.hh"
+#include "color.hh"
 
 // Il était tard et j'avais la flemme
 // Kèstuvafér
@@ -35,7 +41,7 @@ namespace board
         Chessboard();
         Chessboard(const FenObject&);
         Chessboard(const PerftObject& perft):
-            Chessboard(perft.fen_get()) {}
+            Chessboard(perft.get_fen()) {}
         Chessboard(const std::string& fen_string):
             Chessboard(parse_perft(fen_string + std::string(" w - - 0 0 0"))) {}
 
@@ -44,6 +50,7 @@ namespace board
 
         // Assume that move is legal
         void do_move(const Move& move);
+        void undo_move(const Move& move, const option_parser::BoardState& state);
 
         bool is_move_legal(const Move& move) const;
 
@@ -65,6 +72,12 @@ namespace board
         friend std::ostream& operator<<(std::ostream& os, const Chessboard& board);
 
     private:
+        /**
+         * First access white or black
+         * Then access the piece
+         * Then the line
+         * Then the row
+        */
         std::array<bitboard_t, nb_pieces> white_bitboards_;
         std::array<bitboard_t, nb_pieces> black_bitboards_;
 
@@ -87,6 +100,7 @@ namespace board
 
         void init_end_ranks(PieceType piecetype, File file);
         void symetric_init_end_ranks(PieceType piecetype, File file);
+        void set_piece(const PieceType& piece_type, const Color& color, const Position& move);
 
         bool is_move_possible(const Move& move) const;
         bool is_possible_move_legal(const Move& move) const;

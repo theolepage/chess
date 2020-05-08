@@ -1,8 +1,33 @@
 #include "chessboard.hh"
+
 #include "rule.hh"
+#include "piece-type.hh"
+#include "color.hh"
+#include "position.hh"
+#include "move.hh"
 
 namespace board
 {
+    void Chessboard::set_piece(const PieceType& piece_type, const Color& color, const Position& move)
+    {
+        if (color == Color::WHITE)
+        {
+            const u_int8_t piece_indice = utils::utype(piece_type);
+            const u_int8_t y = utils::utype(move.get_rank());
+            const u_int8_t x = utils::utype(move.get_file());
+
+            white_bitboards_[piece_indice][y].set(x);
+        }
+        else
+        {
+            const u_int8_t piece_indice = utils::utype(piece_type);
+            const u_int8_t y = utils::utype(move.get_rank());
+            const u_int8_t x = utils::utype(move.get_file());
+
+            white_bitboards_[piece_indice][y].set(x);
+        }
+    }
+
     const Chessboard::bitboard_t& Chessboard::get_bitboard(PieceType piecetype, Color color) const
     {
         const auto piecetype_i = utils::utype(piecetype);
@@ -211,6 +236,47 @@ namespace board
         white_turn_ = !white_turn_;
     }
 
+    void Chessboard::undo_move(const Move& move, const option_parser::BoardState& state)
+    {
+        // First make the move but in the opposite direction
+        const Move reversed = move.get_reverse();
+        do_move(reversed);
+
+        // Then restore any eaten piece that was at end position
+        if (state.ate)
+        {
+            if (white_turn_) // The white was currently playing, a black piece was eaten
+            {
+                set_piece(static_cast<PieceType>(state.piece_type), Color::BLACK, move.end_get());
+            }
+            else
+            {
+                set_piece(static_cast<PieceType>(state.piece_type), Color::WHITE, move.end_get());
+            }
+        }
+
+        // Now restore the state flags
+        white_king_castling_ = state.white_king_castling;
+        white_queen_castling_ = state.white_queen_castling;
+        black_king_castling_ = state.black_king_castling;
+        black_queen_castling_ = state.black_queen_castling;
+
+        // Also need to restore en passant
+        if (state.en_passant)
+        {
+            en_passant_ = Position(state.x, state.y);
+        }
+
+        /**
+        * The white_turn is already good exemple:
+        * The white are playing, white_turn_ == white, we make do move
+        * Now white_turn == black
+        * We calculate the number of valide move
+        * The call undomove which stat by toggeling white_turn, so back to white
+        * Thus, we started with the white playing, at the end it's still their turn
+        * We can then process to inspect the number of possibilites with the next move
+        */
+    }
     bool Chessboard::is_move_possible(const Move& move) const
     {
         std::vector<Move> possible_piecetype_moves;

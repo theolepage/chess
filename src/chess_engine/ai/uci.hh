@@ -2,6 +2,7 @@
 
 #include <string>
 
+// Interface to play with the chess engine with ai
 namespace ai
 {
     /** Initialize the communication with the GUI. This function should be

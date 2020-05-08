@@ -2,6 +2,7 @@
 
 #include <array>
 #include <optional>
+#include <cstdint>
 
 #include "chess_engine/ai/utype.hh"
 
@@ -11,14 +12,14 @@ namespace board
      * piece type present on the board. The char associated
      * with each value is the ascii char representing the
      * piece on the board */
-    enum class PieceType
+    enum class PieceType : uint8_t
     {
-        QUEEN,
-        ROOK,
-        BISHOP,
-        KNIGHT,
-        PAWN,
-        KING, // Last position allows better optimization (order-move)
+        QUEEN = 0,
+        ROOK = 1,
+        BISHOP = 2,
+        KNIGHT = 3,
+        PAWN = 4,
+        KING = 5 // Last position allows better optimization (order-move)
     };
 
     using opt_piecetype_t = std::optional<PieceType>;

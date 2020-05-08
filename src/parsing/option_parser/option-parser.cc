@@ -3,16 +3,23 @@
 #include <boost/program_options.hpp>
 #include <iostream>
 #include <vector>
+#include <fstream>
 #include <dlfcn.h>
 
 #include "listener/listener-manager.hh"
 #include "parsing/pgn_parser/pgn-parser.hh"
+#include "parsing/perft_parser/perft-object.hh"
+#include "parsing/perft_parser/perft-parser.hh"
 #include "listener/listener.hh"
 
 using namespace boost::program_options;
 
 namespace option_parser
 {
+    using side_piece_t = std::pair<board::PieceType, board::Color>;
+    using opt_piece_t = std::optional<side_piece_t>;
+    using opt_pos_t = std::optional<board::Position>;
+
     static void on_pgn(std::string path)
     {
         auto moves = pgn_parser::parse_pgn(path);
@@ -45,9 +52,56 @@ namespace option_parser
         }
     }
 
+    static std::string get_file_content(const std::string& path)
+    {
+        std::ifstream t(path);
+        std::stringstream buffer;
+        buffer << t.rdbuf();
+        return buffer.str();
+    }
+
+    // Would be better in it's own file but fails when I try
+    static uint64_t get_perft_value(board::Chessboard& board, int depth) // TODO generate legal moves shoudld be const
+    {
+        if (depth == 0)
+            return 1;
+        
+        std::vector<board::Move> move_list = board.generate_legal_moves(); // TODO reduce size based on depth
+
+        if (depth == 1)
+            return move_list.size();
+
+        u_int64_t nodes = 0; // TODO same
+
+        for (const board::Move& m : move_list) // TODO convert to indice
+        {
+            BoardState state; // Scope used to destroy eaten & en_passant object
+            {
+                opt_piece_t eaten = board[m.end_get()];
+                opt_pos_t en_passant = board.get_en_passant();
+                state.white_king_castling = board.get_king_castling(board::Color::WHITE);
+                state.white_queen_castling = board.get_queen_castling(board::Color::WHITE);
+                state.black_king_castling = board.get_king_castling(board::Color::BLACK);
+                state.black_queen_castling = board.get_queen_castling(board::Color::BLACK);
+                state.piece_type = ((eaten.has_value()) ? static_cast<uint8_t>(eaten.value().first) : 0);
+                state.ate = ((eaten.has_value()) ? 1 : 0);
+                state.x = ((en_passant.has_value()) ? static_cast<uint8_t>(en_passant.value().get_file()) : 0);
+                state.y = ((en_passant.has_value()) ? static_cast<uint8_t>(en_passant.value().get_rank()) : 0);
+                state.en_passant = ((en_passant.has_value()) ? 1 : 0);
+            }
+            board.do_move(m);
+            nodes += get_perft_value(board, depth - 1);
+            board.undo_move(m, state);
+        }
+
+        return nodes;
+    }
+
     static void on_perft(std::string path)
     {
-        std::cout << path << std::endl;
+        perft_parser::PerftObject perftobj = perft_parser::parse_perft(get_file_content(path));
+        board::Chessboard chessboard(perftobj);
+        std::cout << get_perft_value(chessboard, perftobj.get_depth()) << std::endl;
     }
 
     static void start_ai(void)
