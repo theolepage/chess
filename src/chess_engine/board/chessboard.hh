@@ -97,6 +97,8 @@ namespace board
         bitboard_t& get_bitboard(PieceType piecetype, Color color);
         void set_position(const Position& pos, PieceType piecetype, Color color);
         void unset_position(const Position& pos, PieceType piecetype, Color color);
+        void move_piece(const Position& start, const Position& end, PieceType piecetype, Color color);
+        void change_piece_type(const Position& pos, PieceType old_type, PieceType new_type, Color color);
 
         void init_end_ranks(PieceType piecetype, File file);
         void symetric_init_end_ranks(PieceType piecetype, File file);
