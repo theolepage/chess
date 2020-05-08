@@ -564,6 +564,21 @@ TEST(GenerateLegalMoves, Length)
     EXPECT_EQ(legal_moves.size(), nb_legal_moves);
 }
 
+TEST(Castling, Illegal)
+{
+    // Subject example
+    // Isn't legal because the black bishop would put the white king in check
+    Chessboard board = Chessboard(parse_perft("4k3/8/8/1b6/8/8/8/4K2R w - - 0 0 0"));
+
+    auto legal_moves = board.generate_legal_moves();
+
+    for (auto move : legal_moves)
+    {
+        EXPECT_FALSE(move.king_castling_get());
+        EXPECT_FALSE(move.queen_castling_get());
+    }
+}
+
 
 // To start tests
 int main(int argc, char **argv) {
