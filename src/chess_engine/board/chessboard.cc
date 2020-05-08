@@ -161,6 +161,7 @@ namespace board
         unset_position(start, piecetype, color);
         set_position(end, piecetype, color);
 
+        // NOTE if a move is a double pawn push, then it cannot be a capture
         if (move.double_pawn_push_get())
         {
             // double pawn push handling
@@ -174,6 +175,11 @@ namespace board
         {
             if (en_passant_.has_value())
                 en_passant_ = std::nullopt;
+
+            if (move.capture_get() || move.piece_get() == PieceType::PAWN)
+                last_fifty_turn_ = 0;
+            else
+                last_fifty_turn_++;
 
             // erase the eaten pawn
             if (move.en_passant_get())
@@ -236,10 +242,10 @@ namespace board
         return false;
     }
 
+    // TODO handle threefold repetition
     bool Chessboard::is_draw()
     {
-        // FIXME
-        return false;
+        return last_fifty_turn_ >= 50 || generate_legal_moves().empty();
     }
 
     bool Chessboard::get_white_turn() const
