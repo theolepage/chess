@@ -222,9 +222,6 @@ namespace rule
         moves.emplace_back(from, to, PieceType::PAWN,
                            false, false, false, false, false,
                            PieceType::KNIGHT);
-        moves.emplace_back(from, to, PieceType::PAWN,
-                           false, false, false, false, false,
-                           PieceType::PAWN);
         return true;
     }
 
