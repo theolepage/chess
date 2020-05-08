@@ -13,7 +13,12 @@ namespace board
         , report_(report)
         , queen_castling_(false)
         , king_castling_(false)
-    {}
+    {
+        double_pawn_push_ = (piece_ == board::PieceType::PAWN) &&
+                            (std::abs(utils::utype(start_.get_rank()) -
+                                 utils::utype(end_.get_rank())) ==
+                             2);
+    }
 
     PgnMove::PgnMove(const Position& start, const Position& end,
                      PieceType piece, bool capture, ReportType report,
@@ -29,8 +34,8 @@ namespace board
         , king_castling_(king_castling)
     {
         double_pawn_push_ = (piece_ == board::PieceType::PAWN) &&
-                            (utils::utype(start_.get_rank()) -
-                                 utils::utype(end_.get_rank()) + 8 % 8 ==
+                            (std::abs(utils::utype(start_.get_rank()) -
+                                 utils::utype(end_.get_rank())) ==
                              2);
     }
 
@@ -49,7 +54,7 @@ namespace board
                                    PieceType::KING,
                                    false,
                                    ReportType::NONE,
-                                   std::nullopt, false, true};
+                                   std::nullopt, true, false};
         static const PgnMove b_small{bking_pos,
                                      {File::G, Rank::EIGHT},
                                      PieceType::KING,
@@ -61,7 +66,7 @@ namespace board
                                    PieceType::KING,
                                    false,
                                    ReportType::NONE,
-                                   std::nullopt, false, true};
+                                   std::nullopt, true, false};
 
         if (color == Color::WHITE)
             return queen_side ? w_big : w_small;

@@ -52,6 +52,9 @@ namespace board
         // if the move is a capture
         bool capture_;
 
+        // type of report given by the pgn file
+        ReportType report_;
+
         // if the move is a queen_castling
         bool queen_castling_;
 
@@ -61,7 +64,5 @@ namespace board
         // if the move is a double_pawn_push
         bool double_pawn_push_;
 
-        // type of report given by the pgn file
-        ReportType report_;
     };
 } // namespace board
