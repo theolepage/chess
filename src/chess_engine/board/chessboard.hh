@@ -59,6 +59,7 @@ namespace board
         bool is_check(void);
         bool is_check_mate(void);
         bool is_draw(void);
+        bool is_pat(void);
 
         opt_piece_t operator[](const Position& position) const override;
 
@@ -70,7 +71,7 @@ namespace board
         bool get_queen_castling(const Color& color) const;
 
         Position get_king_position(void) const;
-        
+
         friend std::ostream& operator<<(std::ostream& os, const Chessboard& board);
 
     private:
