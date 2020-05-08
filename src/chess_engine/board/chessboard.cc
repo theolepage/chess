@@ -197,6 +197,7 @@ namespace board
             }
         }
 
+        turn_++;
         white_turn_ = !white_turn_;
     }
 
