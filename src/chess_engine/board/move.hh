@@ -27,15 +27,19 @@ namespace board
         bool operator==(const Move& move) const;
         bool operator!=(const Move& move) const;
 
-        const Position& start_get() const;
-        const Position& end_get() const;
-        PieceType piece_get() const;
-        bool capture_get() const;
-        bool double_pawn_push_get() const;
-        bool queen_castling_get() const;
-        bool king_castling_get() const;
-        bool en_passant_get() const;
-        const opt_piece_t& promotion_get() const;
+        const Position& start_get(void) const;
+        const Position& end_get(void) const;
+        PieceType piece_get(void) const;
+        bool capture_get(void) const;
+        bool double_pawn_push_get(void) const;
+        bool queen_castling_get(void) const;
+        bool king_castling_get(void) const;
+        bool en_passant_get(void) const;
+        const opt_piece_t& promotion_get(void) const;
+        Move get_reverse(void) const // Reverse start and end, doesn't compile if placed in hxx
+        {
+            return Move(end_, start_, piece_, capture_, double_pawn_push_, queen_castling_, king_castling_, en_passant_, promotion_);
+        }
 
     private:
         // The original position of the piece

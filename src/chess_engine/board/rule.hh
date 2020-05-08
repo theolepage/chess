@@ -44,6 +44,8 @@ namespace rule
     std::vector<Move> generate_moves(const Chessboard& board,
                                      const PieceType& piece);
 
+    std::vector<Move> generate_all_moves(const Chessboard& board);
+
     std::vector<Move> generate_pawn_moves(const Chessboard& board);
     std::vector<Move> generate_king_moves(const Chessboard& board);
     std::vector<Move> generate_bishop_moves(const Chessboard& board);

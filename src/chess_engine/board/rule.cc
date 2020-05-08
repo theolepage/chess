@@ -349,4 +349,30 @@ namespace rule
         return generate_moves(board, PieceType::KNIGHT);
     }
 
+    std::vector<Move> generate_all_moves(const Chessboard& board)
+    {
+        std::vector<Move> moves;
+
+        const auto pawn_moves = generate_pawn_moves(board);
+        const auto king_moves = generate_king_moves(board);
+        const auto bishop_moves = generate_bishop_moves(board);
+        const auto rook_moves = generate_rook_moves(board);
+        const auto queen_moves = generate_queen_moves(board);
+        const auto knight_moves = generate_knight_moves(board);
+
+        for (const auto& move : pawn_moves)
+            moves.push_back(move);
+        for (const auto& move : king_moves)
+            moves.push_back(move);
+        for (const auto& move : bishop_moves)
+            moves.push_back(move);
+        for (const auto& move : rook_moves)
+            moves.push_back(move);
+        for (const auto& move : queen_moves)
+            moves.push_back(move);
+        for (const auto& move : knight_moves)
+            moves.push_back(move);
+
+        return moves;
+    }
 } // namespace rule

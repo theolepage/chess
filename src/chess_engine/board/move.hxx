@@ -22,15 +22,19 @@ namespace board
 
     inline bool Move::operator==(const Move& move) const
     {
-        return start_ == move.start_ &&
+        if (promotion_.has_value() != move.promotion_.has_value())
+            return false;
+        bool almost_equal = start_ == move.start_ &&
             end_ == move.end_ &&
             piece_ == move.piece_ &&
-            promotion_.value() == move.promotion_.value() &&
             capture_ == move.capture_ &&
             double_pawn_push_ == move.double_pawn_push_ &&
             queen_castling_ == move.queen_castling_ &&
             king_castling_ == move.king_castling_ &&
             en_passant_ == move.en_passant_;
+        if (promotion_.has_value())
+            return almost_equal && promotion_.value() == move.promotion_.value();
+        return almost_equal;
     }
 
     inline bool Move::operator!=(const Move& move) const
