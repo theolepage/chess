@@ -540,6 +540,30 @@ TEST(Check, False)
     EXPECT_FALSE(white_check_board.is_check());
 }
 
+TEST(GenerateLegalMoves, IsLegalMove)
+{
+    // a valid board I found on the internet
+    Chessboard board = Chessboard(parse_perft("2k4r/1pp1qN2/2nr2pp/pQ6/3P1B2/P3P3/1P3PPP/2R3K1 w - - 0 0 0"));
+
+    auto legal_moves = board.generate_legal_moves();
+    for (auto move : legal_moves)
+        EXPECT_TRUE(board.is_move_legal(move));
+}
+
+TEST(GenerateLegalMoves, Length)
+{
+    Chessboard board = Chessboard(parse_perft("5k2/8/6K1/p7/8/8/8/R7 w - - 0 0 0"));
+
+    auto nb_legal_king_moves = 6;
+    // nb_vertical + nb_horizontal
+    auto nb_legal_rook_moves = 4 + 7;
+    auto nb_legal_moves = nb_legal_king_moves + nb_legal_rook_moves;
+
+    auto legal_moves = board.generate_legal_moves();
+
+    EXPECT_EQ(legal_moves.size(), nb_legal_moves);
+}
+
 
 // To start tests
 int main(int argc, char **argv) {
