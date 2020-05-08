@@ -24,6 +24,10 @@ namespace board
              const bool en_passant,
              const opt_piece_t& promotion = std::nullopt);
 
+        Move& operator=(const Move&){return *this;}
+        Move(const Move& move) = default;
+        ~Move() = default;
+
         bool operator==(const Move& move) const;
         bool operator!=(const Move& move) const;
 
