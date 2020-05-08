@@ -8,7 +8,12 @@
 #include <algorithm>
 
 #include "chessboard-interface.hh"
+#include "../../parsing/perft_parser/perft-parser.hh"
 #include "move.hh"
+
+// Il était tard et j'avais la flemme
+// Kèstuvafér
+using namespace perft_parser;
 
 namespace board
 {
@@ -28,17 +33,23 @@ namespace board
         using opt_pos_t = std::optional<Position>;
 
         Chessboard();
+        Chessboard(const FenObject&);
+        Chessboard(const PerftObject& perft):
+            Chessboard(perft.fen_get()) {}
+        Chessboard(const std::string& fen_string):
+            Chessboard(parse_perft(fen_string + std::string(" w - - 0 0 0"))) {}
 
-        std::vector<Move> generate_legal_moves();
+
+        std::vector<Move> generate_legal_moves(void) const;
 
         // Assume that move is legal
         void do_move(const Move& move);
 
-        bool is_move_legal(const Move& move);
+        bool is_move_legal(const Move& move) const;
 
-        bool is_check();
-        bool is_check_mate();
-        bool is_draw();
+        bool is_check(void);
+        bool is_check_mate(void);
+        bool is_draw(void);
 
         opt_piece_t operator[](const Position& position) const override;
 
@@ -48,6 +59,8 @@ namespace board
 
         bool get_king_castling(const Color& color) const;
         bool get_queen_castling(const Color& color) const;
+
+        Position get_king_position(void) const;
         
         friend std::ostream& operator<<(std::ostream& os, const Chessboard& board);
 
@@ -67,8 +80,16 @@ namespace board
         unsigned turn_;
         unsigned last_fifty_turn_;
 
+        const bitboard_t& get_bitboard(PieceType piecetype, Color color) const;
+        bitboard_t& get_bitboard(PieceType piecetype, Color color);
+        void set_position(const Position& pos, PieceType piecetype, Color color);
+        void unset_position(const Position& pos, PieceType piecetype, Color color);
+
         void init_end_ranks(PieceType piecetype, File file);
         void symetric_init_end_ranks(PieceType piecetype, File file);
+
+        bool is_move_possible(const Move& move) const;
+        bool is_possible_move_legal(const Move& move) const;
     };
 
     /*
@@ -81,12 +102,14 @@ namespace board
 
         for (int rank_i = Chessboard::width - 1; rank_i >= 0; rank_i--)
         {
-            std::cout << rank_i + 1 << sep;
+            os << rank_i + 1;
             for (size_t file_i = 0; file_i < Chessboard::width; file_i++)
             {
                 const auto file = static_cast<File>(file_i);
                 const auto rank = static_cast<Rank>(rank_i);
                 const auto curr_piece = board[Position(file, rank)];
+
+                os << sep;
 
                 if (curr_piece.has_value())
                 {
@@ -95,26 +118,20 @@ namespace board
 
                     const char piece_char = piece_to_char(piecetype);
 
-                    std::cout << char(piece_color == Color::WHITE ?
-                                      piece_char :
-                                      tolower(piece_char));
+                    os << char(piece_color == Color::WHITE ?
+                               piece_char :
+                               tolower(piece_char));
                 }
                 else
-                {
-                    std::cout << empty_cell_char;
-                }
-
-                std::cout << sep;
+                    os << empty_cell_char;
             }
 
-            std::cout << std::endl;
+            os << std::endl;
         }
 
-        std::cout << sep << sep;
+        os << sep;
         for (size_t file_i = 0; file_i < Chessboard::width; file_i++)
-            std::cout << char('A' + file_i) << sep;
-
-        std::cout << std::endl;
+            os << sep << char('A' + file_i);
 
         return os;
     }

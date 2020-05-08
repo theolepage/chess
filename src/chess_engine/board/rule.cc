@@ -338,4 +338,38 @@ namespace rule
         return generate_moves(board, PieceType::KNIGHT);
     }
 
+    std::vector<Move> generate_moves(const Chessboard& board)
+    {
+        std::vector<Move> moves;
+
+        auto pawn_moves = generate_pawn_moves(board);
+        auto king_moves = generate_king_moves(board);
+        auto bishop_moves = generate_bishop_moves(board);
+        auto rook_moves = generate_rook_moves(board);
+        auto queen_moves = generate_queen_moves(board);
+        auto knight_moves = generate_knight_moves(board);
+
+        // FIXME Doesn't compile for a reason
+        // moves.insert(moves.end(), pawn_moves.begin(), pawn_moves.end());
+        // moves.insert(moves.end(), king_moves.begin(), king_moves.end());
+        // moves.insert(moves.end(), bishop_moves.begin(), bishop_moves.end());
+        // moves.insert(moves.end(), rook_moves.begin(), rook_moves.end());
+        // moves.insert(moves.end(), queen_moves.begin(), queen_moves.end());
+        // moves.insert(moves.end(), knight_moves.begin(), knight_moves.end());
+
+        for (auto move : pawn_moves)
+            moves.push_back(move);
+        for (auto move : king_moves)
+            moves.push_back(move);
+        for (auto move : bishop_moves)
+            moves.push_back(move);
+        for (auto move : rook_moves)
+            moves.push_back(move);
+        for (auto move : queen_moves)
+            moves.push_back(move);
+        for (auto move : knight_moves)
+            moves.push_back(move);
+
+        return moves;
+    }
 } // namespace rule
