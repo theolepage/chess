@@ -241,8 +241,6 @@ namespace board
         // First make the move but in the opposite direction
         const Move reversed = move.get_reverse();
         do_move(reversed);
-        // After the first do_move, the turn changed
-        white_turn_ = !white_turn_; // We restore it cause we need to know who was playing
 
         // Then restore any eaten piece that was at end position
         if (state.ate)
