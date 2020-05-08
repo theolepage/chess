@@ -90,15 +90,18 @@ endif()
 find_package(Boost REQUIRED COMPONENTS system program_options)
 set(LIBRARIES Boost::system Boost::program_options ${CMAKE_DL_LIBS})
 
+# LIBRARIE OF SRC_FILES
+add_library(SRC_ENGINE_OBJ ${SRC_ENGINE})
+
 # CHESSENGINE
 add_executable(chessengine)
 set_target_properties(chessengine PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}) # binary destination
-target_sources(chessengine PRIVATE ${MAIN_ENGINE} ${SRC_ENGINE})
+target_sources(chessengine PRIVATE ${MAIN_ENGINE})
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
-    target_link_libraries(chessengine PRIVATE ${LIBRARIES} -static)
+    target_link_libraries(chessengine PRIVATE SRC_ENGINE_OBJ ${LIBRARIES} -static)
 else()
-    target_link_libraries(chessengine PRIVATE ${LIBRARIES})
+    target_link_libraries(chessengine PRIVATE SRC_ENGINE_OBJ ${LIBRARIES})
 endif()
 
 # TESTS
@@ -115,9 +118,8 @@ if (${GTEST_FOUND} AND ${THREADS_FOUND})
 
         # Create an executable with all sources and lib needed
         add_executable(${TEST_NAME} ${f})
-        target_sources(${TEST_NAME} PRIVATE ${SRC_ENGINE})
-        target_compile_options(${TEST_NAME} PRIVATE -Wall -Werror -Wextra)
         target_link_libraries(${TEST_NAME} PRIVATE
+            SRC_ENGINE_OBJ
             ${GTEST_BOTH_LIBRARIES}
             ${CMAKE_THREAD_LIBS_INIT}
             ${LIBRARIES}
