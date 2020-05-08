@@ -84,6 +84,9 @@ namespace board
 
         void init_end_ranks(PieceType piecetype, File file);
         void symetric_init_end_ranks(PieceType piecetype, File file);
+
+        bool is_move_possible(const Move& move);
+        bool is_possible_move_legal(const Move& move);
     };
 
     /*

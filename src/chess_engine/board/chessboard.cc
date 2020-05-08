@@ -206,8 +206,7 @@ namespace board
         white_turn_ = !white_turn_;
     }
 
-    // TODO make sure to do some tests with malformed moves
-    bool Chessboard::is_move_legal(const Move& move)
+    bool Chessboard::is_move_possible(const Move& move)
     {
         std::vector<Move> possible_piecetype_moves;
 
@@ -237,6 +236,19 @@ namespace board
         auto end = possible_piecetype_moves.end();
 
         return std::find(start, end, move) != end;
+    }
+
+    bool Chessboard::is_possible_move_legal(const Move& move)
+    {
+        Chessboard board_copy = *this;
+        board_copy.do_move(move);
+
+        return !board_copy.is_check();
+    }
+
+    bool Chessboard::is_move_legal(const Move& move)
+    {
+        return is_move_possible(move) && is_possible_move_legal(move);
     }
 
     bool Chessboard::is_check()
