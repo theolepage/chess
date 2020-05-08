@@ -39,7 +39,8 @@ namespace rule
     bool register_promotion(std::vector<Move>& moves,
                             const Position& from,
                             const Position& to,
-                            const Color& color);
+                            const Color& color,
+                            bool capture);
 
     std::vector<Move> generate_moves(const Chessboard& board,
                                      const PieceType& piece);

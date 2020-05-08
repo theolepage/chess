@@ -203,7 +203,8 @@ namespace rule
     bool register_promotion(std::vector<Move>& moves,
                             const Position& from,
                             const Position& to,
-                            const Color& color)
+                            const Color& color,
+                            bool capture)
     {
         // Have the pawn reached the end?
         if (to.get_rank() != (color == Color::BLACK ? Rank::ONE : Rank::EIGHT))
@@ -211,16 +212,16 @@ namespace rule
 
         // Create the moves
         moves.emplace_back(from, to, PieceType::PAWN,
-                           false, false, false, false, false,
+                           capture, false, false, false, false,
                            PieceType::QUEEN);
         moves.emplace_back(from, to, PieceType::PAWN,
-                           false, false, false, false, false,
+                           capture, false, false, false, false,
                            PieceType::ROOK);
         moves.emplace_back(from, to, PieceType::PAWN,
-                           false, false, false, false, false,
+                           capture, false, false, false, false,
                            PieceType::BISHOP);
         moves.emplace_back(from, to, PieceType::PAWN,
-                           false, false, false, false, false,
+                           capture, false, false, false, false,
                            PieceType::KNIGHT);
         return true;
     }
@@ -276,7 +277,7 @@ namespace rule
                 : from.move(0,  1);
             if (to_forward && !board[*to_forward])
             {
-                if (!register_promotion(res, from, *to_forward, color))
+                if (!register_promotion(res, from, *to_forward, color, false))
                     res.emplace_back(from, *to_forward, piece,
                                      false, false, false, false, false);
             }
@@ -305,16 +306,18 @@ namespace rule
                     (board[*to_diag_left] && board[*to_diag_left]->second != color)
                     || (board.get_en_passant() == *to_diag_left)))
             {
-                res.emplace_back(from, *to_diag_left, piece,
-                                 true, false, false, false, false);
+                if (!register_promotion(res, from, *to_diag_left, color, true))
+                    res.emplace_back(from, *to_diag_left, piece,
+                                     true, false, false, false, false);
             }
 
             if (to_diag_right && (
                     (board[*to_diag_right] && board[*to_diag_right]->second != color)
                     || (board.get_en_passant() == *to_diag_right)))
             {
-                res.emplace_back(from, *to_diag_right, piece,
-                                 true, false, false, false, false);
+                if (!register_promotion(res, from, *to_diag_right, color, true))
+                    res.emplace_back(from, *to_diag_right, piece,
+                                     true, false, false, false, false);
             }
         }
 

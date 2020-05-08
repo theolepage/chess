@@ -175,7 +175,8 @@ TEST(rule, register_promotion_simple)
     register_promotion(res,
         Position(File::C, Rank::SEVEN),
         Position(File::C, Rank::EIGHT),
-        Color::WHITE);
+        Color::WHITE,
+        false);
 
     EXPECT_EQ(res.size(), 5);
 }
