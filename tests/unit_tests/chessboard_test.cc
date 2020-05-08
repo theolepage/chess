@@ -159,7 +159,7 @@ TEST(InitialPieces, PieceCount)
 }
 
 // FIXME Black and white seems to be inverted in fen string parser
-TEST(Constructor, DISABLED_FenString)
+TEST(Constructor, FenString)
 {
     Chessboard board = Chessboard("4B3/8/2Q1p3/1k3N2/8/b1n3R1/8/K7");
 
@@ -373,7 +373,7 @@ TEST(DoMove, EnPassantCapture)
 
 
 // FIXME
-TEST(Draw, DISABLED_InitialState)
+TEST(Draw, InitialState)
 {
     Chessboard board;
 
@@ -381,7 +381,7 @@ TEST(Draw, DISABLED_InitialState)
 }
 
 // FIXME
-TEST(Draw, DISABLED_Stalemate)
+TEST(Draw, Stalemate)
 {
     // This is the subject example
     Chessboard board = Chessboard("8/8/8/1k6/8/b1n5/8/K7");
@@ -391,7 +391,7 @@ TEST(Draw, DISABLED_Stalemate)
 
 // NOTE Will not pass anymore if we implement the threefold repetition bonus
 // FIXME
-TEST(Draw, DISABLED_FiftyLastTurns1)
+TEST(Draw, FiftyLastTurns1)
 {
     Chessboard board;
 
@@ -430,7 +430,7 @@ TEST(Draw, DISABLED_FiftyLastTurns1)
 
 // NOTE Will not pass anymore if we implement the threefold repetition bonus
 // FIXME
-TEST(Draw, DISABLED_FiftyLastTurns2)
+TEST(Draw, FiftyLastTurns2)
 {
     Chessboard board;
 
