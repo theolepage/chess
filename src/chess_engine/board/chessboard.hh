@@ -48,7 +48,7 @@ namespace board
 
         bool get_king_castling(const Color& color) const;
         bool get_queen_castling(const Color& color) const;
-        
+
         friend std::ostream& operator<<(std::ostream& os, const Chessboard& board);
 
     private:

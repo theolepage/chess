@@ -3,7 +3,7 @@
 #include <array>
 #include <optional>
 
-#include "chess_engine/ai/utype.hh"
+#include "utils/utype.hh"
 
 namespace board
 {
