@@ -103,8 +103,8 @@ namespace board
         const auto piecetype_i = utils::utype(move.piece_get());
 
         bitboard_t& piece_bitboard = moved_piece_color == Color::WHITE ?
-            white_bitboards_[piecetype_i] :
-            black_bitboards_[piecetype_i];
+                                    white_bitboards_[piecetype_i] :
+                                    black_bitboards_[piecetype_i];
 
         const auto start_rank_i = utils::utype(move_start.get_rank());
         const auto start_file_i = utils::utype(move_start.get_file());
