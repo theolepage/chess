@@ -40,6 +40,8 @@ namespace board
 
         Chessboard();
         Chessboard(const FenObject&);
+        Chessboard(const std::string& str, const Color& color):
+            Chessboard(parse_perft(str + ((color == Color::WHITE) ? std::string(" w - - 0 0 0") : std::string(" b - - 0 0 0")))) {}
         Chessboard(const PerftObject& perft):
             Chessboard(perft.get_fen()) {}
         Chessboard(const std::string& fen_string):

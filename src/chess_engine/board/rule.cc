@@ -1,70 +1,74 @@
-// To-Do: implement is_king_checked(Color, Position) => bool
-// - if king of color is checked => only move king
-// - king cannot put himself in check situation
-
-// To-Do: implement getters/setters in Move
-
 #include <vector>
-#include <cmath>
 
-#include "chessboard.hh"
-#include "move.hh"
+#include "chess_engine/board/chessboard.hh"
+#include "chess_engine/board/move.hh"
+#include "chess_engine/board/rule.hh"
 
 using namespace board;
 
 namespace rule
 {
-    using piece_pos_t = std::pair<Position, Color>;
-
-    static std::vector<Position> get_pieces_positions(const Chessboard& board,
-                                                      const PieceType& piece,
-                                                      const Color& color)
+    std::vector<Position> get_pieces_positions(const Chessboard& board,
+                                               const PieceType& piece,
+                                               const Color& color)
     {
         std::vector<Position> res;
 
-        for (int file = 0; file < 8; file++)
+        for (size_t file = 0; file < Chessboard::width; file++)
         {
-            for (int rank = 0; rank < 8; rank++)
+            for (size_t rank = 0; rank < Chessboard::width; rank++)
             {
                 Position pos(static_cast<File>(file), static_cast<Rank>(rank));
-                if (board[pos]->first == piece && board[pos]->second == color)
+                if (board[pos].has_value()
+                    && board[pos]->first == piece
+                    && board[pos]->second == color)
+                {
                     res.push_back(pos);
+                }
             }
         }
 
         return res;
     }
 
-    static std::vector<Position> get_positions_between(const Position& x,
-                                                       const Position& y)
+    std::vector<Position> get_positions_between(const Position& x,
+                                                const Position& y)
     {
         std::vector<Position> res;
-        int x_file = static_cast<int>(x.get_file());
-        int x_rank = static_cast<int>(x.get_rank());
-        int y_file = static_cast<int>(y.get_file());
-        int y_rank = static_cast<int>(y.get_rank());
+        const int x_file = utils::utype(x.get_file());
+        const int x_rank = utils::utype(x.get_rank());
+        const int y_file = utils::utype(y.get_file());
+        const int y_rank = utils::utype(y.get_rank());
 
         // Determine shift_file and shift_rank
-        int shift_file = (y_file - x_file) / abs(y_file - x_file);
-        int shift_rank = (y_rank - x_rank) / abs(y_rank - x_rank);
+        int shift_file = y_file - x_file;
+        if (shift_file > 0) shift_file = 1;
+        else if (shift_file < 0) shift_file = -1;
+        
+        int shift_rank = y_rank - x_rank;
+        if (shift_rank > 0) shift_rank = 1;
+        else if (shift_rank < 0) shift_rank = -1;
 
+        res.push_back(x);
         std::optional<Position> pos = x.move(shift_file, shift_rank);
-        while (pos)
+        while (pos && pos != y)
         {
             res.push_back(*pos);
             pos = pos->move(shift_file, shift_rank);
         }
+        res.push_back(y);
 
         return res;
     }
 
-    static std::vector<piece_pos_t> get_pieces_between(const Chessboard& board,
-                                                       const Position& x,
-                                                       const Position& y)
+    bool have_pieces_between(const Chessboard& board,
+                             const Position& x,
+                             const Position& y)
     {
-        std::vector<piece_pos_t> res;
+        bool res = false;
         for (Position pos : get_positions_between(x, y))
-            res.emplace_back(pos, board[pos]->second);
+            if (board[pos].has_value() && pos != y && pos != x)
+                res = true;
         return res;
     }
 
@@ -89,8 +93,8 @@ namespace rule
         }
     }
 
-    static std::vector<Position> get_authorized_pos(const PieceType& piece,
-                                                    const Position& from)
+    std::vector<Position> get_authorized_pos(const PieceType& piece,
+                                             const Position& from)
     {
         std::vector<Position> res;
 
@@ -102,7 +106,7 @@ namespace rule
                 from.move(-1, -1), from.move(0, -1), from.move(1, -1)  // bottom
             });
         }
-        else if (piece == PieceType::KNIGHT)
+        if (piece == PieceType::KNIGHT)
         {
             register_pos(res, {
                 from.move(-1,  2), from.move(-2,  1),   // top left
@@ -111,14 +115,14 @@ namespace rule
                 from.move( 1, -2), from.move( 2, -1)    // bottom right
             });
         }
-        else if (piece == PieceType::ROOK || piece == PieceType::QUEEN)
+        if (piece == PieceType::ROOK || piece == PieceType::QUEEN)
         {
             register_pos_line(res, from, -1,  0);   // line left
             register_pos_line(res, from,  1,  0);   // line right
             register_pos_line(res, from,  0,  1);   // line up
             register_pos_line(res, from,  0, -1);   // line down
         }
-        else if (piece == PieceType::BISHOP || piece == PieceType::QUEEN)
+        if (piece == PieceType::BISHOP || piece == PieceType::QUEEN)
         {
             register_pos_line(res, from, -1,  1);   // diagonal up left
             register_pos_line(res, from,  1,  1);   // diagonal up right
@@ -129,11 +133,11 @@ namespace rule
         return res;
     }
 
-    static std::optional<Move> get_possible_move(const Chessboard& board,
-                                                 const PieceType& piece,
-                                                 const Color& color,
-                                                 const Position& from,
-                                                 const Position& to)
+    std::optional<Move> get_possible_move(const Chessboard& board,
+                                          const PieceType& piece,
+                                          const Color& color,
+                                          const Position& from,
+                                          const Position& to)
     {
         // Cannot move a piece to a cell that already
         // contains another piece of the same color.
@@ -144,11 +148,8 @@ namespace rule
         // piece to go through a cell that already contains another
         // piece - regardless of its color (except for the Knight).
         if (piece != PieceType::KNIGHT)
-        {
-            auto pieces_traversed = get_pieces_between(board, from, to);
-            if (!pieces_traversed.empty())
+            if (have_pieces_between(board, from, to))
                 return std::nullopt;
-        }
 
         // Handle "en passant": if cell is free and is
         // board.en_passant_ it is a capture.
@@ -161,77 +162,76 @@ namespace rule
         return Move(from, to, piece, capture, false, false, false, false);
     }
 
-    static void register_castling(const Chessboard& board,
-                                  std::vector<Move>&,
-                                  const Color& color)
+    std::optional<Move> register_castling(const Chessboard& board,
+                                          const Color& color,
+                                          bool king_castling)
     {
-        // Find positions of king and the two rooks
-        Position king = Position(File::E, (color == Color::WHITE) ? Rank::ONE : Rank::EIGHT);
-        Position left_rook = Position(File::A, (color == Color::WHITE) ? Rank::ONE : Rank::EIGHT);
-        Position right_rook = Position(File::H, (color == Color::WHITE) ? Rank::ONE : Rank::EIGHT);
+        // Find positions of king and rook
+        const Rank rank = (color == Color::WHITE) ? Rank::ONE : Rank::EIGHT;
+        const Position king = Position(File::E, rank);
+        const Position rook = Position(king_castling ? File::H : File::A, rank);
+        const Position new_king = Position(king_castling ? File::G : File::C, rank);
+        // Position new_rook = Position(king_castling ? File::F : File::D, rank);
 
         // Check if allowed to do a king castling (RIGHT)
-        if (board.get_king_castling(color)
-            && get_pieces_between(board, king, right_rook).empty())
+        const bool castling_allowed = king_castling
+            ? board.get_king_castling(color)
+            : board.get_queen_castling(color);
+        if (castling_allowed && !have_pieces_between(board, king, rook))
         {
-            // Determine new positions
-            // Position new_king = Position(File::G, (color == Color::WHITE) ? Rank::ONE : Rank::EIGHT);
-            // Position new_right_rook = Position(File::F, (color == Color::WHITE) ? Rank::ONE : Rank::EIGHT);
+            bool not_in_check = true;
+            for (Position step : get_positions_between(king, new_king))
+            {
+                // Create temp move
+                const Move temp_move = Move(king, step, PieceType::KING, false, false, false, false, false);
+                
+                // If for temp move, king would be in check do not add move
+                if (!board.is_move_legal(temp_move))
+                    not_in_check = false;
+            }
 
-            // for (Position pos : get_positions_between(king, new_king))
-            // {
-            //      if king at pos would be in check => do not add move
-            // }
+            if (not_in_check)
+            {
+                if (king_castling)
+                    return Move(king, new_king, PieceType::KING, false, false, false, true, false);
+                return Move(king, new_king, PieceType::KING, false, false, true, false, false);
+            }
         }
-
-        // Check if allowed to do a queen castling (LEFT)
-        if (board.get_queen_castling(color)
-            && get_pieces_between(board, king, left_rook).empty())
-        {
-            // Determine new positions
-            // Position new_king = Position(File::C, (color == Color::WHITE) ? Rank::ONE : Rank::EIGHT);
-            // Position new_left_rook = Position(File::D, (color == Color::WHITE) ? Rank::ONE : Rank::EIGHT);
-
-            // for (Position pos : get_positions_between(king, new_king))
-            // {
-            //     if king at pos would be in check => do not add move
-            // }
-        }
+        return std::nullopt;
     }
 
-    static void register_promotion(std::vector<Move>& moves,
-                                   const Position& from,
-                                   const Position& to,
-                                   const Color& color)
+    bool register_promotion(std::vector<Move>& moves,
+                            const Position& from,
+                            const Position& to,
+                            const Color& color,
+                            bool capture)
     {
         // Have the pawn reached the end?
         if (to.get_rank() != (color == Color::BLACK ? Rank::ONE : Rank::EIGHT))
-            return;
+            return false;
 
         // Create the moves
         moves.emplace_back(from, to, PieceType::PAWN,
-                           false, false, false, false, false,
+                           capture, false, false, false, false,
                            PieceType::QUEEN);
         moves.emplace_back(from, to, PieceType::PAWN,
-                           false, false, false, false, false,
+                           capture, false, false, false, false,
                            PieceType::ROOK);
         moves.emplace_back(from, to, PieceType::PAWN,
-                           false, false, false, false, false,
+                           capture, false, false, false, false,
                            PieceType::BISHOP);
         moves.emplace_back(from, to, PieceType::PAWN,
-                           false, false, false, false, false,
+                           capture, false, false, false, false,
                            PieceType::KNIGHT);
-        moves.emplace_back(from, to, PieceType::PAWN,
-                           false, false, false, false, false,
-                           PieceType::PAWN);
+        return true;
     }
 
-    static std::vector<Move> generate_moves(const Chessboard& board,
-                                            const PieceType& piece)
+    std::vector<Move> generate_moves(const Chessboard& board,
+                                     const PieceType& piece)
     {
         std::vector<Move> res;
-        Color color = Color::WHITE; // FIXME: color depends on board.white_turn_
-        auto pieces_positions = get_pieces_positions(board, piece, color);
+        const Color color = board.get_white_turn() ? Color::WHITE : Color::BLACK;
+        const auto pieces_positions = get_pieces_positions(board, piece, color);
 
         // Generate regular moves
         for (Position from : pieces_positions)
@@ -241,20 +241,21 @@ namespace rule
             for (auto to : authorized_pos)
             {
                 // Step 2: Possible (cell occupied, capture?)
-                std::optional<Move> move = get_possible_move(board, piece,
-                                                             color, from, to);
-
+                const auto move = get_possible_move(board, piece, color, from, to);
                 if (move)
-                    res.emplace_back(*move);
-
-                // Handle promotion
-                if (piece == PieceType::PAWN)
-                    register_promotion(res, from, to, color);
+                    res.push_back(*move);
             }
 
             // Handle castling moves
             if (piece == PieceType::KING)
-                register_castling(board, res, color);
+            {
+                const auto king_castling = register_castling(board, color, true);
+                const auto queen_castling = register_castling(board, color, false);
+                if (king_castling)
+                    res.push_back(*king_castling);
+                if (queen_castling)
+                    res.push_back(*queen_castling);
+            }
         }
 
         return res;
@@ -263,25 +264,30 @@ namespace rule
     std::vector<Move> generate_pawn_moves(const Chessboard& board)
     {
         std::vector<Move> res;
-        Color color = Color::WHITE; // FIXME: color depends on board.white_turn_
-        PieceType piece = PieceType::PAWN;
-        auto pieces_positions = get_pieces_positions(board, piece, color);
+        const Color color = board.get_white_turn() ? Color::WHITE : Color::BLACK;
+        const PieceType piece = PieceType::PAWN;
+        const auto pieces_positions = get_pieces_positions(board, piece, color);
 
         for (Position from : pieces_positions)
         {
             // Pawn cannot capture a piece that is in front of it and
             // obviously cannot capture same color.
-            std::optional<Position> to_forward = (color == Color::BLACK)
+            const std::optional<Position> to_forward = (color == Color::BLACK)
                 ? from.move(0, -1)
                 : from.move(0,  1);
             if (to_forward && !board[*to_forward])
-                res.emplace_back(from, *to_forward, piece,
-                                 false, false, false, false, false);
+            {
+                if (!register_promotion(res, from, *to_forward, color, false))
+                    res.emplace_back(from, *to_forward, piece,
+                                     false, false, false, false, false);
+            }
 
-            std::optional<Position> to_forward_2 = (color == Color::BLACK)
+            const std::optional<Position> to_forward_2 = (color == Color::BLACK)
                 ? from.move(0, -2)
                 : from.move(0,  2);
-            bool first_move = from.get_rank() == Rank::TWO || from.get_rank() == Rank::SEVEN;
+            const bool first_move = (color == Color::BLACK)
+                ? from.get_rank() == Rank::SEVEN
+                : from.get_rank() == Rank::TWO;
             if (first_move && to_forward_2 && !board[*to_forward_2])
                 res.emplace_back(from, *to_forward_2, piece,
                                  false, true, false, false, false);
@@ -289,25 +295,30 @@ namespace rule
             // Pawn can move to a cell diagonally in front of it on an adjacent
             // file if (and only if) the cell already contains a piece of the
             // other color on it. In this case it is also a capture.
-            std::optional<Position> to_diag_left = (color == Color::BLACK)
+            const std::optional<Position> to_diag_left = (color == Color::BLACK)
                 ? from.move(-1, -1)
                 : from.move(-1,  1);
-
-            std::optional<Position> to_diag_right = (color == Color::BLACK)
+            const std::optional<Position> to_diag_right = (color == Color::BLACK)
                 ? from.move(1, -1)
                 : from.move(1,  1);
             
-            if (to_diag_left
-                && board[*to_diag_left]
-                && board[*to_diag_left]->second != color)
-                res.emplace_back(from, *to_diag_left, piece,
-                                 true, false, false, false, false);
+            if (to_diag_left && (
+                    (board[*to_diag_left] && board[*to_diag_left]->second != color)
+                    || (board.get_en_passant() == *to_diag_left)))
+            {
+                if (!register_promotion(res, from, *to_diag_left, color, true))
+                    res.emplace_back(from, *to_diag_left, piece,
+                                     true, false, false, false, false);
+            }
 
-            if (to_diag_right
-                && board[*to_diag_right]
-                && board[*to_diag_right]->second != color)
-                res.emplace_back(from, *to_diag_right, piece,
-                                 true, false, false, false, false);
+            if (to_diag_right && (
+                    (board[*to_diag_right] && board[*to_diag_right]->second != color)
+                    || (board.get_en_passant() == *to_diag_right)))
+            {
+                if (!register_promotion(res, from, *to_diag_right, color, true))
+                    res.emplace_back(from, *to_diag_right, piece,
+                                     true, false, false, false, false);
+            }
         }
 
         return res;
@@ -338,36 +349,28 @@ namespace rule
         return generate_moves(board, PieceType::KNIGHT);
     }
 
-    std::vector<Move> generate_moves(const Chessboard& board)
+    std::vector<Move> generate_all_moves(const Chessboard& board)
     {
         std::vector<Move> moves;
 
-        auto pawn_moves = generate_pawn_moves(board);
-        auto king_moves = generate_king_moves(board);
-        auto bishop_moves = generate_bishop_moves(board);
-        auto rook_moves = generate_rook_moves(board);
-        auto queen_moves = generate_queen_moves(board);
-        auto knight_moves = generate_knight_moves(board);
+        const auto pawn_moves = generate_pawn_moves(board);
+        const auto king_moves = generate_king_moves(board);
+        const auto bishop_moves = generate_bishop_moves(board);
+        const auto rook_moves = generate_rook_moves(board);
+        const auto queen_moves = generate_queen_moves(board);
+        const auto knight_moves = generate_knight_moves(board);
 
-        // FIXME Doesn't compile for a reason
-        // moves.insert(moves.end(), pawn_moves.begin(), pawn_moves.end());
-        // moves.insert(moves.end(), king_moves.begin(), king_moves.end());
-        // moves.insert(moves.end(), bishop_moves.begin(), bishop_moves.end());
-        // moves.insert(moves.end(), rook_moves.begin(), rook_moves.end());
-        // moves.insert(moves.end(), queen_moves.begin(), queen_moves.end());
-        // moves.insert(moves.end(), knight_moves.begin(), knight_moves.end());
-
-        for (auto move : pawn_moves)
+        for (const auto& move : pawn_moves)
             moves.push_back(move);
-        for (auto move : king_moves)
+        for (const auto& move : king_moves)
             moves.push_back(move);
-        for (auto move : bishop_moves)
+        for (const auto& move : bishop_moves)
             moves.push_back(move);
-        for (auto move : rook_moves)
+        for (const auto& move : rook_moves)
             moves.push_back(move);
-        for (auto move : queen_moves)
+        for (const auto& move : queen_moves)
             moves.push_back(move);
-        for (auto move : knight_moves)
+        for (const auto& move : knight_moves)
             moves.push_back(move);
 
         return moves;

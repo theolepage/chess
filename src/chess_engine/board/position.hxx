@@ -36,4 +36,11 @@ namespace board
         return Position(static_cast<File>(new_file), static_cast<Rank>(new_rank));
     }
 
+    inline std::ostream& operator<<(std::ostream& os, const Position& pos)
+    {
+        os << "Pos(" << static_cast<int>(pos.get_file());
+        os << ";" << static_cast<int>(pos.get_rank()) << ")";
+        return os;
+    }
+
 } // namespace board

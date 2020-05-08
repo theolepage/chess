@@ -60,6 +60,8 @@ namespace board
 
         std::optional<Position> move(int file, int rank) const;
 
+        friend std::ostream& operator<<(std::ostream& os, const Position& pos);
+
     private:
         File file_; // col / x
         Rank rank_; // line / y
