@@ -140,6 +140,12 @@ namespace board
         return false;
     }
 
+    bool Chessboard::is_pat()
+    {
+        // FIXME
+        return false;
+    }
+
     bool Chessboard::get_white_turn() const
     {
         return white_turn_;

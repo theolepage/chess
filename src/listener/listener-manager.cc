@@ -17,17 +17,20 @@ namespace listener
     {
         NOTIFY(on_piece_moved(move.piece_get(), move.start_get(),
                                     move.end_get()));
-        if (move.capture_get()) //FIXME better way ?
-            NOTIFY(on_piece_taken(taken_piece.value().first,
-                                        move.end_get()));
-        if (move.promotion_get().has_value())
-            NOTIFY(on_piece_promoted(move.promotion_get().value(),
-                                        move.end_get()));
         if (move.king_castling_get())
             NOTIFY(on_kingside_castling(GET_OTHER_COLOR()));
             // move already done so color changed
-        if (move.queen_castling_get())
+        else if (move.queen_castling_get())
             NOTIFY(on_queenside_castling(GET_OTHER_COLOR()));
+        else
+        {
+            if (move.capture_get()) //FIXME better way ?
+                NOTIFY(on_piece_taken(taken_piece.value().first,
+                                      move.end_get()));
+            if (move.promotion_get().has_value())
+                NOTIFY(on_piece_promoted(move.promotion_get().value(),
+                                         move.end_get()));
+        }
     }
 
     bool ListenerManager::notify_board_state()
@@ -37,33 +40,36 @@ namespace listener
             NOTIFY(on_player_mat(GET_COLOR()));
             return false;
         }
-        if (chessboard_.is_draw())
+
+        if (chessboard_.is_check())
+            NOTIFY(on_player_check(GET_COLOR()));
+
+        if (chessboard_.is_pat())
+        {
+            NOTIFY(on_player_pat(GET_COLOR()));
+            NOTIFY(on_draw());
+            return false;
+        }
+        else if (chessboard_.is_draw())
         {
             NOTIFY(on_draw());
             return false;
         }
-        if (chessboard_.is_check())
-            NOTIFY(on_player_check(GET_COLOR()));
-        /*FIXME if (chessboard_.is_pat())
-            NOTIFY(on_player_pat(GET_COLOR()));*/
         return true;
     }
 
     bool ListenerManager::do_move_and_notify(board::Move move)
     {
-        if (chessboard_.is_move_legal(move))
-        {
-            opt_piece_t possibly_taken_piece = std::nullopt;
-            if (move.capture_get()) //FIXME better way ?
-                possibly_taken_piece.emplace(chessboard_[move.end_get()].value());
-            chessboard_.do_move(move);
-            notify_move(move, possibly_taken_piece);
-        }
-        else
+        if (!chessboard_.is_move_legal(move))
         {
             NOTIFY(on_player_disqualified(GET_COLOR()));
             return false; // FIXME what should I do
         }
+        opt_piece_t possibly_taken_piece = std::nullopt;
+        if (move.capture_get()) //FIXME better way ?
+            possibly_taken_piece.emplace(chessboard_[move.end_get()].value());
+        chessboard_.do_move(move);
+        notify_move(move, possibly_taken_piece);
         return notify_board_state();
     }
 

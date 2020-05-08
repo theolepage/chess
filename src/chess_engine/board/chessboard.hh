@@ -39,6 +39,7 @@ namespace board
         bool is_check();
         bool is_check_mate();
         bool is_draw();
+        bool is_pat();
 
         opt_piece_t operator[](const Position& position) const override;
 
