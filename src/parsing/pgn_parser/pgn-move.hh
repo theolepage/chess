@@ -34,7 +34,7 @@ namespace board
         void report_set(ReportType report);
 
         board::Move to_Move() const;
-        board::Move to_Move(const board::Move previous_move) const;
+        void to_Move(board::Move &previous_move) const;
 
     private:
         // The original position of the piece

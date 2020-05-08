@@ -63,7 +63,7 @@ namespace listener
         if (!chessboard_.is_move_legal(move))
         {
             NOTIFY(on_player_disqualified(GET_COLOR()));
-            return false; // FIXME what should I do
+            return false;
         }
         opt_piece_t possibly_taken_piece = std::nullopt;
         if (move.capture_get()) //FIXME better way ?
@@ -80,43 +80,41 @@ namespace listener
 
         /* TODO draft
         register_board(ai::get_board()) // FIXME do not call get board twice
-        while( ? True ? ):
-            board = ai::get_board()
-            if (board.is_checkmate())
-                break; //FIXME
-            Move move = ai.search(board)
+        while(True)
+        {
+            board::Chessboard board = ai::get_board();
+            board::Move move = ai.search(board)
             ai::play_move(move_to_str(move))
             notify_move(move)
-
-            notify_board_state(board) ???
+            notify_board_state();
+        }
         */
     }
 
     void ListenerManager::play_pgn_moves(const std::vector<board::PgnMove> moves)
     {
+        NOTIFY(register_board(chessboard_));
+
+        // quit if there is no moves
         if (moves.size() == 0)
             return;
-
-        // load board
-        chessboard_ = board::Chessboard(); // FIXME not needed, right ?
-        NOTIFY(register_board(chessboard_));
 
         // first move
         board::Move move = moves[0].to_Move();
         if (!do_move_and_notify(move))
         {
-            NOTIFY(on_game_finished()); // FIXME should I quit after a disqualified
+            NOTIFY(on_game_finished());
             return;
         }
 
         // all other moves
-        for (board::PgnMove pgnMove : moves)
+        for (size_t i = 1; i < moves.size(); i++)
         {
-            move = pgnMove.to_Move(move); // FIXME by changing move in to_Move
+            moves[i].to_Move(move);
             if (!do_move_and_notify(move))
             {
                 NOTIFY(on_game_finished());
-                break; // FIXME should I end game
+                break;
             }
         }
     }

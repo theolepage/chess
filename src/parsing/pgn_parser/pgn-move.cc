@@ -85,7 +85,7 @@ namespace board
                     queen_castling_, king_castling_, false);
     }
 
-    board::Move PgnMove::to_Move(const board::Move previous_move) const
+    void PgnMove::to_Move(board::Move &previous_move) const
     {
         // Check if move is an en passant move
         const board::Position prev_end = previous_move.end_get();
@@ -96,7 +96,7 @@ namespace board
                           (utils::utype(end_.get_rank()) == 6 ||
                           utils::utype(end_.get_rank()) == 3);
 
-        return Move(start_, end_, piece_, capture_, double_pawn_push_,
+        previous_move.set(start_, end_, piece_, capture_, double_pawn_push_,
                         queen_castling_, king_castling_,
                         en_passant, promotion_);
     }
