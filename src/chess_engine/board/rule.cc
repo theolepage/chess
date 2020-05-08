@@ -1,5 +1,3 @@
-// To-Do: handle en passant capture for pawns
-
 #include <vector>
 
 #include "chess_engine/board/chessboard.hh"
@@ -196,8 +194,7 @@ namespace rule
             {
                 if (king_castling)
                     return Move(king, new_king, PieceType::KING, false, false, false, true, false);
-                else
-                    return Move(king, new_king, PieceType::KING, false, false, true, false, false);
+                return Move(king, new_king, PieceType::KING, false, false, true, false, false);
             }
         }
         return std::nullopt;
@@ -307,17 +304,17 @@ namespace rule
                 ? from.move(1, -1)
                 : from.move(1,  1);
             
-            if (to_diag_left
-                && board[*to_diag_left]
-                && board[*to_diag_left]->second != color)
+            if (to_diag_left && (
+                    (board[*to_diag_left] && board[*to_diag_left]->second != color)
+                    || (board.get_en_passant() == *to_diag_left)))
             {
                 res.emplace_back(from, *to_diag_left, piece,
                                  true, false, false, false, false);
             }
 
-            if (to_diag_right
-                && board[*to_diag_right]
-                && board[*to_diag_right]->second != color)
+            if (to_diag_right && (
+                    (board[*to_diag_right] && board[*to_diag_right]->second != color)
+                    || (board.get_en_passant() == *to_diag_right)))
             {
                 res.emplace_back(from, *to_diag_right, piece,
                                  true, false, false, false, false);
