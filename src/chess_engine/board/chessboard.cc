@@ -266,7 +266,10 @@ namespace board
     {
         const Position king_pos = get_king_position();
 
+        // little hack to get the opponent turns
+        white_turn_ = !white_turn_;
         auto possible_moves = rule::generate_moves(*this);
+        white_turn = !white_turn_;
 
         for (Move move : possible_moves)
             if (move.end_get() == king_pos)
