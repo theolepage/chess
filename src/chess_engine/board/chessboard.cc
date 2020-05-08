@@ -102,7 +102,6 @@ namespace board
 
     Chessboard::Chessboard(const FenObject& fen)
     {
-        // TODO Ask Nicolas if I'm right
         white_turn_ = fen.side_to_move_to_get() == Color::WHITE;
 
         auto castling_chars = fen.castling_get();
@@ -114,7 +113,6 @@ namespace board
         black_king_castling_ = std::find(chars_begin, chars_end, 'k') != chars_end;
         black_queen_castling_ = std::find(chars_begin, chars_end, 'q') != chars_end;
 
-        // NOTE especially here
         en_passant_ = fen.en_passant_target_get();
 
         // FIXME it should be an available data in the fen string
