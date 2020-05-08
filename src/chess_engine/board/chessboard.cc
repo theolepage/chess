@@ -3,6 +3,16 @@
 
 namespace board
 {
+    const Chessboard::bitboard_t& Chessboard::get_bitboard(PieceType piecetype, Color color) const
+    {
+        const auto piecetype_i = utils::utype(piecetype);
+
+        return color == Color::WHITE ?
+            white_bitboards_[piecetype_i] :
+            black_bitboards_[piecetype_i];
+    }
+
+    // TODO can we do better than code duplication ?
     Chessboard::bitboard_t& Chessboard::get_bitboard(PieceType piecetype, Color color)
     {
         const auto piecetype_i = utils::utype(piecetype);
@@ -138,13 +148,13 @@ namespace board
         }
     }
 
-    std::vector<Move> Chessboard::generate_legal_moves()
+    std::vector<Move> Chessboard::generate_legal_moves(void) const
     {
         std::vector<Move> legal_moves;
 
-        std::vector<Move> possible_moves = rule::generate_moves(*this);
+        const std::vector<Move> possible_moves = rule::generate_moves(*this);
 
-        for (Move move : possible_moves)
+        for (const Move& move : possible_moves)
             if (is_move_legal(move))
                 legal_moves.push_back(move);
 
@@ -201,7 +211,7 @@ namespace board
         white_turn_ = !white_turn_;
     }
 
-    bool Chessboard::is_move_possible(const Move& move)
+    bool Chessboard::is_move_possible(const Move& move) const
     {
         std::vector<Move> possible_piecetype_moves;
 
@@ -231,22 +241,24 @@ namespace board
         auto end = possible_piecetype_moves.end();
 
         return std::find(start, end, move) != end;
+
     }
 
-    bool Chessboard::is_possible_move_legal(const Move& move)
+    bool Chessboard::is_possible_move_legal(const Move& move) const
     {
+        // TODO try do undo
         Chessboard board_copy = *this;
         board_copy.do_move(move);
 
         return !board_copy.is_check();
     }
 
-    bool Chessboard::is_move_legal(const Move& move)
+    bool Chessboard::is_move_legal(const Move& move) const
     {
         return is_move_possible(move) && is_possible_move_legal(move);
     }
 
-    Position Chessboard::get_king_position()
+    Position Chessboard::get_king_position(void) const
     {
         auto king_color = white_turn_ ? Color::WHITE : Color::BLACK;
         bitboard_t king_bitboard = get_bitboard(PieceType::KING, king_color);
@@ -262,14 +274,14 @@ namespace board
         return Position(static_cast<File>(file_i), static_cast<Rank>(rank_i));
     }
 
-    bool Chessboard::is_check()
+    bool Chessboard::is_check(void)
     {
         const Position king_pos = get_king_position();
 
         // little hack to get the opponent turns
         white_turn_ = !white_turn_;
         auto possible_moves = rule::generate_moves(*this);
-        white_turn = !white_turn_;
+        white_turn_ = !white_turn_;
 
         for (Move move : possible_moves)
             if (move.end_get() == king_pos)
@@ -278,13 +290,13 @@ namespace board
         return false;
     }
 
-    bool Chessboard::is_check_mate()
+    bool Chessboard::is_check_mate(void)
     {
         return is_check() && generate_legal_moves().empty();
     }
 
     // TODO handle threefold repetition
-    bool Chessboard::is_draw()
+    bool Chessboard::is_draw(void)
     {
         return last_fifty_turn_ >= 50 || (!is_check() && generate_legal_moves().empty());
     }

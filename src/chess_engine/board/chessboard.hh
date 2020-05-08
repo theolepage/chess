@@ -40,16 +40,16 @@ namespace board
             Chessboard(parse_perft(fen_string + std::string(" w - - 0 0 0"))) {}
 
 
-        std::vector<Move> generate_legal_moves();
+        std::vector<Move> generate_legal_moves(void) const;
 
         // Assume that move is legal
         void do_move(const Move& move);
 
-        bool is_move_legal(const Move& move);
+        bool is_move_legal(const Move& move) const;
 
-        bool is_check();
-        bool is_check_mate();
-        bool is_draw();
+        bool is_check(void);
+        bool is_check_mate(void);
+        bool is_draw(void);
 
         opt_piece_t operator[](const Position& position) const override;
 
@@ -60,7 +60,7 @@ namespace board
         bool get_king_castling(const Color& color) const;
         bool get_queen_castling(const Color& color) const;
 
-        Position get_king_position();
+        Position get_king_position(void) const;
         
         friend std::ostream& operator<<(std::ostream& os, const Chessboard& board);
 
@@ -80,6 +80,7 @@ namespace board
         unsigned turn_;
         unsigned last_fifty_turn_;
 
+        const bitboard_t& get_bitboard(PieceType piecetype, Color color) const;
         bitboard_t& get_bitboard(PieceType piecetype, Color color);
         void set_position(const Position& pos, PieceType piecetype, Color color);
         void unset_position(const Position& pos, PieceType piecetype, Color color);
@@ -87,8 +88,8 @@ namespace board
         void init_end_ranks(PieceType piecetype, File file);
         void symetric_init_end_ranks(PieceType piecetype, File file);
 
-        bool is_move_possible(const Move& move);
-        bool is_possible_move_legal(const Move& move);
+        bool is_move_possible(const Move& move) const;
+        bool is_possible_move_legal(const Move& move) const;
     };
 
     /*
