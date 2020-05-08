@@ -19,7 +19,7 @@ project(Chess
         - Debug build   : -DCMAKE_BUILD_TYPE=Debug
         - Release build : -DCMAKE_BUILD_TYPE=Release
 
-3. Use make as usual in the wanted build_directory:
+3. Use make as usual in the wanted build_directory: (use -j8 to go swifty)
     - `make`
     - `make all`
     - `make clean`

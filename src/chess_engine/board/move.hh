@@ -49,6 +49,10 @@ namespace board
                  const bool king_castling,
                  const bool en_passant,
                  const opt_piece_t &promotion);
+        Move get_reverse(void) const // Reverse start and end, doesn't compile if placed in hxx
+        {
+            return Move(end_, start_, piece_, capture_, double_pawn_push_, queen_castling_, king_castling_, en_passant_, promotion_);
+        }
 
     private:
         // The original position of the piece

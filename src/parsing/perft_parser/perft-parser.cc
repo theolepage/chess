@@ -2,7 +2,7 @@
 
 #include <string>
 #include <vector>
-#include <boost/algorithm/string.hpp> // TODO on a le droit ?
+#include <boost/algorithm/string.hpp>
 #include <cassert>
 #include <optional>
 
@@ -11,14 +11,14 @@
 
 namespace perft_parser
 {
-    PerftObject parse_perft(std::string input)
+    PerftObject parse_perft(const std::string& input)
     {
         std::vector<std::string> tokens;
         boost::split(tokens, input, boost::is_any_of(" "));
         assert(tokens.size() == 7);
 
         std::string depth_s = tokens.at(tokens.size() - 1);
-        unsigned long long depth = std::stoi(depth_s); // TODO can we have -values ?
+        int depth = std::stoi(depth_s);
         tokens.pop_back(); // Remove depth
 
         FenObject fen = parse_fen(tokens);
@@ -38,10 +38,12 @@ namespace perft_parser
         std::vector<std::string> ranks;
         boost::split(ranks, splited_input.at(0), boost::is_any_of("/"));
 
+        // TODO find more opti than that
+        // Need to push front since ranks are given from 8 to 1
         std::vector<FenRank> franks;
         for (const std::string& rank : ranks)
         {
-            franks.emplace_back(FenRank(rank));
+            franks.insert(franks.begin(), FenRank(rank));
         }
 
         // Color

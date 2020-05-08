@@ -13,12 +13,12 @@ namespace perft_parser
             depth_ = depth;
         }
 
-        FenObject fen_get(void) const
+        FenObject get_fen(void) const
         {
             return fen_;
         }
 
-        int depth_get(void) const
+        int get_depth(void) const
         {
             return depth_;
         }

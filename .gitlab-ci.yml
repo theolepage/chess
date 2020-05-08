@@ -12,7 +12,7 @@ build and tests:
         - mkdir build && cd build
         - cmake ..
         - make
-        - ctest
+        - ctest --verbose
         - cd ..
     artifacts:
         paths:

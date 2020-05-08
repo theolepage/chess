@@ -52,14 +52,14 @@ TEST(perft_parser_test, first_basic_case)
                             get_file_content(base_path + "base_depth-1.perft"));
 
     vector<FenRank> ranks_{
-                            BACK_LINE(BL),
-                            FULL_PAWN(BL),
-                            EMPTY_LINE,
-                            EMPTY_LINE,
-                            EMPTY_LINE,
-                            EMPTY_LINE,
+                            BACK_LINE(WH),
                             FULL_PAWN(WH),
-                            BACK_LINE(WH)
+                            EMPTY_LINE,
+                            EMPTY_LINE,
+                            EMPTY_LINE,
+                            EMPTY_LINE,
+                            FULL_PAWN(BL),
+                            BACK_LINE(BL)
                             };
 
     Color side_to_move_ = WH;
@@ -78,14 +78,14 @@ TEST(perft_parser_test, hard_case)
     PerftObject parsed_obj = parse_perft("rnb1kbNr/2pPPppp/7r/P4P2/3N4/8/1Q1Q1Q1Q/6r1 b - f6 999 999 25");
 
     vector<FenRank> ranks_{
-FR(SD(ROOK, BL), SD(KNIGHT, BL), SD(BISHOP, BL), nullopt, SD(KING, BL), SD(BISHOP, BL), SD(KNIGHT, WH), SD(ROOK, BL)),
-FR(nullopt, nullopt, SD(PAWN, BL), SD(PAWN, WH), SD(PAWN, WH), SD(PAWN, BL), SD(PAWN, BL), SD(PAWN, BL)),
-FR(nullopt, nullopt, nullopt, nullopt, nullopt, nullopt, nullopt, SD(ROOK, BL)),
-FR(SD(PAWN, WH), nullopt, nullopt, nullopt, nullopt, SD(PAWN, WH), nullopt, nullopt),
-FR(nullopt, nullopt, nullopt, SD(KNIGHT, WH), nullopt, nullopt, nullopt, nullopt),
-EMPTY_LINE,
+FR(nullopt, nullopt, nullopt, nullopt, nullopt, nullopt, SD(ROOK, BL),  nullopt),
 FR(nullopt, SD(QUEEN, WH), nullopt, SD(QUEEN, WH), nullopt, SD(QUEEN, WH), nullopt, SD(QUEEN, WH)),
-FR(nullopt, nullopt, nullopt, nullopt, nullopt, nullopt, SD(ROOK, BL),  nullopt)
+EMPTY_LINE,
+FR(nullopt, nullopt, nullopt, SD(KNIGHT, WH), nullopt, nullopt, nullopt, nullopt),
+FR(SD(PAWN, WH), nullopt, nullopt, nullopt, nullopt, SD(PAWN, WH), nullopt, nullopt),
+FR(nullopt, nullopt, nullopt, nullopt, nullopt, nullopt, nullopt, SD(ROOK, BL)),
+FR(nullopt, nullopt, SD(PAWN, BL), SD(PAWN, WH), SD(PAWN, WH), SD(PAWN, BL), SD(PAWN, BL), SD(PAWN, BL)),
+FR(SD(ROOK, BL), SD(KNIGHT, BL), SD(BISHOP, BL), nullopt, SD(KING, BL), SD(BISHOP, BL), SD(KNIGHT, WH), SD(ROOK, BL))
 };
 
     Color side_to_move_ = BL;
