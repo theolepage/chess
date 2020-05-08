@@ -15,4 +15,5 @@ namespace rule
     std::vector<board::Move> generate_queen_moves(const board::Chessboard& board);
     std::vector<board::Move> generate_knight_moves(const board::Chessboard& board);
 
+    std::vector<board::Move> generate_moves(const board::Chessboard& board);
 } // namespace rule
