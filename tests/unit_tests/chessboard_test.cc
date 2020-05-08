@@ -229,6 +229,16 @@ Move dummy_capture_move(const Position& start, const Position& end, PieceType pi
     return Move(start, end, piecetype, true, false, false, false, false, std::nullopt);
 }
 
+Move dummy_promotion_move(const Position& start, const Position& end, PieceType promotion)
+{
+    return Move(start, end, PieceType::PAWN, false, false, false, false, false, promotion);
+}
+
+Move dummy_promotion_capture(const Position& start, const Position& end, PieceType promotion)
+{
+    return Move(start, end, PieceType::PAWN, true, false, false, false, false, promotion);
+}
+
 TEST(Checkboard, Copy)
 {
     Chessboard board;
@@ -371,6 +381,31 @@ TEST(DoMove, EnPassantCapture)
     EXPECT_EQ(count_pieces(board), 31);
 }
 
+TEST(DoMove, PromotionMove)
+{
+    Chessboard board("8/6P1/8/8/8/8/8/8");
+
+    auto white_pawn_start = Position(File::G, Rank::SEVEN);
+    auto white_pawn_end = Position(File::G, Rank::EIGHT);
+
+    board.do_move(dummy_promotion_move(white_pawn_start, white_pawn_end, PieceType::QUEEN));
+
+    EXPECT_EQ(PieceType::QUEEN, board[white_pawn_end].value().first);
+    EXPECT_EQ(Color::WHITE, board[white_pawn_end].value().second);
+}
+
+TEST(DoMove, PromotionCapture)
+{
+    Chessboard board("5p2/6P1/8/8/8/8/8/8");
+
+    auto white_pawn_start = Position(File::G, Rank::SEVEN);
+    auto white_pawn_end = Position(File::F, Rank::EIGHT);
+
+    board.do_move(dummy_promotion_capture(white_pawn_start, white_pawn_end, PieceType::QUEEN));
+
+    EXPECT_EQ(PieceType::QUEEN, board[white_pawn_end].value().first);
+    EXPECT_EQ(Color::WHITE, board[white_pawn_end].value().second);
+}
 
 // FIXME
 TEST(Draw, InitialState)
