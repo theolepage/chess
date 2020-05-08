@@ -86,10 +86,6 @@ namespace board
         turn_ = 0;
         last_fifty_turn_ = 0;
 
-        const size_t pawn_i = utils::utype(PieceType::PAWN);
-        white_bitboards_[pawn_i][1].set();
-        black_bitboards_[pawn_i][width - 2].set();
-
         for (size_t file_i = 0; file_i < width; file_i++)
         {
             auto file = static_cast<File>(file_i);
