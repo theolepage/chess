@@ -373,6 +373,113 @@ TEST(DoMove, EnPassantCapture)
 }
 
 
+TEST(Draw, InitialState)
+{
+    // FIXME
+    GTEST_SKIP();
+    Chessboard board;
+
+    EXPECT_FALSE(board.is_draw());
+}
+
+TEST(Draw, Stalemate)
+{
+    // FIXME
+    GTEST_SKIP();
+    // This is the subject example
+    Chessboard board = Chessboard("8/8/8/1k6/8/b1n5/8/K7");
+
+    EXPECT_TRUE(board.is_draw());
+}
+
+// NOTE Will not pass anymore if we implement the threefold repetition bonus
+TEST(Draw, FiftyLastTurns1)
+{
+    // FIXME
+    GTEST_SKIP();
+    Chessboard board;
+
+    auto white_rook_pos_1 = Position(File::B, Rank::ONE);
+    auto white_rook_pos_2 = Position(File::A, Rank::THREE);
+    auto white_1_to_2 = dummy_move(white_rook_pos_1, white_rook_pos_2, PieceType::ROOK);
+    auto white_2_to_1 = dummy_move(white_rook_pos_2, white_rook_pos_1, PieceType::ROOK);
+
+    auto black_rook_pos_1 = Position(File::G, Rank::EIGHT);
+    auto black_rook_pos_2 = Position(File::H, Rank::SIX);
+    auto black_1_to_2 = dummy_move(black_rook_pos_1, black_rook_pos_2, PieceType::ROOK);
+    auto black_2_to_1 = dummy_move(black_rook_pos_2, black_rook_pos_1, PieceType::ROOK);
+
+    for (auto turn = 0; turn < 50; turn++)
+    {
+        EXPECT_FALSE(board.is_draw());
+
+        if (board.get_white_turn())
+        {
+            if (board[white_rook_pos_1].has_value())
+                board.do_move(white_1_to_2);
+            else
+                board.do_move(white_2_to_1);
+        }
+        else
+        {
+            if (board[black_rook_pos_1].has_value())
+                board.do_move(black_1_to_2);
+            else
+                board.do_move(black_2_to_1);
+        }
+    }
+
+    EXPECT_TRUE(board.is_draw());
+}
+
+// NOTE Will not pass anymore if we implement the threefold repetition bonus
+TEST(Draw, FiftyLastTurns2)
+{
+    // FIXME
+    GTEST_SKIP();
+    Chessboard board;
+
+    auto white_rook_pos_1 = Position(File::B, Rank::ONE);
+    auto white_rook_pos_2 = Position(File::A, Rank::THREE);
+    auto white_1_to_2 = dummy_move(white_rook_pos_1, white_rook_pos_2, PieceType::ROOK);
+    auto white_2_to_1 = dummy_move(white_rook_pos_2, white_rook_pos_1, PieceType::ROOK);
+
+    auto black_rook_pos_1 = Position(File::G, Rank::EIGHT);
+    auto black_rook_pos_2 = Position(File::H, Rank::SIX);
+    auto black_1_to_2 = dummy_move(black_rook_pos_1, black_rook_pos_2, PieceType::ROOK);
+    auto black_2_to_1 = dummy_move(black_rook_pos_2, black_rook_pos_1, PieceType::ROOK);
+
+    for (auto turn = 0; turn < 49; turn++)
+    {
+        EXPECT_FALSE(board.is_draw());
+
+        if (board.get_white_turn())
+        {
+            if (board[white_rook_pos_1].has_value())
+                board.do_move(white_1_to_2);
+            else
+                board.do_move(white_2_to_1);
+        }
+        else
+        {
+            if (board[black_rook_pos_1].has_value())
+                board.do_move(black_1_to_2);
+            else
+                board.do_move(black_2_to_1);
+        }
+    }
+
+    EXPECT_FALSE(board.get_white_turn());
+
+    // black pawn move
+    board.do_move(dummy_move(Position(File::A, Rank::SEVEN),
+                             Position(File::A, Rank::SIX),
+                             PieceType::PAWN));
+
+    EXPECT_FALSE(board.is_draw());
+}
+
+
 // To start tests
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
