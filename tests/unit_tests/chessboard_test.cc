@@ -15,13 +15,14 @@ using namespace board;
     EXPECT_EQ(SidePiece.second, Color);\
 } while (0)
 
-#define EXPECT_PIECE(SidePiece, PieceType, Color) do {\
-    EXPECT_PIECETYPE(SidePiece, PieceType);\
-    EXPECT_COLOR(SidePiece, Color);\
+#define EXPECT_PIECE(OptSidePiece, PieceType, Color) do {\
+    EXPECT_TRUE(OptSidePiece.has_value());\
+    EXPECT_PIECETYPE(OptSidePiece.value(), PieceType);\
+    EXPECT_COLOR(OptSidePiece.value(), Color);\
 } while (0)
 
-#define EXPECT_NO_PIECE(SidePiece) do {\
-    EXPECT_FALSE(SidePiece.has_value());\
+#define EXPECT_NO_PIECE(OptSidePiece) do {\
+    EXPECT_FALSE(OptSidePiece.has_value());\
 } while (0)
 
 
@@ -125,8 +126,7 @@ TEST(InitialPieces, EmptyMid)
         {
             auto file = static_cast<File>(file_i);
 
-            auto opt_side_piece = virgin_board[Position(file, rank)];
-            EXPECT_FALSE(opt_side_piece.has_value());
+            EXPECT_NO_PIECE(virgin_board[Position(file, rank)]);
         }
     }
 }
@@ -249,10 +249,10 @@ TEST(Checkboard, Copy)
 
     board_copy.do_move(dummy_move(start, end, PieceType::PAWN));
 
-    EXPECT_PIECE(board_copy[end].value(), PieceType::PAWN, Color::WHITE);
+    EXPECT_PIECE(board_copy[end], PieceType::PAWN, Color::WHITE);
     EXPECT_FALSE(board_copy.get_white_turn());
 
-    EXPECT_FALSE(board[end].has_value());
+    EXPECT_NO_PIECE(board[end]);
     EXPECT_TRUE(board.get_white_turn());
 }
 
@@ -269,11 +269,9 @@ TEST(DoMove, SimplePawnMove)
     board.do_move(dummy_move(start_pos, end_pos, PieceType::PAWN));
 
     EXPECT_FALSE(board.get_white_turn());
-    EXPECT_FALSE(board[start_pos].has_value());
+    EXPECT_NO_PIECE(board[start_pos]);
 
-    auto moved_side_piece = board[end_pos].value();
-    EXPECT_COLOR(moved_side_piece, Color::WHITE);
-    EXPECT_PIECETYPE(moved_side_piece, PieceType::PAWN);
+    EXPECT_PIECE(board[end_pos], PieceType::PAWN, Color::WHITE);
 
     EXPECT_EQ(count_pieces(board), 32);
 }
@@ -292,12 +290,10 @@ TEST(DoMove, DoublePawnPush)
 
     EXPECT_FALSE(board.get_white_turn());
 
-    EXPECT_FALSE(board[start_pos].has_value());
-    EXPECT_FALSE(board[start_pos_front].has_value());
+    EXPECT_NO_PIECE(board[start_pos]);
+    EXPECT_NO_PIECE(board[start_pos_front]);
 
-    auto moved_side_piece = board[end_pos].value();
-    EXPECT_COLOR(moved_side_piece, Color::WHITE);
-    EXPECT_PIECETYPE(moved_side_piece, PieceType::PAWN);
+    EXPECT_PIECE(board[end_pos], PieceType::PAWN, Color::WHITE);
 
     EXPECT_EQ(count_pieces(board), 32);
 }
@@ -316,11 +312,9 @@ TEST(DoMove, SimpleCapture)
 
     EXPECT_FALSE(board.get_white_turn());
 
-    EXPECT_FALSE(board[start_pos].has_value());
+    EXPECT_NO_PIECE(board[start_pos]);
 
-    auto moved_side_pawn = board[end_pos].value();
-    EXPECT_COLOR(moved_side_pawn, Color::WHITE);
-    EXPECT_PIECETYPE(moved_side_pawn, PieceType::PAWN);
+    EXPECT_PIECE(board[end_pos], PieceType::PAWN, Color::WHITE);
 
     auto left_black_rook_pos = Position(File::A, Rank::EIGHT);
 
@@ -328,9 +322,9 @@ TEST(DoMove, SimpleCapture)
 
     EXPECT_TRUE(board.get_white_turn());
 
-    EXPECT_FALSE(board[left_black_rook_pos].has_value());
+    EXPECT_NO_PIECE(board[left_black_rook_pos]);
 
-    EXPECT_PIECE(board[end_pos].value(), PieceType::ROOK, Color::BLACK);
+    EXPECT_PIECE(board[end_pos], PieceType::ROOK, Color::BLACK);
 
     EXPECT_EQ(count_pieces(board), 31);
 }
@@ -390,8 +384,8 @@ TEST(DoMove, PromotionMove)
 
     board.do_move(dummy_promotion_move(white_pawn_start, white_pawn_end, PieceType::QUEEN));
 
-    EXPECT_EQ(PieceType::QUEEN, board[white_pawn_end].value().first);
-    EXPECT_EQ(Color::WHITE, board[white_pawn_end].value().second);
+    EXPECT_NO_PIECE(board[white_pawn_start]);
+    EXPECT_PIECE(board[white_pawn_end], PieceType::QUEEN, Color::WHITE);
 }
 
 TEST(DoMove, PromotionCapture)
@@ -403,11 +397,10 @@ TEST(DoMove, PromotionCapture)
 
     board.do_move(dummy_promotion_capture(white_pawn_start, white_pawn_end, PieceType::QUEEN));
 
-    EXPECT_EQ(PieceType::QUEEN, board[white_pawn_end].value().first);
-    EXPECT_EQ(Color::WHITE, board[white_pawn_end].value().second);
+    EXPECT_NO_PIECE(board[white_pawn_start]);
+    EXPECT_PIECE(board[white_pawn_end], PieceType::QUEEN, Color::WHITE);
 }
 
-// FIXME
 TEST(Draw, InitialState)
 {
     Chessboard board;
@@ -415,7 +408,6 @@ TEST(Draw, InitialState)
     EXPECT_FALSE(board.is_draw());
 }
 
-// FIXME
 TEST(Draw, Stalemate)
 {
     // This is the subject example
@@ -425,7 +417,6 @@ TEST(Draw, Stalemate)
 }
 
 // NOTE Will not pass anymore if we implement the threefold repetition bonus
-// FIXME
 TEST(Draw, FiftyLastTurns1)
 {
     Chessboard board;
@@ -464,7 +455,6 @@ TEST(Draw, FiftyLastTurns1)
 }
 
 // NOTE Will not pass anymore if we implement the threefold repetition bonus
-// FIXME
 TEST(Draw, FiftyLastTurns2)
 {
     Chessboard board;
