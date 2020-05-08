@@ -251,16 +251,38 @@ namespace board
         return is_move_possible(move) && is_possible_move_legal(move);
     }
 
+    Position Chessboard::get_king_position()
+    {
+        auto king_color = white_turn_ ? Color::WHITE : Color::BLACK;
+        bitboard_t king_bitboard = get_bitboard(PieceType::KING, king_color);
+
+        size_t rank_i = 0;
+        while (king_bitboard[rank_i].none())
+            rank_i++;
+
+        size_t file_i = 0;
+        while (!king_bitboard[rank_i][file_i])
+            file_i++;
+
+        return Position(static_cast<File>(file_i), static_cast<Rank>(rank_i));
+    }
+
     bool Chessboard::is_check()
     {
-        // FIXME
+        const Position king_pos = get_king_position();
+
+        auto possible_moves = rule::generate_moves(*this);
+
+        for (Move move : possible_moves)
+            if (move.end_get() == king_pos)
+                return true;
+
         return false;
     }
 
     bool Chessboard::is_check_mate()
     {
-        // FIXME
-        return false;
+        return is_check() && generate_legal_moves().empty();
     }
 
     // TODO handle threefold repetition
