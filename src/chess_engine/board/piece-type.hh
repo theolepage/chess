@@ -4,7 +4,7 @@
 #include <optional>
 #include <cstdint>
 
-#include "chess_engine/ai/utype.hh"
+#include "utils/utype.hh"
 
 namespace board
 {

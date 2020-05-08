@@ -40,6 +40,7 @@ set(OPT_FLAGS
 set(MAIN_ENGINE
     src/main.cc)
 set(SRC_ENGINE
+    src/chess_engine/ai/uci.cc
     src/chess_engine/board/rule.cc
     src/chess_engine/board/chessboard.cc
     src/parsing/option_parser/option-parser.cc
@@ -47,6 +48,7 @@ set(SRC_ENGINE
     src/parsing/pgn_parser/pgn-exception.cc
     src/parsing/pgn_parser/pgn-move.cc
     src/parsing/pgn_parser/pgn-parser.cc
+    src/listener/listener-manager.cc
     )
 include_directories(src
                     #FIXME

@@ -5,7 +5,7 @@
 #include <cassert>
 #include <iostream>
 
-#include "chess_engine/ai/utype.hh"
+#include "utils/utype.hh"
 
 namespace board
 {
@@ -50,6 +50,7 @@ namespace board
             file_ = static_cast<File>(file - 'a');
             rank_ =  static_cast<Rank>(rank - '0' - 1); // + 1 cause ONE corresponds to 0
         }
+        Position& operator=(const Position& position) = default;
 
         File get_file() const;
         Rank get_rank() const;

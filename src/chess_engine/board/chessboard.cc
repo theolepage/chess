@@ -356,6 +356,12 @@ namespace board
         return false;
     }
 
+    bool Chessboard::is_pat(void)
+    {
+        // FIXME
+        return false;
+    }
+
     bool Chessboard::is_check_mate(void)
     {
         return is_check() && generate_legal_moves().empty();
