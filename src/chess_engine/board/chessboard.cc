@@ -1,14 +1,39 @@
 #include "chessboard.hh"
+
 #include "rule.hh"
+#include "piece-type.hh"
+#include "color.hh"
+#include "position.hh"
+#include "move.hh"
 
 namespace board
 {
+    void Chessboard::set_piece(const PieceType& piece_type, const Color& color, const Position& move)
+    {
+        if (color == Color::WHITE)
+        {
+            const u_int8_t piece_indice = utils::utype(piece_type);
+            const u_int8_t y = utils::utype(move.get_rank());
+            const u_int8_t x = utils::utype(move.get_file());
+
+            white_bitboards_[piece_indice][y].set(x);
+        }
+        else
+        {
+            const u_int8_t piece_indice = utils::utype(piece_type);
+            const u_int8_t y = utils::utype(move.get_rank());
+            const u_int8_t x = utils::utype(move.get_file());
+
+            white_bitboards_[piece_indice][y].set(x);
+        }
+    }
+
     void Chessboard::init_end_ranks(PieceType piecetype, File file)
     {
         constexpr size_t white_end_rank_i = 0;
         constexpr size_t black_end_rank_i = width - 1;
 
-        size_t bitboard_i = utils::utype(piecetype);
+        const size_t bitboard_i = utils::utype(piecetype);
         const size_t file_i = utils::utype(file);
 
         white_bitboards_[bitboard_i][white_end_rank_i].set(file_i);
@@ -90,6 +115,38 @@ namespace board
         piece_bitboard[end_rank_i].set(end_file_i);
 
         white_turn_ = !white_turn_;
+    }
+
+    void Chessboard::undo_move(const Move& move, const option_parser::BoardState& state)
+    {
+        // First make the move but in the opposite direction
+        const Move reversed = move.get_reverse();
+        do_move(reversed);
+
+        // Then restore any eaten piece that was at end position
+        if (state.ate)
+        {
+            if (white_turn_) // The white was currently playing, a black piece was eaten
+            {
+                set_piece(static_cast<PieceType>(state.piece_type), Color::BLACK, move.end_get());
+            }
+            else
+            {
+                set_piece(static_cast<PieceType>(state.piece_type), Color::WHITE, move.end_get());
+            }
+        }
+
+        // Now restore the state flags
+        white_king_castling_ = state.white_king_castling;
+        white_queen_castling_ = state.white_queen_castling;
+        black_king_castling_ = state.black_king_castling;
+        black_queen_castling_ = state.black_queen_castling;
+
+        // Also need to restore en passant
+        if (state.en_passant)
+        {
+            en_passant_ = Position(state.x, state.y);
+        }
     }
 
     bool Chessboard::is_move_legal(const Move& move)

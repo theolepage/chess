@@ -9,6 +9,10 @@
 
 #include "chessboard-interface.hh"
 #include "move.hh"
+#include "parsing/option_parser/option-parser.hh"
+#include "position.hh"
+#include "piece-type.hh"
+#include "color.hh"
 
 namespace board
 {
@@ -33,6 +37,7 @@ namespace board
 
         // Assume that move is legal
         void do_move(const Move& move);
+        void undo_move(const Move& move, const option_parser::BoardState& state);
 
         bool is_move_legal(const Move& move);
 
@@ -52,6 +57,12 @@ namespace board
         friend std::ostream& operator<<(std::ostream& os, const Chessboard& board);
 
     private:
+        /**
+         * First access white or black
+         * Then access the piece
+         * Then the line
+         * Then the row
+        */
         std::array<bitboard_t, nb_pieces> white_bitboards_;
         std::array<bitboard_t, nb_pieces> black_bitboards_;
 
@@ -69,6 +80,7 @@ namespace board
 
         void init_end_ranks(PieceType piecetype, File file);
         void symetric_init_end_ranks(PieceType piecetype, File file);
+        void set_piece(const PieceType& piece_type, const Color& color, const Position& move);
     };
 
     /*
