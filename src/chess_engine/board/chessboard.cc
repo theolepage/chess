@@ -254,7 +254,7 @@ namespace board
                 const auto rook_start = Position(rook_start_file, king_rank);
                 const auto rook_end = Position(rook_end_file, king_rank);
 
-                move_piece(rook_start, rook_end, piecetype, color);
+                move_piece(rook_start, rook_end, PieceType::ROOK, color);
             }
             else if (move.promotion_get().has_value())
             {
