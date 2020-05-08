@@ -12,7 +12,7 @@ using namespace board;
 
 namespace rule
 {
-    bool count_pieces_between(const Chessboard& board,
+    bool have_pieces_between(const Chessboard& board,
                               const Position& x,
                               const Position& y);
 

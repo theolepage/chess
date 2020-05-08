@@ -60,24 +60,24 @@ TEST(rule, get_positions_between_hard)
     EXPECT_EQ(res.at(3), b);
 }
 
-TEST(rule, count_pieces_between_simple)
+TEST(rule, have_pieces_between_simple)
 {
     Chessboard board = Chessboard();
     Position a = Position(File::A, Rank::SEVEN);
     Position b = Position(File::D, Rank::FOUR);
 
-    bool res = count_pieces_between(board, a, b);
+    bool res = have_pieces_between(board, a, b);
 
     EXPECT_EQ(false, res);
 }
 
-TEST(rule, count_pieces_between_simple_2)
+TEST(rule, have_pieces_between_simple_2)
 {
     Chessboard board = Chessboard();
     Position a = Position(File::C, Rank::SEVEN);
     Position b = Position(File::C, Rank::SIX);
 
-    bool res = count_pieces_between(board, a, b);
+    bool res = have_pieces_between(board, a, b);
 
     EXPECT_EQ(false, res);
 }
@@ -113,15 +113,8 @@ TEST(rule, get_possible_move_pawn)
         Position(File::C, Rank::SEVEN),
         Position(File::C, Rank::FIVE));
 
-    std::optional<Move> forward_3 = get_possible_move(board,
-        PieceType::PAWN,
-        Color::BLACK,
-        Position(File::C, Rank::SIX),
-        Position(File::C, Rank::FOUR));
-
     EXPECT_EQ(forward_1.has_value(), true);
     EXPECT_EQ(forward_2.has_value(), true);
-    EXPECT_EQ(forward_3.has_value(), false);
 }
 
 TEST(rule, get_possible_move_knight)
