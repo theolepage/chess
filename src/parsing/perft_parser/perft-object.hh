@@ -1,6 +1,7 @@
 #pragma once
 
 #include "fen-object.hh"
+#include "chess_engine/board/chessboard.hh"
 
 namespace perft_parser
 {
@@ -13,12 +14,12 @@ namespace perft_parser
             depth_ = depth;
         }
 
-        FenObject fen_get(void) const
+        FenObject get_fen(void) const
         {
             return fen_;
         }
 
-        int depth_get(void) const
+        int get_depth(void) const
         {
             return depth_;
         }
@@ -32,6 +33,11 @@ namespace perft_parser
         bool operator!=(const PerftObject& rhs) const
         {
             return !(*this == rhs);
+        }
+
+        board::Chessboard get_board() const
+        {
+            return board::Chessboard(); // TODO replace with alan implem
         }
 
     private:
