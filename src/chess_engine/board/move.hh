@@ -34,6 +34,7 @@ namespace board
         bool double_pawn_push_get(void) const;
         bool queen_castling_get(void) const;
         bool king_castling_get(void) const;
+        bool castling_get(void) const;
         bool en_passant_get(void) const;
         const opt_piece_t& promotion_get(void) const;
         Move get_reverse(void) const // Reverse start and end, doesn't compile if placed in hxx

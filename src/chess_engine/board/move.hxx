@@ -77,6 +77,11 @@ namespace board
         return king_castling_;
     }
 
+    inline bool Move::castling_get() const
+    {
+        return queen_castling_get() || king_castling_get();
+    }
+
     inline bool Move::en_passant_get() const
     {
         return en_passant_;
