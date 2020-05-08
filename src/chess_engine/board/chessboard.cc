@@ -198,6 +198,70 @@ namespace board
         return legal_moves;
     }
 
+    void Chessboard::register_double_pawn_push(const Move& move)
+    {
+        const Position& start = move.start_get();
+        const Position& end = move.end_get();
+        const Color color = (*this)[start].value().second;
+
+        const auto start_rank_i = utils::utype(start.get_rank());
+        const auto en_passant_rank_i = start_rank_i + (color == Color::WHITE ? 1 : -1);
+        const auto en_passant_rank = static_cast<Rank>(en_passant_rank_i);
+
+        en_passant_ = opt_pos_t(Position(end.get_file(), en_passant_rank));
+    }
+
+    void Chessboard::forget_en_passant()
+    {
+        if (en_passant_.has_value())
+            en_passant_ = std::nullopt;
+    }
+
+    void Chessboard::update_last_fifty_turn(const Move& move)
+    {
+        if (move.capture_get() || move.piece_get() == PieceType::PAWN)
+            last_fifty_turn_ = 0;
+        else
+            last_fifty_turn_++;
+    }
+
+    void Chessboard::eat_en_passant(const Move& move)
+    {
+        const Position& start = move.start_get();
+        const Position& end = move.end_get();
+        const Color color = (*this)[start].value().second;
+
+        const auto en_passant_rank_i = utils::utype(end.get_rank());
+        const auto eaten_pawn_rank_i = en_passant_rank_i +
+            (color == Color::WHITE ? -1 : 1);
+        const auto eaten_pawn_rank = static_cast<Rank>(eaten_pawn_rank_i);
+
+        const auto eaten_pawn_color = color == Color::WHITE ?
+            Color::BLACK : Color::WHITE;
+
+        unset_position(Position(end.get_file(), eaten_pawn_rank),
+                       PieceType::PAWN, eaten_pawn_color);
+    }
+
+    void Chessboard::move_castling_rook(const Move& move)
+    {
+        const Position& start = move.start_get();
+        const Position& end = move.end_get();
+        const Color color = (*this)[start].value().second;
+
+        const auto king_file_i = utils::utype(end.get_file());
+        const auto king_rank = end.get_rank();
+
+        const auto rook_start_file = move.king_castling_get() ? File::H : File::A;
+        const auto rook_end_file_i = king_file_i + (move.king_castling_get() ? -1 : 1);
+        const auto rook_end_file = static_cast<File>(rook_end_file_i);
+
+        const auto rook_start = Position(rook_start_file, king_rank);
+        const auto rook_end = Position(rook_end_file, king_rank);
+
+        move_piece(rook_start, rook_end, PieceType::ROOK, color);
+    }
+
     void Chessboard::do_move(const Move& move)
     {
         const Position& start = move.start_get();
@@ -209,53 +273,16 @@ namespace board
 
         // NOTE if a move is a double pawn push, then it cannot be a capture
         if (move.double_pawn_push_get())
-        {
-            // double pawn push handling
-            const auto start_rank_i = utils::utype(start.get_rank());
-            const auto en_passant_rank_i = start_rank_i + (color == Color::WHITE ? 1 : -1);
-            const auto en_passant_rank = static_cast<Rank>(en_passant_rank_i);
-
-            en_passant_ = opt_pos_t(Position(end.get_file(), en_passant_rank));
-        }
+            register_double_pawn_push(move);
         else
         {
-            if (en_passant_.has_value())
-                en_passant_ = std::nullopt;
-
-            if (move.capture_get() || move.piece_get() == PieceType::PAWN)
-                last_fifty_turn_ = 0;
-            else
-                last_fifty_turn_++;
+            forget_en_passant();
+            update_last_fifty_turn(move);
 
             if (move.en_passant_get())
-            {
-                // erase the eaten pawn
-                const auto en_passant_rank_i = utils::utype(end.get_rank());
-                const auto eaten_pawn_rank_i = en_passant_rank_i +
-                    (color == Color::WHITE ? -1 : 1);
-                const auto eaten_pawn_rank = static_cast<Rank>(eaten_pawn_rank_i);
-
-                const auto eaten_pawn_color = color == Color::WHITE ?
-                    Color::BLACK : Color::WHITE;
-
-                unset_position(Position(end.get_file(), eaten_pawn_rank),
-                               PieceType::PAWN, eaten_pawn_color);
-            }
+                eat_en_passant(move);
             else if (move.castling_get())
-            {
-                //  move the corresponding rook next to its beloved king
-                const auto king_file_i = utils::utype(end.get_file());
-                const auto king_rank = end.get_rank();
-
-                const auto rook_start_file = move.king_castling_get() ? File::H : File::A;
-                const auto rook_end_file_i = king_file_i + (move.king_castling_get() ? -1 : 1);
-                const auto rook_end_file = static_cast<File>(rook_end_file_i);
-
-                const auto rook_start = Position(rook_start_file, king_rank);
-                const auto rook_end = Position(rook_end_file, king_rank);
-
-                move_piece(rook_start, rook_end, PieceType::ROOK, color);
-            }
+                move_castling_rook(move);
             else if (move.promotion_get().has_value())
             {
                 const auto new_piecetype = move.promotion_get().value();
