@@ -95,8 +95,8 @@ namespace board
 
         const bitboard_t& get_bitboard(PieceType piecetype, Color color) const;
         bitboard_t& get_bitboard(PieceType piecetype, Color color);
-        void set_position(const Position& pos, PieceType piecetype, Color color);
-        void unset_position(const Position& pos, PieceType piecetype, Color color);
+        void set_piece(const Position& pos, PieceType piecetype, Color color);
+        void unset_piece(const Position& pos, PieceType piecetype, Color color);
         void move_piece(const Position& start, const Position& end, PieceType piecetype, Color color);
         void change_piece_type(const Position& pos, PieceType old_type, PieceType new_type, Color color);
 

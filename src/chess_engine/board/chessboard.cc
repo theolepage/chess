@@ -27,7 +27,7 @@ namespace board
             black_bitboards_[piecetype_i];
     }
 
-    void Chessboard::set_position(const Position& pos, PieceType piecetype, Color color)
+    void Chessboard::set_piece(const Position& pos, PieceType piecetype, Color color)
     {
         bitboard_t& piece_bitboard = get_bitboard(piecetype, color);
 
@@ -37,7 +37,7 @@ namespace board
         piece_bitboard[pos_rank_i].set(pos_file_i);
     }
 
-    void Chessboard::unset_position(const Position& pos, PieceType piecetype, Color color)
+    void Chessboard::unset_piece(const Position& pos, PieceType piecetype, Color color)
     {
         bitboard_t& piece_bitboard = get_bitboard(piecetype, color);
 
@@ -49,14 +49,14 @@ namespace board
 
     void Chessboard::move_piece(const Position& start, const Position& end, PieceType piecetype, Color color)
     {
-        unset_position(start, piecetype, color);
-        set_position(end, piecetype, color);
+        unset_piece(start, piecetype, color);
+        set_piece(end, piecetype, color);
     }
 
     void Chessboard::change_piece_type(const Position& pos, PieceType old_type, PieceType new_type, Color color)
     {
-        unset_position(pos, old_type, color);
-        set_position(pos, new_type, color);
+        unset_piece(pos, old_type, color);
+        set_piece(pos, new_type, color);
     }
 
     void Chessboard::init_end_ranks(PieceType piecetype, File file)
@@ -64,8 +64,8 @@ namespace board
         constexpr Rank white_end_rank = Rank::ONE;
         constexpr Rank black_end_rank = Rank::EIGHT;
 
-        set_position(Position(file, white_end_rank), piecetype, Color::WHITE);
-        set_position(Position(file, black_end_rank), piecetype, Color::BLACK);
+        set_piece(Position(file, white_end_rank), piecetype, Color::WHITE);
+        set_piece(Position(file, black_end_rank), piecetype, Color::BLACK);
     }
 
     File symetric_file(File file)
@@ -116,8 +116,8 @@ namespace board
         for (size_t file_i = 0; file_i < width; file_i++)
         {
             auto file = static_cast<File>(file_i);
-            set_position(Position(file, Rank::TWO), PieceType::PAWN, Color::WHITE);
-            set_position(Position(file, Rank::SEVEN), PieceType::PAWN, Color::BLACK);
+            set_piece(Position(file, Rank::TWO), PieceType::PAWN, Color::WHITE);
+            set_piece(Position(file, Rank::SEVEN), PieceType::PAWN, Color::BLACK);
         }
 
         symetric_init_end_ranks(PieceType::ROOK, File::A);
@@ -159,7 +159,7 @@ namespace board
                 if (opt_side_piece.has_value())
                 {
                     auto side_piece = opt_side_piece.value();
-                    set_position(pos, side_piece.first, side_piece.second);
+                    set_piece(pos, side_piece.first, side_piece.second);
                 }
             }
         }
@@ -219,7 +219,7 @@ namespace board
         const auto eaten_pawn_color = color == Color::WHITE ?
             Color::BLACK : Color::WHITE;
 
-        unset_position(Position(end.get_file(), eaten_pawn_rank),
+        unset_piece(Position(end.get_file(), eaten_pawn_rank),
                        PieceType::PAWN, eaten_pawn_color);
     }
 
@@ -285,11 +285,11 @@ namespace board
         {
             if (white_turn_) // The white was currently playing, a black piece was eaten
             {
-                set_position(move.end_get(), static_cast<PieceType>(state.piece_type), Color::BLACK);
+                set_piece(move.end_get(), static_cast<PieceType>(state.piece_type), Color::BLACK);
             }
             else
             {
-                set_position(move.end_get(), static_cast<PieceType>(state.piece_type), Color::WHITE);
+                set_piece(move.end_get(), static_cast<PieceType>(state.piece_type), Color::WHITE);
             }
         }
 
