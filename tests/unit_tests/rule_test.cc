@@ -178,7 +178,7 @@ TEST(rule, register_promotion_simple)
         Color::WHITE,
         false);
 
-    EXPECT_EQ(res.size(), 5);
+    EXPECT_EQ(res.size(), 4);
 }
 
 TEST(rule, generate_moves_simple)

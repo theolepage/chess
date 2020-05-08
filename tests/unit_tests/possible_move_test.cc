@@ -7,7 +7,6 @@ using namespace board;
 using namespace rule;
 using namespace std;
 
-
 TEST(PossibleMove, Queen)
 {
     // This is the subject example
@@ -48,7 +47,7 @@ TEST(PossibleMove, Pawn)
 
     board = Chessboard("2ppp1p1/PPPPPP2/7P/8/8/8/8/8");
     moves = generate_pawn_moves(board);
-    EXPECT_EQ(4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 1, moves.size());
+    EXPECT_EQ(4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 1, moves.size());
 }
 
 int main(int argc, char *argv[])
