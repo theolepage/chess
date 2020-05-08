@@ -79,7 +79,6 @@ namespace option_parser
             {
                 opt_piece_t eaten = board[m.end_get()];
                 opt_pos_t en_passant = board.get_en_passant();
-                board.get_en_passant();
                 state.white_king_castling = board.get_king_castling(board::Color::WHITE);
                 state.white_queen_castling = board.get_queen_castling(board::Color::WHITE);
                 state.black_king_castling = board.get_king_castling(board::Color::BLACK);
