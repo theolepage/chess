@@ -25,8 +25,10 @@ namespace listener
         else
         {
             if (move.capture_get()) //FIXME better way ?
+            {
                 NOTIFY(on_piece_taken(taken_piece.value().first,
                                       move.end_get()));
+            }
             if (move.promotion_get().has_value())
                 NOTIFY(on_piece_promoted(move.promotion_get().value(),
                                          move.end_get()));
@@ -125,9 +127,4 @@ namespace listener
         listeners_.emplace_back(listener);
     }
 
-    void ListenerManager::close_listeners(void)
-    {
-        for (void* dll : dlls_)
-            dlclose(dll); // Do what on fail close
-    }
 }

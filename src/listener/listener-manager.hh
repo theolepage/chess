@@ -11,6 +11,17 @@ namespace listener
     class ListenerManager : public board::ChessboardInterface
     {
     public:
+        virtual ~ListenerManager()
+        {
+            for (size_t i = 0; i < dlls_.size(); ++i)
+            {
+                delete listeners_[i];
+                int a = dlclose(dlls_[i]);
+                if (a != 0)
+                    fprintf(stderr, "%s\n", dlerror());
+            }
+        }
+
         virtual opt_piece_t operator[](const board::Position& position) const override
         {
             return chessboard_[position];
