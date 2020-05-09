@@ -52,7 +52,7 @@ TEST(PossibleMove, Pawn)
 }
 
 // TODO FIX
-TEST(PossibleMove, Castling)
+TEST(PossibleMove, DISABLED_Castling)
 {
     Chessboard board = Chessboard(parse_perft("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1 1"));
     auto moves = generate_moves(board, PieceType::KING);
@@ -65,6 +65,11 @@ TEST(PossibleMove, EnPassant)
     Chessboard board = Chessboard(parse_perft("8/8/8/4Pp2/8/8/8/8 w - f6 0 1 1"));
     auto moves = generate_pawn_moves(board);
     EXPECT_EQ(2, moves.size());
+
+
+    board = Chessboard(parse_perft("1p5p/P6P/8/3Pp3/8/8/8/8 w - e6 0 1 1"));
+    moves = generate_pawn_moves(board);
+    EXPECT_EQ(10, moves.size());
 }
 
 int main(int argc, char *argv[])

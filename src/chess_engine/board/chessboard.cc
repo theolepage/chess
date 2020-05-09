@@ -174,7 +174,7 @@ namespace board
         const std::vector<Move> possible_moves = rule::generate_all_moves(*this);
 
         for (const Move& move : possible_moves)
-            if (is_move_legal(move))
+            if (is_possible_move_legal(move))
                 legal_moves.push_back(move);
 
         return legal_moves;
