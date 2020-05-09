@@ -6,6 +6,8 @@
 #include "position.hh"
 #include "move.hh"
 
+#include <cassert>
+
 namespace board
 {
     const Chessboard::bitboard_t& Chessboard::get_bitboard(PieceType piecetype, Color color) const
@@ -244,6 +246,9 @@ namespace board
         const Color color = (*this)[start].value().second;
         const PieceType piecetype = move.piece_get();
 
+        // The piece that will be eaten if move is a capture
+        const opt_piece_t opt_end_piece = (*this)[end];
+
         move_piece(start, end, piecetype, color);
 
         // NOTE if a move is a double pawn push, then it cannot be a capture
@@ -262,6 +267,16 @@ namespace board
             {
                 const auto new_piecetype = move.promotion_get().value();
                 change_piece_type(end, PieceType::PAWN, new_piecetype, color);
+            }
+            else if (move.capture_get())
+            {
+                side_piece_t eaten_piece = opt_end_piece.value();
+                auto eaten_piece_type = eaten_piece.first;
+                auto eaten_piece_color = eaten_piece.second;
+
+                assert(eaten_piece_color == (color == Color::WHITE ? Color::BLACK : Color::WHITE));
+
+                unset_piece(end, eaten_piece_type, eaten_piece_color);
             }
         }
 
