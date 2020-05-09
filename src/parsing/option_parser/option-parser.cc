@@ -57,6 +57,21 @@ namespace option_parser
         return buffer.str();
     }
 
+    static void fill_state(const board::Move& m, const board::Chessboard& board, BoardState& state)
+    {
+        opt_piece_t eaten = board[m.end_get()];
+        opt_pos_t en_passant = board.get_en_passant();
+        state.white_king_castling = board.get_king_castling(board::Color::WHITE);
+        state.white_queen_castling = board.get_queen_castling(board::Color::WHITE);
+        state.black_king_castling = board.get_king_castling(board::Color::BLACK);
+        state.black_queen_castling = board.get_queen_castling(board::Color::BLACK);
+        state.piece_type = ((eaten.has_value()) ? static_cast<uint8_t>(eaten.value().first) : 0);
+        state.ate = ((eaten.has_value()) ? 1 : 0);
+        state.x = ((en_passant.has_value()) ? static_cast<uint8_t>(en_passant.value().get_file()) : 0);
+        state.y = ((en_passant.has_value()) ? static_cast<uint8_t>(en_passant.value().get_rank()) : 0);
+        state.en_passant = ((en_passant.has_value()) ? 1 : 0);
+    }
+
     // Would be better in it's own file but fails when I try
     static uint64_t get_perft_value(board::Chessboard& board, int depth) // TODO generate legal moves should be const
     {
@@ -73,19 +88,7 @@ namespace option_parser
         for (const board::Move& m : move_list) // TODO convert to indice
         {
             BoardState state; // Scope used to destroy eaten & en_passant object
-            {
-                opt_piece_t eaten = board[m.end_get()];
-                opt_pos_t en_passant = board.get_en_passant();
-                state.white_king_castling = board.get_king_castling(board::Color::WHITE);
-                state.white_queen_castling = board.get_queen_castling(board::Color::WHITE);
-                state.black_king_castling = board.get_king_castling(board::Color::BLACK);
-                state.black_queen_castling = board.get_queen_castling(board::Color::BLACK);
-                state.piece_type = ((eaten.has_value()) ? static_cast<uint8_t>(eaten.value().first) : 0);
-                state.ate = ((eaten.has_value()) ? 1 : 0);
-                state.x = ((en_passant.has_value()) ? static_cast<uint8_t>(en_passant.value().get_file()) : 0);
-                state.y = ((en_passant.has_value()) ? static_cast<uint8_t>(en_passant.value().get_rank()) : 0);
-                state.en_passant = ((en_passant.has_value()) ? 1 : 0);
-            }
+            fill_state(m, board, state);
             board.do_move(m);
             nodes += get_perft_value(board, depth - 1);
             board.undo_move(m, state);
@@ -139,6 +142,5 @@ namespace option_parser
             //TODO triggered on bad option, what expected ?
             std::cerr << ex.what() << '\n';
         }
-        manager.close_listeners();
     }
 }

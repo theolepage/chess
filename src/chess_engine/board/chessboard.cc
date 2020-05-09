@@ -1,5 +1,6 @@
 #include "chessboard.hh"
 
+#include "parsing/option_parser/option-parser.hh"
 #include "rule.hh"
 #include "piece-type.hh"
 #include "color.hh"
@@ -7,9 +8,14 @@
 #include "move.hh"
 
 #include <cassert>
+#include <optional>
 
 namespace board
 {
+    using side_piece_t = std::pair<PieceType, Color>;
+    using opt_piece_t = std::optional<side_piece_t>;
+    using opt_pos_t = std::optional<board::Position>;
+
     const Chessboard::bitboard_t& Chessboard::get_bitboard(PieceType piecetype, Color color) const
     {
         const auto piecetype_i = utils::utype(piecetype);
@@ -270,6 +276,7 @@ namespace board
             }
             else if (move.capture_get())
             {
+                assert(opt_end_piece.has_value());
                 side_piece_t eaten_piece = opt_end_piece.value();
                 auto eaten_piece_type = eaten_piece.first;
                 auto eaten_piece_color = eaten_piece.second;
@@ -355,7 +362,6 @@ namespace board
         auto end = possible_piecetype_moves.end();
 
         return std::find(start, end, move) != end;
-
     }
 
     bool Chessboard::is_possible_move_legal(const Move& move)
@@ -364,8 +370,19 @@ namespace board
         Chessboard board_copy = *this;
         board_copy.do_move(move);
         board_copy.white_turn_ = !board_copy.white_turn_;
-
         return !board_copy.is_check();
+
+        /*option_parser::BoardState state;
+        fill_state(move, *this, state);
+
+        do_move(move);
+        white_turn_ = !white_turn_;
+        bool no_checked = !is_check();
+        white_turn_ = !white_turn_;
+        undo_move(move, state);
+        turn_ -= 2; // We called do_move 2 times
+
+        return no_checked;*/
     }
 
     bool Chessboard::is_move_legal(const Move& move)

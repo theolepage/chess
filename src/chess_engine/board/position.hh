@@ -11,30 +11,30 @@ namespace board
 {
     /* The file enum represent the colomns
      * on the board */
-    enum class File : uint8_t
+    enum class File
     {
-        A = 0,
-        B = 1,
-        C = 2,
-        D = 3,
-        E = 4,
-        F = 5,
-        G = 6,
-        H = 7
+        A,
+        B,
+        C,
+        D,
+        E,
+        F,
+        G,
+        H
     };
 
     /* The rank enum represent the lines
      * on the board */
-    enum class Rank : uint8_t
+    enum class Rank
     {
-        ONE = 0,
-        TWO = 1,
-        THREE = 2,
-        FOUR = 3,
-        FIVE = 4,
-        SIX = 5,
-        SEVEN = 6,
-        EIGHT = 7
+        ONE,
+        TWO,
+        THREE,
+        FOUR,
+        FIVE,
+        SIX,
+        SEVEN,
+        EIGHT
     };
 
     /* Position represent a coordinate on the board */
@@ -43,6 +43,12 @@ namespace board
     public:
         // (x, y)
         Position(File file, Rank rank);
+
+        Position(u_int8_t x, u_int8_t y)
+        {
+            file_ = static_cast<File>(x);
+            rank_ =  static_cast<Rank>(y);
+        }
 
         Position(char file, char rank)
         {
