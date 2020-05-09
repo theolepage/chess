@@ -112,4 +112,11 @@ namespace board
          king_castling_ = king_castling;
          en_passant_ = en_passant;
     }
+
+    inline std::ostream& operator<<(std::ostream& os, const Move& move)
+    {
+        os << "Move - piece: " << static_cast<int>(move.piece_get()) << " ";
+        os << "start: " << move.start_get() << " end: " << move.end_get();
+        return os;
+    }
 }

@@ -32,7 +32,7 @@ namespace rule
                                           const Position& from,
                                           const Position& to);
 
-    std::optional<Move> register_castling(const Chessboard& board,
+    std::optional<Move> register_castling(Chessboard& board,
                                           const Color& color,
                                           bool king_castling);
 
@@ -42,15 +42,15 @@ namespace rule
                             const Color& color,
                             bool capture);
 
-    std::vector<Move> generate_moves(const Chessboard& board,
+    std::vector<Move> generate_moves(Chessboard& board,
                                      const PieceType& piece);
 
-    std::vector<Move> generate_all_moves(const Chessboard& board);
+    std::vector<Move> generate_all_moves(Chessboard& board);
 
-    std::vector<Move> generate_pawn_moves(const Chessboard& board);
-    std::vector<Move> generate_king_moves(const Chessboard& board);
-    std::vector<Move> generate_bishop_moves(const Chessboard& board);
-    std::vector<Move> generate_rook_moves(const Chessboard& board);
-    std::vector<Move> generate_queen_moves(const Chessboard& board);
-    std::vector<Move> generate_knight_moves(const Chessboard& board);
+    std::vector<Move> generate_pawn_moves(Chessboard& board);
+    std::vector<Move> generate_king_moves(Chessboard& board);
+    std::vector<Move> generate_bishop_moves(Chessboard& board);
+    std::vector<Move> generate_rook_moves(Chessboard& board);
+    std::vector<Move> generate_queen_moves(Chessboard& board);
+    std::vector<Move> generate_knight_moves(Chessboard& board);
 } // namespace rule

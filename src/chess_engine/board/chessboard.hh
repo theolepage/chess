@@ -48,13 +48,14 @@ namespace board
             Chessboard(parse_perft(fen_string + std::string(" w - - 0 0 0"))) {}
 
 
-        std::vector<Move> generate_legal_moves(void) const;
+        std::vector<Move> generate_legal_moves(void);
 
         // Assume that move is legal
         void do_move(const Move& move);
         void undo_move(const Move& move, const option_parser::BoardState& state);
 
-        bool is_move_legal(const Move& move) const;
+        bool is_move_legal(const Move& move);
+        bool is_possible_move_legal(const Move& move);
 
         bool is_check(void);
         bool is_checkmate(void);
@@ -66,9 +67,12 @@ namespace board
         opt_pos_t get_en_passant() const;
 
         bool get_white_turn() const;
+        void set_white_turn(bool state);
 
         bool get_king_castling(const Color& color) const;
         bool get_queen_castling(const Color& color) const;
+        void set_king_castling(const Color& color, bool state);
+        void set_queen_castling(const Color& color, bool state);
 
         Position get_king_position(void) const;
 
@@ -106,8 +110,7 @@ namespace board
         void init_end_ranks(PieceType piecetype, File file);
         void symetric_init_end_ranks(PieceType piecetype, File file);
 
-        bool is_move_possible(const Move& move) const;
-        bool is_possible_move_legal(const Move& move) const;
+        bool is_move_possible(const Move& move);
 
         void register_double_pawn_push(const Move& move, Color color);
         void forget_en_passant();

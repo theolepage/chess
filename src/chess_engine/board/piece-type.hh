@@ -3,6 +3,7 @@
 #include <array>
 #include <optional>
 #include <cstdint>
+#include <stdexcept>
 
 #include "utils/utype.hh"
 

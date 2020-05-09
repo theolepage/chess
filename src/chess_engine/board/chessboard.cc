@@ -167,7 +167,7 @@ namespace board
         }
     }
 
-    std::vector<Move> Chessboard::generate_legal_moves(void) const
+    std::vector<Move> Chessboard::generate_legal_moves(void)
     {
         std::vector<Move> legal_moves;
 
@@ -325,7 +325,7 @@ namespace board
         * We can then process to inspect the number of possibilites with the next move
         */
     }
-    bool Chessboard::is_move_possible(const Move& move) const
+    bool Chessboard::is_move_possible(const Move& move)
     {
         std::vector<Move> possible_piecetype_moves;
 
@@ -358,7 +358,7 @@ namespace board
 
     }
 
-    bool Chessboard::is_possible_move_legal(const Move& move) const
+    bool Chessboard::is_possible_move_legal(const Move& move)
     {
         // TODO try do undo
         Chessboard board_copy = *this;
@@ -368,7 +368,7 @@ namespace board
         return !board_copy.is_check();
     }
 
-    bool Chessboard::is_move_legal(const Move& move) const
+    bool Chessboard::is_move_legal(const Move& move)
     {
         return is_move_possible(move) && is_possible_move_legal(move);
     }
@@ -396,7 +396,6 @@ namespace board
         // little hack to get the opponent turns
         white_turn_ = !white_turn_;
         auto possible_moves = rule::generate_all_moves(*this);
-
         white_turn_ = !white_turn_;
 
         for (const Move& move : possible_moves)
@@ -428,6 +427,11 @@ namespace board
         return white_turn_;
     }
 
+    void Chessboard::set_white_turn(bool state)
+    {
+        white_turn_ = state;
+    }
+
     Chessboard::opt_pos_t Chessboard::get_en_passant() const
     {
         return en_passant_;
@@ -445,6 +449,22 @@ namespace board
         return color == Color::WHITE ?
             white_queen_castling_:
             black_queen_castling_;
+    }
+
+    void Chessboard::set_king_castling(const Color& color, bool state)
+    {
+        if (color == Color::WHITE)
+            white_king_castling_ = state;
+        else if (color == Color::BLACK)
+            black_king_castling_ = state;
+    }
+
+    void Chessboard::set_queen_castling(const Color& color, bool state)
+    {
+        if (color == Color::WHITE)
+            white_queen_castling_ = state;
+        else if (color == Color::BLACK)
+            black_queen_castling_ = state;
     }
 
     Chessboard::opt_piece_t Chessboard::operator[](const Position& pos) const

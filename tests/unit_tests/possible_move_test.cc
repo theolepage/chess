@@ -52,12 +52,11 @@ TEST(PossibleMove, Pawn)
 }
 
 // TODO FIX
-TEST(PossibleMove, DISABLED_Castling)
+TEST(PossibleMove, Castling)
 {
     Chessboard board = Chessboard(parse_perft("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1 1"));
     auto moves = generate_moves(board, PieceType::KING);
     EXPECT_EQ(4, moves.size());
-
 }
 
 TEST(PossibleMove, EnPassant)

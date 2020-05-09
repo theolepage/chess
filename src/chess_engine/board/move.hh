@@ -51,6 +51,8 @@ namespace board
             return Move(end_, start_, piece_, capture_, double_pawn_push_, queen_castling_, king_castling_, en_passant_, promotion_);
         }
 
+        friend std::ostream& operator<<(std::ostream& os, const Position& pos);
+
     private:
         // The original position of the piece
         Position start_;
