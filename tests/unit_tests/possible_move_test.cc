@@ -2,6 +2,7 @@
 
 #include "chess_engine/board/chessboard.hh"
 #include "chess_engine/board/rule.hh"
+#include "parsing/perft_parser/perft-parser.hh"
 
 using namespace board;
 using namespace rule;
@@ -48,6 +49,22 @@ TEST(PossibleMove, Pawn)
     board = Chessboard("2ppp1p1/PPPPPP2/7P/8/8/8/8/8");
     moves = generate_pawn_moves(board);
     EXPECT_EQ(4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 1, moves.size());
+}
+
+// TODO FIX
+TEST(PossibleMove, Castling)
+{
+    Chessboard board = Chessboard(parse_perft("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1 1"));
+    auto moves = generate_moves(board, PieceType::KING);
+    EXPECT_EQ(4, moves.size());
+
+}
+
+TEST(PossibleMove, EnPassant)
+{
+    Chessboard board = Chessboard(parse_perft("8/8/8/4Pp2/8/8/8/8 w - f6 0 1 1"));
+    auto moves = generate_pawn_moves(board);
+    EXPECT_EQ(2, moves.size());
 }
 
 int main(int argc, char *argv[])
