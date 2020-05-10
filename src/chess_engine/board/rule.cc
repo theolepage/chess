@@ -315,17 +315,17 @@ namespace rule
                 if (!register_promotion(res, from, *to_forward, color, false))
                     res.emplace_back(from, *to_forward, piece,
                                      false, false, false, false, false);
-            }
 
-            const std::optional<Position> to_forward_2 = (color == Color::BLACK)
-                ? from.move(0, -2)
-                : from.move(0,  2);
-            const bool first_move = (color == Color::BLACK)
-                ? from.get_rank() == Rank::SEVEN
-                : from.get_rank() == Rank::TWO;
-            if (first_move && to_forward_2 && !board[*to_forward_2])
-                res.emplace_back(from, *to_forward_2, piece,
-                                 false, true, false, false, false);
+                const std::optional<Position> to_forward_2 = (color == Color::BLACK)
+                    ? from.move(0, -2)
+                    : from.move(0,  2);
+                const bool first_move = (color == Color::BLACK)
+                    ? from.get_rank() == Rank::SEVEN
+                    : from.get_rank() == Rank::TWO;
+                if (first_move && to_forward_2 && !board[*to_forward_2])
+                    res.emplace_back(from, *to_forward_2, piece,
+                                    false, true, false, false, false);
+            }
 
             // Pawn can move to a cell diagonally in front of it on an adjacent
             // file if (and only if) the cell already contains a piece of the
