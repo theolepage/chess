@@ -38,8 +38,8 @@ namespace board
 
     inline std::ostream& operator<<(std::ostream& os, const Position& pos)
     {
-        os << "Pos(" << static_cast<int>(pos.get_file());
-        os << ";" << static_cast<int>(pos.get_rank()) << ")";
+        os << "Pos(" << (char)(static_cast<char>(pos.get_file()) + 'A');
+        os << ";" << static_cast<int>(pos.get_rank()) + 1 << ")";
         return os;
     }
 

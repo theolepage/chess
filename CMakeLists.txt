@@ -65,6 +65,7 @@ set(SRC_TESTS
     tests/unit_tests/rule_test.cc
     tests/unit_tests/possible_move_test.cc
     tests/unit_tests/check_test.cc
+    tests/unit_tests/game_test.cc
     #FIXME
     )
 

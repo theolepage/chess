@@ -262,7 +262,7 @@ namespace rule
             }
 
             // Handle castling moves
-            if (piece == PieceType::KING && color != Color::BLACK)
+            if (piece == PieceType::KING)
             {
                 const auto king_castling = register_castling(board, color, true);
                 const auto queen_castling = register_castling(board, color, false);

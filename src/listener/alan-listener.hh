@@ -86,7 +86,7 @@ namespace listener
 
         virtual void on_kingside_castling(const board::Color color)
         {
-            cout << "[QUEEN_CASTLING] player :" << static_cast<int>(color) << endl;
+            cout << "[KING_CASTLING] player :" << static_cast<int>(color) << endl;
             print_board();
         }
 

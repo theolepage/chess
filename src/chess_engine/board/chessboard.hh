@@ -56,6 +56,7 @@ namespace board
 
         bool is_move_legal(const Move& move);
         bool is_possible_move_legal(const Move& move);
+        bool is_move_possible(const Move& move);
 
         bool is_check(void);
         bool is_checkmate(void);
@@ -109,8 +110,6 @@ namespace board
 
         void init_end_ranks(PieceType piecetype, File file);
         void symetric_init_end_ranks(PieceType piecetype, File file);
-
-        bool is_move_possible(const Move& move);
 
         void register_double_pawn_push(const Move& move, Color color);
         void forget_en_passant();
