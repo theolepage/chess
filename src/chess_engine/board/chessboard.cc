@@ -418,6 +418,21 @@ namespace board
     }
     bool Chessboard::is_move_possible(const Move& move)
     {
+        // Move is invalid if in start the piece is not there or bad color
+        // Scope is soooo perf, swiftly
+        {
+            auto opt_piece = (*this)[move.start_get()];
+            if (!opt_piece.has_value())
+            {
+                return false;
+            }
+            else if (opt_piece.value().first != move.piece_get()
+                    || opt_piece.value().second != ((white_turn_) ? Color::WHITE : Color::BLACK))
+            {
+                return false;
+            }
+        }
+
         std::vector<Move> possible_piecetype_moves;
 
         switch (move.piece_get())
@@ -471,9 +486,7 @@ namespace board
 
     bool Chessboard::is_move_legal(const Move& move)
     {
-        bool a = is_move_possible(move);
-        bool b = is_possible_move_legal(move);
-        return a && b;
+        return is_move_possible(move) && is_possible_move_legal(move);
     }
 
     Position Chessboard::get_king_position(void) const

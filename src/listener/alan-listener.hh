@@ -40,6 +40,26 @@ namespace listener
             print_board();
         }
 
+        const char* piece_name(const board::PieceType piece)
+        {
+            switch (piece)
+            {
+                case board::PieceType::KING:
+                    return "KING";
+                case board::PieceType::BISHOP:
+                    return "BISHOP";
+                case board::PieceType::KNIGHT:
+                    return "KNIGHT";
+                case board::PieceType::PAWN:
+                    return "PAWN";
+                case board::PieceType::ROOK:
+                    return "ROOK";
+                case board::PieceType::QUEEN:
+                    return "QUEEN";
+            }
+            return "olo";
+        }
+
         /**
         ** \brief Must be called when a piece is moved.
         **
@@ -51,7 +71,7 @@ namespace listener
                                     const board::Position& from,
                                     const board::Position& to)
         {
-            cout << "[PIECE_MOVE] piece moved : " << static_cast<int>(piece) << " from " << from << " to " << to << endl;
+            cout << "[PIECE_MOVE] piece moved : " << piece_name(piece) << " from " << from << " to " << to << endl;
             print_board();
         }
 
