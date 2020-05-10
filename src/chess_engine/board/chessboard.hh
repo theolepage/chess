@@ -116,6 +116,9 @@ namespace board
         void update_last_fifty_turn(const Move& move);
         void eat_en_passant(const Move& move, Color color);
         void move_castling_rook(const Move& move, Color color);
+        void update_white_castling_bools(const Move& move);
+        void update_black_castling_bools(const Move& move);
+        void update_castling_bools(const Move& move, Color color);
     };
 
     /*

@@ -597,6 +597,12 @@ TEST(Castling, WhiteKingSideBlackQueenSide)
 
     for (auto pos : {black_king_start, black_rook_start, white_king_start, white_rook_start})
         EXPECT_NO_PIECE(board[pos]);
+
+    for (auto color : {Color::WHITE, Color::BLACK})
+    {
+        EXPECT_FALSE(board.get_king_castling(color));
+        EXPECT_FALSE(board.get_queen_castling(color));
+    }
 }
 
 

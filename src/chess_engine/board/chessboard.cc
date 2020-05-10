@@ -245,6 +245,84 @@ namespace board
         move_piece(rook_start, rook_end, PieceType::ROOK, color);
     }
 
+    void Chessboard::update_white_castling_bools(const Move& move)
+    {
+        const Position queenside_rook_pos = Position(File::A, Rank::ONE);
+        const Position kingside_rook_pos = Position(File::H, Rank::ONE);
+
+        if (move.castling_get())
+        {
+            if (move.king_castling_get())
+                white_king_castling_ = false;
+            else
+                white_queen_castling_ = false;
+        }
+        else
+        {
+            auto move_piecetype = move.piece_get();
+
+            if (move_piecetype == PieceType::KING)
+            {
+                // If the king is moved, no castling will ever be possible again
+                white_king_castling_ = false;
+                white_queen_castling_ = false;
+            }
+            else if (move_piecetype == PieceType::ROOK)
+            {
+                auto rook_start = move.start_get();
+
+                // If a rook is moved, it can only cancels one castling out of two
+                if (rook_start == kingside_rook_pos)
+                    white_king_castling_ = false;
+                else if (rook_start == queenside_rook_pos)
+                    white_queen_castling_ = false;
+            }
+        }
+    }
+
+    void Chessboard::update_black_castling_bools(const Move& move)
+    {
+        const Position queenside_rook_pos = Position(File::A, Rank::EIGHT);
+        const Position kingside_rook_pos = Position(File::H, Rank::EIGHT);
+
+        if (move.castling_get())
+        {
+            if (move.king_castling_get())
+                black_king_castling_ = false;
+            else
+                black_queen_castling_ = false;
+        }
+        else
+        {
+            auto move_piecetype = move.piece_get();
+
+            if (move_piecetype == PieceType::KING)
+            {
+                // If the king is moved, no castling will ever be possible again
+                black_king_castling_ = false;
+                black_queen_castling_ = false;
+            }
+            else if (move_piecetype == PieceType::ROOK)
+            {
+                auto rook_start = move.start_get();
+
+                // If a rook is moved, it can only cancels one castling out of two
+                if (rook_start == kingside_rook_pos)
+                    black_king_castling_ = false;
+                else if (rook_start == queenside_rook_pos)
+                    black_queen_castling_ = false;
+            }
+        }
+    }
+
+    void Chessboard::update_castling_bools(const Move& move, Color color)
+    {
+        if (color == Color::WHITE)
+            update_white_castling_bools(move);
+        else
+            update_black_castling_bools(move);
+    }
+
     void Chessboard::do_move(const Move& move)
     {
         const Position& start = move.start_get();
@@ -286,6 +364,8 @@ namespace board
                 unset_piece(end, eaten_piece_type, eaten_piece_color);
             }
         }
+
+        update_castling_bools(move, color);
 
         turn_++;
         white_turn_ = !white_turn_;
