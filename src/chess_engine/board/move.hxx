@@ -115,8 +115,11 @@ namespace board
 
     inline std::ostream& operator<<(std::ostream& os, const Move& move)
     {
-        os << "Move - piece: " << static_cast<int>(move.piece_get()) << " ";
-        os << "start: " << move.start_get() << " end: " << move.end_get();
+        os << "Move - " << piece_to_char(move.piece_get()) << " ";
+        os << move.start_get() << " -> " << move.end_get() << " (";
+        if (move.capture_get()) os << "capture";
+        if (move.en_passant_get()) os << ", en passant";
+        os << ")";
         return os;
     }
 }

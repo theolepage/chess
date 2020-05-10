@@ -179,17 +179,9 @@ namespace board
 
         const std::vector<Move> possible_moves = rule::generate_all_moves(*this);
 
-        
-
         for (const Move& move : possible_moves)
             if (is_possible_move_legal(move))
                 legal_moves.push_back(move);
-
-        // for (auto m : legal_moves)
-        // {
-        //     if (m.start_get() == Position(File::E, Rank::FIVE))
-        //         std::cout << "debug: " << m << "\n";
-        // }
 
         return legal_moves;
     }
@@ -368,7 +360,6 @@ namespace board
                 unset_piece(end, eaten_piece_type, eaten_piece_color);
             }
         }
-
         update_castling_bools(move, color);
 
         turn_++;

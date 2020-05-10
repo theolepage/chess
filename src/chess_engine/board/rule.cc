@@ -336,24 +336,31 @@ namespace rule
             const std::optional<Position> to_diag_right = (color == Color::BLACK)
                 ? from.move(1, -1)
                 : from.move(1,  1);
-            
-            if (to_diag_left && (
-                    (board[*to_diag_left] && board[*to_diag_left]->second != color)
-                    || (board.get_en_passant() == *to_diag_left)))
-            {
-                if (!register_promotion(res, from, *to_diag_left, color, true))
-                    res.emplace_back(from, *to_diag_left, piece,
-                                     true, false, false, false, false);
-            }
 
-            if (to_diag_right && (
-                    (board[*to_diag_right] && board[*to_diag_right]->second != color)
-                    || (board.get_en_passant() == *to_diag_right)))
+            if (to_diag_left)
             {
-                if (!register_promotion(res, from, *to_diag_right, color, true))
-                    res.emplace_back(from, *to_diag_right, piece,
-                                     true, false, false, false, false);
+                bool capture = board[*to_diag_left]
+                    && board[*to_diag_left]->second != color;
+                bool en_passant = board.get_en_passant().has_value()
+                    && board.get_en_passant() == *to_diag_left;
+                if (capture || en_passant)
+                    if (!register_promotion(res, from, *to_diag_left, color, true))
+                        res.emplace_back(from, *to_diag_left, piece,
+                                        true, false, false, false, en_passant);
             }
+            
+            if (to_diag_right)
+            {
+                bool capture = board[*to_diag_right]
+                    && board[*to_diag_right]->second != color;
+                bool en_passant = board.get_en_passant().has_value()
+                    && board.get_en_passant() == *to_diag_right;
+
+                if (capture || en_passant)
+                    if (!register_promotion(res, from, *to_diag_right, color, true))
+                        res.emplace_back(from, *to_diag_right, piece,
+                                        true, false, false, false, en_passant);
+            }            
         }
 
         return res;

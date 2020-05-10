@@ -77,10 +77,21 @@ namespace listener
             return false;
         }
         opt_piece_t possibly_taken_piece = std::nullopt;
-        if (move.capture_get()) //FIXME better way ?
+
+        if (move.en_passant_get())
+        {
+            board::Position target = chessboard_.get_white_turn()
+                ? move.end_get().move(0, -1).value()
+                : move.end_get().move(0,  1).value();
+            possibly_taken_piece.emplace(chessboard_[target].value());
+        }
+        else if (move.capture_get()) //FIXME better way ?
             possibly_taken_piece.emplace(chessboard_[move.end_get()].value());
+
         chessboard_.do_move(move);
         notify_move(move, possibly_taken_piece);
+
+       
         return notify_board_state();
     }
 
