@@ -93,8 +93,8 @@ namespace board
                           piece_ == board::PieceType::PAWN &&
                           capture_ &&
                           end_.get_file() == prev_end.get_file() &&
-                          (utils::utype(end_.get_rank()) == 6 ||
-                          utils::utype(end_.get_rank()) == 3);
+                          (utils::utype(end_.get_rank()) == 5 ||
+                          utils::utype(end_.get_rank()) == 2);
 
         previous_move.set(start_, end_, piece_, capture_, double_pawn_push_,
                         queen_castling_, king_castling_,

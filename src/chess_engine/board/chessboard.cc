@@ -179,9 +179,17 @@ namespace board
 
         const std::vector<Move> possible_moves = rule::generate_all_moves(*this);
 
+        
+
         for (const Move& move : possible_moves)
             if (is_possible_move_legal(move))
                 legal_moves.push_back(move);
+
+        // for (auto m : legal_moves)
+        // {
+        //     if (m.start_get() == Position(File::E, Rank::FIVE))
+        //         std::cout << "debug: " << m << "\n";
+        // }
 
         return legal_moves;
     }
@@ -252,10 +260,8 @@ namespace board
 
         if (move.castling_get())
         {
-            if (move.king_castling_get())
-                white_king_castling_ = false;
-            else
-                white_queen_castling_ = false;
+            white_king_castling_ = false;
+            white_queen_castling_ = false;
         }
         else
         {
@@ -287,10 +293,8 @@ namespace board
 
         if (move.castling_get())
         {
-            if (move.king_castling_get())
-                black_king_castling_ = false;
-            else
-                black_queen_castling_ = false;
+            black_king_castling_ = false;
+            black_queen_castling_ = false;
         }
         else
         {
@@ -467,7 +471,9 @@ namespace board
 
     bool Chessboard::is_move_legal(const Move& move)
     {
-        return is_move_possible(move) && is_possible_move_legal(move);
+        bool a = is_move_possible(move);
+        bool b = is_possible_move_legal(move);
+        return a && b;
     }
 
     Position Chessboard::get_king_position(void) const
@@ -516,7 +522,9 @@ namespace board
     // TODO handle threefold repetition
     bool Chessboard::is_draw(void)
     {
-        return last_fifty_turn_ >= 50 || (!is_check() && generate_legal_moves().empty());
+        bool a = !is_check();
+        auto b = generate_legal_moves();
+        return last_fifty_turn_ >= 50 || (a && b.empty());
     }
 
     bool Chessboard::get_white_turn() const

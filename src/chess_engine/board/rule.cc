@@ -173,46 +173,66 @@ namespace rule
         const Position new_king = Position(king_castling ? File::G : File::C, rank);
         // Position new_rook = Position(king_castling ? File::F : File::D, rank);
 
-        // Check if allowed to do a king castling (RIGHT)
-        bool castling_allowed = false;
-        if (king_castling && board.get_king_castling(color))
+        // Keep castling state of opponent 
+        Color opposite_color = (color == Color::WHITE) ? Color::BLACK : Color::WHITE;
+        bool opposite_king_castling = board.get_king_castling(opposite_color);
+        bool opposite_queen_castling = board.get_queen_castling(opposite_color);
+
+        // Check if allowed to do a castling
+        if (have_pieces_between(board, king, rook)
+            || (king_castling && !board.get_king_castling(color))
+            || (!king_castling && !board.get_queen_castling(color)))
+            return std::nullopt;
+
+        // Update castling state
+        if (king_castling)
         {
-            castling_allowed = true;
             board.set_king_castling(color, false);
+            if (opposite_king_castling) board.set_king_castling(opposite_color, false);
         }
-        else if (!king_castling && board.get_queen_castling(color))
+        else
         {
-            castling_allowed = true;
             board.set_queen_castling(color, false);
+            if (opposite_queen_castling) board.set_queen_castling(opposite_color, false);
         }
-        if (castling_allowed && !have_pieces_between(board, king, rook))
+
+        bool not_in_check = true;
+        const auto temp_positions = get_positions_between(king, new_king);
+        Chessboard board_copy = board;
+        Position prev_step = king;
+
+        for (size_t i = 1; i < temp_positions.size(); i++)
         {
-            bool not_in_check = true;
-            const auto temp_positions = get_positions_between(king, new_king);
-            Chessboard board_copy = board;
-            Position prev_step = king;
-
-            for (size_t i = 1; i < temp_positions.size(); i++)
-            {
-                const Position step = temp_positions.at(i);
-                const Move temp_move = Move(prev_step, step, PieceType::KING, false, false, false, false, false);
-                
-                board_copy.do_move(temp_move);
-                board_copy.set_white_turn(!board_copy.get_white_turn());
-                if (board_copy.is_check())
-                    not_in_check = false;
-
-                prev_step = step;
-            }
-
-            if (not_in_check)
-            {
-                if (king_castling)
-                    return Move(king, new_king, PieceType::KING, false, false, false, true, false);
-                return Move(king, new_king, PieceType::KING, false, false, true, false, false);
-            }
+            const Position step = temp_positions.at(i);
+            const Move temp_move = Move(prev_step, step, PieceType::KING, false, false, false, false, false);
+            board_copy.do_move(temp_move);
+            board_copy.set_white_turn(!board_copy.get_white_turn());
+            if (board_copy.is_check())
+                not_in_check = false;
+            prev_step = step;
         }
-        return std::nullopt;
+
+        // Restore castling state
+        if (king_castling)
+        {
+            board.set_king_castling(color, true);
+            if (opposite_king_castling) board.set_king_castling(opposite_color, true);
+        }
+        else
+        {
+            board.set_queen_castling(color, true);
+            if (opposite_queen_castling) board.set_queen_castling(opposite_color, true);
+        }
+
+        std::optional<Move> res = std::nullopt;
+        if (not_in_check)
+        {
+            if (king_castling)
+                res = Move(king, new_king, PieceType::KING, false, false, false, true, false);
+            else
+                res = Move(king, new_king, PieceType::KING, false, false, true, false, false);
+        }
+        return res;
     }
 
     bool register_promotion(std::vector<Move>& moves,

@@ -22,5 +22,6 @@ TEST(DrawPGN, CastlingIllegal)
 
     EXPECT_TRUE(board.is_move_possible(castling));
     EXPECT_TRUE(board.is_possible_move_legal(castling));
-    EXPECT_TRUE(board.is_move_legal(castling));
+    EXPECT_TRUE(board.is_move_possible(castling));
+    EXPECT_TRUE(board.is_possible_move_legal(castling));
 }

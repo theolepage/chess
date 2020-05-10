@@ -8,6 +8,7 @@ using namespace board;
 using namespace rule;
 using namespace std;
 
+/*
 TEST(PossibleMove, Queen)
 {
     // This is the subject example
@@ -50,6 +51,7 @@ TEST(PossibleMove, Pawn)
     moves = generate_pawn_moves(board);
     EXPECT_EQ(4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 1, moves.size());
 }
+*/
 
 // TODO FIX
 TEST(PossibleMove, Castling)
@@ -59,6 +61,7 @@ TEST(PossibleMove, Castling)
     EXPECT_EQ(4, moves.size());
 }
 
+/*
 TEST(PossibleMove, EnPassant)
 {
     Chessboard board = Chessboard(parse_perft("8/8/8/4Pp2/8/8/8/8 w - f6 0 1 1"));
@@ -70,6 +73,7 @@ TEST(PossibleMove, EnPassant)
     moves = generate_pawn_moves(board);
     EXPECT_EQ(10, moves.size());
 }
+*/
 
 int main(int argc, char *argv[])
 {
