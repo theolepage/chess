@@ -370,47 +370,62 @@ namespace board
         white_turn_ = !white_turn_;
     }
 
+    /*// In this function we place the rook correctly, since the king will be placed back thanks to do_move
+    void Chessboard::handle_undo_castling(const Move& move)
+    {
+        if (move.queen_castling_get())
+        {
+            // The white turn variable has not yet been toggeled since it's done in do_move
+            if (white_turn_) // The black was playing
+            {
+                unset_piece(move.start_get(), move.promotion_get().value(), ((white_turn_) ? Color::WHITE : Color::BLACK));
+                set_piece(move.start_get(), PieceType::PAWN, ((white_turn_) ? Color::WHITE : Color::BLACK));
+            }
+        }
+    }
+
     void Chessboard::undo_move(const Move& move, const option_parser::BoardState& state)
     {
-        // First make the move but in the opposite direction
+        // Handle special case or just make move in reverse
+        if (move.king_castling_get() || move.queen_castling_get())
+        {
+            handle_undo_castling(move);
+        }
+
         const Move reversed = move.get_reverse();
         do_move(reversed);
 
         // Then restore any eaten piece that was at end position
+        // We stored where the pawn was eaten so en passant is handled
         if (state.ate)
         {
-            if (white_turn_) // The white was currently playing, a black piece was eaten
-            {
-                set_piece(move.end_get(), static_cast<PieceType>(state.piece_type), Color::BLACK);
-            }
-            else
-            {
-                set_piece(move.end_get(), static_cast<PieceType>(state.piece_type), Color::WHITE);
-            }
+            // The white was currently playing, a black piece was eaten
+            set_piece(Position(state.eaten_x, state.eaten_y), static_cast<PieceType>(state.piece_type),
+                        ((white_turn_) ? Color::BLACK : Color::WHITE));
         }
 
+        // If there was a promotion we need to restore as a pawn
+        if (move.promotion_get().has_value())
+        {
+            unset_piece(move.start_get(), move.promotion_get().value(), ((white_turn_) ? Color::WHITE : Color::BLACK));
+            set_piece(move.start_get(), PieceType::PAWN, ((white_turn_) ? Color::WHITE : Color::BLACK));
+        }
+
+
         // Now restore the state flags
+
         white_king_castling_ = state.white_king_castling;
         white_queen_castling_ = state.white_queen_castling;
         black_king_castling_ = state.black_king_castling;
         black_queen_castling_ = state.black_queen_castling;
 
-        // Also need to restore en passant
+        // Also need to restore en passant flag
         if (state.en_passant)
         {
-            en_passant_ = Position(state.x, state.y);
+            en_passant_ = Position(state.en_passant_y, state.en_passant_y);
         }
+    }*/
 
-        /**
-        * The white_turn is already good exemple:
-        * The white are playing, white_turn_ == white, we make do move
-        * Now white_turn == black
-        * We calculate the number of valide move
-        * The call undomove which stat by toggeling white_turn, so back to white
-        * Thus, we started with the white playing, at the end it's still their turn
-        * We can then process to inspect the number of possibilites with the next move
-        */
-    }
     bool Chessboard::is_move_possible(const Move& move)
     {
         // Move is invalid if in start the piece is not there or bad color
