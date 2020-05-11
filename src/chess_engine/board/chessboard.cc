@@ -444,13 +444,7 @@ namespace board
                 eat_en_passant(move, color);
             else if (move.castling_get())
                 move_castling_rook(move, color);
-            else if (move.promotion_get().has_value())
-            {
-                const auto new_piecetype = move.promotion_get().value();
-                change_piece_type(end, PieceType::PAWN, new_piecetype, color);
-            }
-
-            if (move.capture_get())
+            else if (move.capture_get())
             {
                 assert(opt_end_piece.has_value());
                 side_piece_t eaten_piece = opt_end_piece.value();
@@ -460,6 +454,12 @@ namespace board
                 assert(eaten_piece_color == (color == Color::WHITE ? Color::BLACK : Color::WHITE));
 
                 unset_piece(end, eaten_piece_type, eaten_piece_color);
+            }
+
+            if (move.promotion_get().has_value())
+            {
+                const auto new_piecetype = move.promotion_get().value();
+                change_piece_type(end, PieceType::PAWN, new_piecetype, color);
             }
         }
         update_castling_bools(move, color);
