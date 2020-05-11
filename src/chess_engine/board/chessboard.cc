@@ -394,7 +394,8 @@ namespace board
                 const auto new_piecetype = move.promotion_get().value();
                 change_piece_type(end, PieceType::PAWN, new_piecetype, color);
             }
-            else if (move.capture_get())
+
+            if (move.capture_get())
             {
                 assert(opt_end_piece.has_value());
                 side_piece_t eaten_piece = opt_end_piece.value();
