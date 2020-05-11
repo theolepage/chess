@@ -245,7 +245,7 @@ TEST(Constructor, PerftObjectTurn)
 
 TEST(Checkboard, ToFenString)
 {
-    constexpr auto fen_strings = {
+    auto fen_strings = {
     "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",
     "r2k3r/pppppppp/8/8/8/8/PPPPPPPP/R2K3R",
     "4k2r/8/8/8/8/8/8/R3K3",
@@ -265,7 +265,7 @@ TEST(Checkboard, ToFenString)
     "n1n5/PPPk4/8/8/8/8/4Kppp/5N1N",
     "r3k2r/8/8/8/8/8/8/1R2K2R",
     "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R"
-};
+    };
 
     for (auto fen_string : fen_strings)
         EXPECT_EQ(Chessboard(fen_string).to_fen_string(), fen_string);
