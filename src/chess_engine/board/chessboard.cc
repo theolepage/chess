@@ -35,6 +35,18 @@ namespace board
             black_bitboards_[piecetype_i];
     }
 
+    size_t Chessboard::get_bitboard_count(PieceType piecetype, Color color)
+    {
+        const bitboard_t& bitboard = get_bitboard(piecetype, color);
+
+        size_t count = 0;
+
+        for (auto line : bitboard)
+            count += line.count();
+
+        return count;
+    }
+
     void Chessboard::set_piece(const Position& pos, PieceType piecetype, Color color)
     {
         bitboard_t& piece_bitboard = get_bitboard(piecetype, color);
@@ -318,6 +330,27 @@ namespace board
             update_white_castling_bools(move);
         else
             update_black_castling_bools(move);
+    }
+
+    unsigned Chessboard::get_point_value(Color color)
+    {
+        unsigned point_value = 0;
+
+        for (auto piecetype : piecetype_array)
+        {
+            const auto piecetype_i = utils::utype(piecetype);
+            point_value += piecetype_value[piecetype_i] * get_bitboard_count(piecetype, color);
+        }
+
+        return point_value;
+    }
+
+    // point value implementation
+    int Chessboard::evaluate(Color color)
+    {
+        return color == Color::WHITE ?
+            get_point_value(Color::WHITE) - get_point_value(Color::BLACK) :
+            get_point_value(Color::BLACK) - get_point_value(Color::WHITE);
     }
 
     void Chessboard::do_move(const Move& move)
