@@ -27,6 +27,7 @@ core
 # Documentation
 *.pdf
 *.mp4
+uml.png
 
 # Build folders
 bin*
@@ -72,3 +73,8 @@ tags
 # VisualStudioCode
 .vscode/*
 *.code-workspace
+
+# other files
+mini.cc
+notes
+bench_perft
