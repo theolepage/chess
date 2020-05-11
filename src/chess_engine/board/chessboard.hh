@@ -50,6 +50,10 @@ namespace board
 
         std::vector<Move> generate_legal_moves(void);
 
+        // return the same value than generate_legal_moves().empty(),
+        // without generating superfluous moves
+        bool has_legal_moves(void);
+
         int evaluate(Color color);
 
         // Assume that move is legal
@@ -62,8 +66,9 @@ namespace board
 
         bool is_check(void);
         bool is_checkmate(void);
-        bool is_draw(void);
         bool is_pat(void);
+        bool threefold_repetition();
+        bool is_draw(void);
 
         opt_piece_t operator[](const Position& position) const override;
 

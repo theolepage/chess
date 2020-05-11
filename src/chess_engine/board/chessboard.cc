@@ -559,10 +559,15 @@ namespace board
         return is_check() && generate_legal_moves().empty();
     }
 
-    // TODO handle threefold repetition
+    bool Chessboard::threefold_repetition()
+    {
+        // FIXME
+        return false;
+    }
+
     bool Chessboard::is_draw(void)
     {
-        return last_fifty_turn_ >= 50 || is_pat();
+        return last_fifty_turn_ >= 50 || is_pat() || threefold_repetition();
     }
 
     bool Chessboard::get_white_turn() const
