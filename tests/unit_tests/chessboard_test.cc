@@ -243,6 +243,34 @@ TEST(Constructor, PerftObjectTurn)
     EXPECT_FALSE(black_turn_board.get_white_turn());
 }
 
+TEST(Checkboard, ToFenString)
+{
+    auto fen_strings = {
+    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",
+    "r2k3r/pppppppp/8/8/8/8/PPPPPPPP/R2K3R",
+    "4k2r/8/8/8/8/8/8/R3K3",
+    "r3k2r/pp1ppPpp/8/2pP4/2P2P2/1P4P1/P6P/R3K2R",
+    "r3k2r/pp1pp1pp/8/2pPPp2/2P2P2/1P4P1/P6P/R3K2R",
+    "4r3/8/4k3/8/4K3/8/8/4R3",
+    "1r4K1/r7/k7/8/8/8/8/8",
+    "4k2r/3PP3/3P4/8/8/8/8/4K3",
+    "4k2r/8/8/3PP3/8/8/8/4K3",
+    "r3k2r/8/8/8/8/8/8/2R1K2R",
+    "4k3/8/8/8/8/8/8/R3K2R",
+    "8/1n4N1/2k5/8/8/5K2/1N4n1/8",
+    "B6b/8/8/8/2K5/4k3/8/b6B",
+    "7k/RR6/8/8/8/8/rr6/7K",
+    "7k/8/8/1p6/P7/8/8/7K",
+    "n1n5/1Pk5/8/8/8/8/5Kp1/5N1N",
+    "n1n5/PPPk4/8/8/8/8/4Kppp/5N1N",
+    "r3k2r/8/8/8/8/8/8/1R2K2R",
+    "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R"
+    };
+
+    for (auto fen_string : fen_strings)
+        EXPECT_EQ(Chessboard(fen_string).to_fen_string(), fen_string);
+}
+
 TEST(Checkboard, Copy)
 {
     Chessboard board;
@@ -418,6 +446,43 @@ TEST(Draw, Stalemate)
     Chessboard board = Chessboard("8/8/8/1k6/8/b1n5/8/K7", Color::WHITE);
 
     EXPECT_TRUE(board.is_draw());
+    EXPECT_TRUE(board.is_pat());
+}
+
+TEST(Draw, DoubleStalemate1)
+{
+    // Comes from wikipedia
+    Chessboard board = Chessboard(parse_perft("NBk5/PpP1p3/1P2P3/8/8/3p1p2/3PpPpp/4Kbrq w - - 0 0 0"));
+
+    EXPECT_TRUE(board.is_pat());
+
+    board.set_white_turn(!board.get_white_turn());
+
+    EXPECT_TRUE(board.is_pat());
+}
+
+TEST(Draw, DoubleStalemate2)
+{
+    // Comes from wikipedia too
+    Chessboard board = Chessboard(parse_perft("8/1p6/bp6/rp6/qp6/kp6/1p6/1K6 w - - 0 0 0"));
+
+    EXPECT_TRUE(board.is_pat());
+
+    board.set_white_turn(!board.get_white_turn());
+
+    EXPECT_TRUE(board.is_pat());
+}
+
+TEST(Draw, DoubleStalemate3)
+{
+    // Comes from wikipedia too
+    Chessboard board = Chessboard(parse_perft("8/8/8/2p2p1p/2P2P1k/4pP1P/4P1KP/5BNR w - - 0 0 0"));
+
+    EXPECT_TRUE(board.is_pat());
+
+    board.set_white_turn(!board.get_white_turn());
+
+    EXPECT_TRUE(board.is_pat());
 }
 
 // NOTE Will not pass anymore if we implement the threefold repetition bonus
@@ -435,7 +500,8 @@ TEST(Draw, FiftyLastTurns1)
     auto black_1_to_2 = dummy_move(black_rook_pos_1, black_rook_pos_2, PieceType::ROOK);
     auto black_2_to_1 = dummy_move(black_rook_pos_2, black_rook_pos_1, PieceType::ROOK);
 
-    for (auto turn = 0; turn < 50; turn++)
+    const auto nb_turns = 50;
+    for (auto half_turn = 0; half_turn < 2 * nb_turns; half_turn++)
     {
         EXPECT_FALSE(board.is_draw());
 
@@ -455,6 +521,7 @@ TEST(Draw, FiftyLastTurns1)
         }
     }
 
+    EXPECT_TRUE(board.get_white_turn());
     EXPECT_TRUE(board.is_draw());
 }
 
@@ -473,7 +540,9 @@ TEST(Draw, FiftyLastTurns2)
     auto black_1_to_2 = dummy_move(black_rook_pos_1, black_rook_pos_2, PieceType::ROOK);
     auto black_2_to_1 = dummy_move(black_rook_pos_2, black_rook_pos_1, PieceType::ROOK);
 
-    for (auto turn = 0; turn < 49; turn++)
+
+    const auto nb_turns = 49;
+    for (auto half_turn = 0; half_turn < 2 * nb_turns; half_turn++)
     {
         EXPECT_FALSE(board.is_draw());
 
@@ -493,7 +562,8 @@ TEST(Draw, FiftyLastTurns2)
         }
     }
 
-    EXPECT_FALSE(board.get_white_turn());
+    EXPECT_TRUE(board.get_white_turn());
+    EXPECT_FALSE(board.is_draw());
 
     // black pawn move
     board.do_move(dummy_move(Position(File::A, Rank::SEVEN),
@@ -603,6 +673,24 @@ TEST(Castling, WhiteKingSideBlackQueenSide)
         EXPECT_FALSE(board.get_king_castling(color));
         EXPECT_FALSE(board.get_queen_castling(color));
     }
+}
+
+TEST(Evaluate, Equality)
+{
+    Chessboard board = Chessboard("1b2k3/5q1n/3p4/8/1K5P/3P4/2Q2R2/8");
+
+    EXPECT_EQ(board.evaluate(Color::WHITE), 0);
+    EXPECT_EQ(board.evaluate(Color::BLACK), 0);
+}
+
+TEST(Evaluate, WhiteAdvantage)
+{
+    Chessboard board = Chessboard("1b2k3/5p1n/3p4/8/1K5P/3P4/2Q2R2/8z");
+
+    const auto white_points = 8;
+
+    EXPECT_EQ(board.evaluate(Color::WHITE), white_points);
+    EXPECT_EQ(board.evaluate(Color::BLACK), -white_points);
 }
 
 

@@ -47,8 +47,17 @@ namespace board
         Chessboard(const std::string& fen_string):
             Chessboard(parse_perft(fen_string + std::string(" w - - 0 0 0"))) {}
 
+        static char sidepiece_to_char(PieceType piecetype, Color color);
+        static char sidepiece_to_char(side_piece_t sidepiece);
+        std::string to_fen_string();
 
         std::vector<Move> generate_legal_moves(void);
+
+        // return the same value than generate_legal_moves().empty(),
+        // without generating superfluous moves
+        bool has_legal_moves(void);
+
+        int evaluate(Color color);
 
         // Assume that move is legal
         void do_move(const Move& move);
@@ -60,8 +69,9 @@ namespace board
 
         bool is_check(void);
         bool is_checkmate(void);
-        bool is_draw(void);
         bool is_pat(void);
+        bool threefold_repetition();
+        bool is_draw(void);
 
         opt_piece_t operator[](const Position& position) const override;
 
@@ -101,8 +111,12 @@ namespace board
         unsigned turn_;
         unsigned last_fifty_turn_;
 
+        std::ostream& write_fen_rank(std::ostream& os, Rank rank);
+        std::ostream& write_fen_board(std::ostream& os);
+
         const bitboard_t& get_bitboard(PieceType piecetype, Color color) const;
         bitboard_t& get_bitboard(PieceType piecetype, Color color);
+        size_t get_bitboard_count(PieceType piecetype, Color color);
         void set_piece(const Position& pos, PieceType piecetype, Color color);
         void unset_piece(const Position& pos, PieceType piecetype, Color color);
         void move_piece(const Position& start, const Position& end, PieceType piecetype, Color color);
@@ -110,6 +124,8 @@ namespace board
 
         void init_end_ranks(PieceType piecetype, File file);
         void symetric_init_end_ranks(PieceType piecetype, File file);
+
+        unsigned get_point_value(Color color);
 
         void register_double_pawn_push(const Move& move, Color color);
         void forget_en_passant();
@@ -145,11 +161,7 @@ namespace board
                     const PieceType piecetype = curr_piece.value().first;
                     const Color piece_color = curr_piece.value().second;
 
-                    const char piece_char = piece_to_char(piecetype);
-
-                    os << char(piece_color == Color::WHITE ?
-                               piece_char :
-                               tolower(piece_char));
+                    os << Chessboard::sidepiece_to_char(piecetype, piece_color);
                 }
                 else
                     os << empty_cell_char;
