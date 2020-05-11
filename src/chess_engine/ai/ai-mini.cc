@@ -9,8 +9,14 @@ namespace ai
 {
      using evalAndMove = std::pair<int16_t, std::optional<board::Move>>;
 
+     static void log_minimax(board::Move move, int16_t depth, int16_t eval)
+     {
+          std::cout << "depth: " << depth << " | eval : " << eval << " | ";
+          std::cout << move << std::endl;
+     }
+
      static evalAndMove minimax(board::Chessboard chessboard,
-                                               int depth, int16_t alpha,
+                                               int16_t depth, int16_t alpha,
                                                int16_t beta, bool isMaxPlayer)
      {
           if (chessboard.is_draw())
@@ -34,6 +40,7 @@ namespace ai
                     chessboard_.do_move(moves[i]);
                     int16_t eval = minimax(chessboard_, depth - 1, alpha, beta,
                                            !isMaxPlayer).first;
+                    log_minimax(moves[i], depth, eval);
                     if (eval > bestValue)
                     {
                          bestValue = bestValue;
@@ -54,6 +61,7 @@ namespace ai
                chessboard_.do_move(moves[i]);
                int16_t eval = minimax(chessboard_, depth - 1, alpha, beta,
                                         !isMaxPlayer).first;
+               log_minimax(moves[i], depth, eval);
                if (eval < bestValue)
                {
                     bestValue = std::min(bestValue, eval);
