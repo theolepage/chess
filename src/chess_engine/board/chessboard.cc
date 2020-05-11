@@ -617,15 +617,13 @@ namespace board
 
         for (auto piecetype : piecetype_array)
         {
-            const auto piecetype_i = utils::utype(piecetype);
-            const bitboard_t& white_piecetype_bitboard = white_bitboards_[piecetype_i];
-            const bitboard_t& black_piecetype_bitboard = black_bitboards_[piecetype_i];
+            for (auto color : {Color::WHITE, Color::BLACK})
+            {
+                const bitboard_t& bitboard = get_bitboard(piecetype, color);
 
-            if (white_piecetype_bitboard[rank_i][file_i])
-                return std::make_pair(piecetype, Color::WHITE);
-
-            if (black_piecetype_bitboard[rank_i][file_i])
-                return std::make_pair(piecetype, Color::BLACK);
+                if (bitboard[rank_i][file_i])
+                    return std::make_pair(piecetype, color);
+            }
         }
 
         return std::nullopt;
