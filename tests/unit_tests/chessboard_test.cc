@@ -421,6 +421,42 @@ TEST(Draw, Stalemate)
     EXPECT_TRUE(board.is_pat());
 }
 
+TEST(Draw, DoubleStalemate1)
+{
+    // Comes from wikipedia
+    Chessboard board = Chessboard(parse_perft("NBk5/PpP1p3/1P2P3/8/8/3p1p2/3PpPpp/4Kbrq w - - 0 0 0"));
+
+    EXPECT_TRUE(board.is_pat());
+
+    board.set_white_turn(!board.get_white_turn());
+
+    EXPECT_TRUE(board.is_pat());
+}
+
+TEST(Draw, DoubleStalemate2)
+{
+    // Comes from wikipedia too
+    Chessboard board = Chessboard(parse_perft("8/1p6/bp6/rp6/qp6/kp6/1p6/1K6 w - - 0 0 0"));
+
+    EXPECT_TRUE(board.is_pat());
+
+    board.set_white_turn(!board.get_white_turn());
+
+    EXPECT_TRUE(board.is_pat());
+}
+
+TEST(Draw, DoubleStalemate3)
+{
+    // Comes from wikipedia too
+    Chessboard board = Chessboard(parse_perft("8/8/8/2p2p1p/2P2P1k/4pP1P/4P1KP/5BNR w - - 0 0 0"));
+
+    EXPECT_TRUE(board.is_pat());
+
+    board.set_white_turn(!board.get_white_turn());
+
+    EXPECT_TRUE(board.is_pat());
+}
+
 // NOTE Will not pass anymore if we implement the threefold repetition bonus
 TEST(Draw, FiftyLastTurns1)
 {
