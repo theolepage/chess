@@ -102,10 +102,15 @@ add_executable(chessengine)
 set_target_properties(chessengine PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}) # binary destination
 target_sources(chessengine PRIVATE ${MAIN_ENGINE})
+target_link_libraries(chessengine PRIVATE SRC_ENGINE_OBJ ${LIBRARIES})
+
+# STATIC TARGET
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
-    target_link_libraries(chessengine PRIVATE SRC_ENGINE_OBJ ${LIBRARIES} -static)
-else()
-    target_link_libraries(chessengine PRIVATE SRC_ENGINE_OBJ ${LIBRARIES})
+    add_executable(chessengine-static)
+    set_target_properties(chessengine-static PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}) # binary destination
+    target_sources(chessengine-static PRIVATE ${MAIN_ENGINE})
+    target_link_libraries(chessengine-static PRIVATE SRC_ENGINE_OBJ ${LIBRARIES} -static)
 endif()
 
 # TESTS

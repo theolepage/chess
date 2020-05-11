@@ -1,5 +1,6 @@
 # chessengine binary
 chessengine
+chessengine-static
 
 # C++ and tmp files
 *~
