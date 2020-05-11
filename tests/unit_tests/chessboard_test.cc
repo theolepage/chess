@@ -418,6 +418,7 @@ TEST(Draw, Stalemate)
     Chessboard board = Chessboard("8/8/8/1k6/8/b1n5/8/K7", Color::WHITE);
 
     EXPECT_TRUE(board.is_draw());
+    EXPECT_TRUE(board.is_pat());
 }
 
 // NOTE Will not pass anymore if we implement the threefold repetition bonus
@@ -435,7 +436,8 @@ TEST(Draw, FiftyLastTurns1)
     auto black_1_to_2 = dummy_move(black_rook_pos_1, black_rook_pos_2, PieceType::ROOK);
     auto black_2_to_1 = dummy_move(black_rook_pos_2, black_rook_pos_1, PieceType::ROOK);
 
-    for (auto turn = 0; turn < 50; turn++)
+    const auto nb_turns = 50;
+    for (auto half_turn = 0; half_turn < 2 * nb_turns; half_turn++)
     {
         EXPECT_FALSE(board.is_draw());
 
@@ -455,6 +457,7 @@ TEST(Draw, FiftyLastTurns1)
         }
     }
 
+    EXPECT_TRUE(board.get_white_turn());
     EXPECT_TRUE(board.is_draw());
 }
 
@@ -473,7 +476,9 @@ TEST(Draw, FiftyLastTurns2)
     auto black_1_to_2 = dummy_move(black_rook_pos_1, black_rook_pos_2, PieceType::ROOK);
     auto black_2_to_1 = dummy_move(black_rook_pos_2, black_rook_pos_1, PieceType::ROOK);
 
-    for (auto turn = 0; turn < 49; turn++)
+
+    const auto nb_turns = 49;
+    for (auto half_turn = 0; half_turn < 2 * nb_turns; half_turn++)
     {
         EXPECT_FALSE(board.is_draw());
 
@@ -493,7 +498,8 @@ TEST(Draw, FiftyLastTurns2)
         }
     }
 
-    EXPECT_FALSE(board.get_white_turn());
+    EXPECT_TRUE(board.get_white_turn());
+    EXPECT_FALSE(board.is_draw());
 
     // black pawn move
     board.do_move(dummy_move(Position(File::A, Rank::SEVEN),

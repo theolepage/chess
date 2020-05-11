@@ -209,7 +209,8 @@ namespace board
         if (move.capture_get() || move.piece_get() == PieceType::PAWN)
             last_fifty_turn_ = 0;
         else
-            last_fifty_turn_++;
+            if (!white_turn_)
+                last_fifty_turn_++;
     }
 
     void Chessboard::eat_en_passant(const Move& move, Color color)
@@ -362,7 +363,10 @@ namespace board
         }
         update_castling_bools(move, color);
 
-        turn_++;
+        // If black played, then a turned passed
+        if (!white_turn_)
+            turn_++;
+
         white_turn_ = !white_turn_;
     }
 
@@ -529,8 +533,7 @@ namespace board
 
     bool Chessboard::is_pat(void)
     {
-        // FIXME
-        return false;
+        return !is_check() && generate_legal_moves().empty();
     }
 
     bool Chessboard::is_checkmate(void)
@@ -541,9 +544,7 @@ namespace board
     // TODO handle threefold repetition
     bool Chessboard::is_draw(void)
     {
-        bool a = !is_check();
-        auto b = generate_legal_moves();
-        return last_fifty_turn_ >= 50 || (a && b.empty());
+        return last_fifty_turn_ >= 50 || is_pat();
     }
 
     bool Chessboard::get_white_turn() const
