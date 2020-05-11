@@ -47,6 +47,8 @@ namespace board
         Chessboard(const std::string& fen_string):
             Chessboard(parse_perft(fen_string + std::string(" w - - 0 0 0"))) {}
 
+        static char sidepiece_to_char(PieceType piecetype, Color color);
+        static char sidepiece_to_char(side_piece_t sidepiece);
 
         std::vector<Move> generate_legal_moves(void);
 
@@ -155,11 +157,7 @@ namespace board
                     const PieceType piecetype = curr_piece.value().first;
                     const Color piece_color = curr_piece.value().second;
 
-                    const char piece_char = piece_to_char(piecetype);
-
-                    os << char(piece_color == Color::WHITE ?
-                               piece_char :
-                               tolower(piece_char));
+                    os << Chessboard::sidepiece_to_char(piecetype, piece_color);
                 }
                 else
                     os << empty_cell_char;

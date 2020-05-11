@@ -185,6 +185,18 @@ namespace board
         }
     }
 
+    char Chessboard::sidepiece_to_char(PieceType piecetype, Color color)
+    {
+        char piece_char = piece_to_char(piecetype);
+
+        return color == Color::WHITE ? piece_char : tolower(piece_char);
+    }
+
+    char Chessboard::sidepiece_to_char(side_piece_t sidepiece)
+    {
+        return sidepiece_to_char(sidepiece.first, sidepiece.second);
+    }
+
     std::vector<Move> Chessboard::generate_legal_moves(void)
     {
         std::vector<Move> legal_moves;
