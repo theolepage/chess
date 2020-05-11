@@ -520,7 +520,7 @@ namespace board
     Position Chessboard::get_king_position(void) const
     {
         auto king_color = white_turn_ ? Color::WHITE : Color::BLACK;
-        bitboard_t king_bitboard = get_bitboard(PieceType::KING, king_color);
+        const bitboard_t& king_bitboard = get_bitboard(PieceType::KING, king_color);
 
         size_t rank_i = 0;
         while (king_bitboard[rank_i].none())
@@ -618,8 +618,8 @@ namespace board
         for (auto piecetype : piecetype_array)
         {
             const auto piecetype_i = utils::utype(piecetype);
-            const bitboard_t white_piecetype_bitboard = white_bitboards_[piecetype_i];
-            const bitboard_t black_piecetype_bitboard = black_bitboards_[piecetype_i];
+            const bitboard_t& white_piecetype_bitboard = white_bitboards_[piecetype_i];
+            const bitboard_t& black_piecetype_bitboard = black_bitboards_[piecetype_i];
 
             if (white_piecetype_bitboard[rank_i][file_i])
                 return std::make_pair(piecetype, Color::WHITE);
