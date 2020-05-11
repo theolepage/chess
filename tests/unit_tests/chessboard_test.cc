@@ -418,6 +418,7 @@ TEST(Draw, Stalemate)
     Chessboard board = Chessboard("8/8/8/1k6/8/b1n5/8/K7", Color::WHITE);
 
     EXPECT_TRUE(board.is_draw());
+    EXPECT_TRUE(board.is_pat());
 }
 
 // NOTE Will not pass anymore if we implement the threefold repetition bonus

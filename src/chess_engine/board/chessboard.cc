@@ -514,8 +514,7 @@ namespace board
 
     bool Chessboard::is_pat(void)
     {
-        // FIXME
-        return false;
+        return !is_check() && generate_legal_moves().empty();
     }
 
     bool Chessboard::is_checkmate(void)
@@ -526,9 +525,7 @@ namespace board
     // TODO handle threefold repetition
     bool Chessboard::is_draw(void)
     {
-        bool a = !is_check();
-        auto b = generate_legal_moves();
-        return last_fifty_turn_ >= 50 || (a && b.empty());
+        return last_fifty_turn_ >= 50 || is_pat();
     }
 
     bool Chessboard::get_white_turn() const
