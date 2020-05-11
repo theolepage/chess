@@ -413,11 +413,9 @@ namespace board
     }
 
     // point value implementation
-    int Chessboard::evaluate(Color color)
+    int Chessboard::evaluate()
     {
-        return color == Color::WHITE ?
-            get_point_value(Color::WHITE) - get_point_value(Color::BLACK) :
-            get_point_value(Color::BLACK) - get_point_value(Color::WHITE);
+        return get_point_value(Color::WHITE) - get_point_value(Color::BLACK);
     }
 
     void Chessboard::do_move(const Move& move)

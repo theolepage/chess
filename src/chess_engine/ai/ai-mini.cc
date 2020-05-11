@@ -33,7 +33,7 @@ namespace ai
                     board::Chessboard chessboard_ = chessboard;
                     chessboard_.do_move(moves[i]);
                     int16_t eval = minimax(chessboard_, depth - 1, alpha, beta,
-                                           !isMaxPlayer);
+                                           !isMaxPlayer).first;
                     if (eval > bestValue)
                     {
                          bestValue = bestValue;
@@ -53,7 +53,7 @@ namespace ai
                board::Chessboard chessboard_ = chessboard;
                chessboard_.do_move(moves[i]);
                int16_t eval = minimax(chessboard_, depth - 1, alpha, beta,
-                                        !isMaxPlayer);
+                                        !isMaxPlayer).first;
                if (eval < bestValue)
                {
                     bestValue = std::min(bestValue, eval);
@@ -68,6 +68,6 @@ namespace ai
 
      board::Move AiMini::search(board::Chessboard chessboard)
      {
-          minimax(chessboard, 4, INT16_MIN, INT16_MAX, true).second.value();
+          return minimax(chessboard, 4, INT16_MIN, INT16_MAX, true).second.value();
      }
 }

@@ -40,6 +40,7 @@ set(OPT_FLAGS
 set(MAIN_ENGINE
     src/main.cc)
 set(SRC_ENGINE
+    src/chess_engine/ai/ai-mini.cc
     src/chess_engine/ai/uci.cc
     src/chess_engine/board/rule.cc
     src/chess_engine/board/chessboard.cc

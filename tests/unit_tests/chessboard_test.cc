@@ -679,18 +679,16 @@ TEST(Evaluate, Equality)
 {
     Chessboard board = Chessboard("1b2k3/5q1n/3p4/8/1K5P/3P4/2Q2R2/8");
 
-    EXPECT_EQ(board.evaluate(Color::WHITE), 0);
-    EXPECT_EQ(board.evaluate(Color::BLACK), 0);
+    EXPECT_EQ(board.evaluate(), 0);
 }
 
 TEST(Evaluate, WhiteAdvantage)
 {
-    Chessboard board = Chessboard("1b2k3/5p1n/3p4/8/1K5P/3P4/2Q2R2/8z");
+    Chessboard board = Chessboard("1b2k3/5p1n/3p4/8/1K5P/3P4/2Q2R2/8");
 
-    const auto white_points = 8;
+    const auto score = 8; //white is winning
 
-    EXPECT_EQ(board.evaluate(Color::WHITE), white_points);
-    EXPECT_EQ(board.evaluate(Color::BLACK), -white_points);
+    EXPECT_EQ(board.evaluate(), score);
 }
 
 

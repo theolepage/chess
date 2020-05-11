@@ -11,5 +11,5 @@ namespace ai
           board::Move search(board::Chessboard chessboard);
 
           int evaluate(board::Chessboard);
-     }
+     };
 }

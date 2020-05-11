@@ -57,7 +57,7 @@ namespace board
         // without generating superfluous moves
         bool has_legal_moves(void);
 
-        int evaluate(Color color);
+        int evaluate();
 
         // Assume that move is legal
         void do_move(const Move& move);
