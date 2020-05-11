@@ -209,7 +209,8 @@ namespace board
         if (move.capture_get() || move.piece_get() == PieceType::PAWN)
             last_fifty_turn_ = 0;
         else
-            last_fifty_turn_++;
+            if (!white_turn_)
+                last_fifty_turn_++;
     }
 
     void Chessboard::eat_en_passant(const Move& move, Color color)
@@ -362,7 +363,10 @@ namespace board
         }
         update_castling_bools(move, color);
 
-        turn_++;
+        // If black played, then a turned passed
+        if (!white_turn_)
+            turn_++;
+
         white_turn_ = !white_turn_;
     }
 
