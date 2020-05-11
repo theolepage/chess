@@ -49,6 +49,7 @@ namespace board
 
         static char sidepiece_to_char(PieceType piecetype, Color color);
         static char sidepiece_to_char(side_piece_t sidepiece);
+        std::string to_fen_string();
 
         std::vector<Move> generate_legal_moves(void);
 
@@ -109,6 +110,9 @@ namespace board
 
         unsigned turn_;
         unsigned last_fifty_turn_;
+
+        std::ostream& write_fen_rank(std::ostream& os, Rank rank);
+        std::ostream& write_fen_board(std::ostream& os);
 
         const bitboard_t& get_bitboard(PieceType piecetype, Color color) const;
         bitboard_t& get_bitboard(PieceType piecetype, Color color);

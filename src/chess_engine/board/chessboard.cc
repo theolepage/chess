@@ -9,6 +9,7 @@
 
 #include <cassert>
 #include <optional>
+#include <sstream>
 
 namespace board
 {
@@ -195,6 +196,60 @@ namespace board
     char Chessboard::sidepiece_to_char(side_piece_t sidepiece)
     {
         return sidepiece_to_char(sidepiece.first, sidepiece.second);
+    }
+
+    std::ostream& Chessboard::write_fen_rank(std::ostream& os, Rank rank)
+    {
+        unsigned short empty_cells_count = 0;
+
+        for (size_t file_i = 0; file_i < width; file_i++)
+        {
+            auto file = static_cast<File>(file_i);
+
+            opt_piece_t opt_piece = (*this)[Position(file, rank)];
+
+            if (opt_piece.has_value())
+            {
+                if (empty_cells_count != 0)
+                {
+                    os << empty_cells_count;
+                    empty_cells_count = 0;
+                }
+
+                os << sidepiece_to_char(opt_piece.value());
+            }
+            else
+            {
+                empty_cells_count++;
+            }
+        }
+
+        if (empty_cells_count != 0)
+            os << empty_cells_count;
+
+        return os;
+    }
+
+    std::ostream& Chessboard::write_fen_board(std::ostream& os)
+    {
+        constexpr auto last_rank = Rank::EIGHT;
+        constexpr auto last_rank_i = utils::utype(last_rank);
+
+        write_fen_rank(os, last_rank);
+
+        for (int rank_i = last_rank_i - 1; rank_i >= 0; rank_i--)
+            write_fen_rank(os << '/', static_cast<Rank>(rank_i));
+
+        return os;
+    }
+
+    std::string Chessboard::to_fen_string()
+    {
+        std::stringstream ss;
+
+        write_fen_board(ss);
+
+        return ss.str();
     }
 
     std::vector<Move> Chessboard::generate_legal_moves(void)

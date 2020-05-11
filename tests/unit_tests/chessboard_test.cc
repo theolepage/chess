@@ -243,6 +243,34 @@ TEST(Constructor, PerftObjectTurn)
     EXPECT_FALSE(black_turn_board.get_white_turn());
 }
 
+TEST(Checkboard, ToFenString)
+{
+    constexpr auto fen_strings = {
+    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",
+    "r2k3r/pppppppp/8/8/8/8/PPPPPPPP/R2K3R",
+    "4k2r/8/8/8/8/8/8/R3K3",
+    "r3k2r/pp1ppPpp/8/2pP4/2P2P2/1P4P1/P6P/R3K2R",
+    "r3k2r/pp1pp1pp/8/2pPPp2/2P2P2/1P4P1/P6P/R3K2R",
+    "4r3/8/4k3/8/4K3/8/8/4R3",
+    "1r4K1/r7/k7/8/8/8/8/8",
+    "4k2r/3PP3/3P4/8/8/8/8/4K3",
+    "4k2r/8/8/3PP3/8/8/8/4K3",
+    "r3k2r/8/8/8/8/8/8/2R1K2R",
+    "4k3/8/8/8/8/8/8/R3K2R",
+    "8/1n4N1/2k5/8/8/5K2/1N4n1/8",
+    "B6b/8/8/8/2K5/4k3/8/b6B",
+    "7k/RR6/8/8/8/8/rr6/7K",
+    "7k/8/8/1p6/P7/8/8/7K",
+    "n1n5/1Pk5/8/8/8/8/5Kp1/5N1N",
+    "n1n5/PPPk4/8/8/8/8/4Kppp/5N1N",
+    "r3k2r/8/8/8/8/8/8/1R2K2R",
+    "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R"
+};
+
+    for (auto fen_string : fen_strings)
+        EXPECT_EQ(Chessboard(fen_string).to_fen_string(), fen_string);
+}
+
 TEST(Checkboard, Copy)
 {
     Chessboard board;
