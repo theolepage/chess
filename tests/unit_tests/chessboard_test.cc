@@ -244,7 +244,7 @@ TEST(Constructor, PerftObjectTurn)
     EXPECT_FALSE(black_turn_board.get_white_turn());
 }
 
-TEST(Checkboard, ToFenString)
+TEST(ToFenString, AfterConstruction)
 {
     constexpr auto fen_strings = {
     "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",
@@ -273,6 +273,39 @@ TEST(Checkboard, ToFenString)
 }
 
 TEST(Checkboard, Copy)
+TEST(ToFenString, AfterMove)
+{
+    Chessboard board;
+
+    auto white_knight_pos_1 = Position(File::B, Rank::ONE);
+    auto white_knight_pos_2 = Position(File::A, Rank::THREE);
+    auto white_1_to_2 = dummy_move(white_knight_pos_1, white_knight_pos_2, PieceType::KNIGHT);
+    auto white_2_to_1 = dummy_move(white_knight_pos_2, white_knight_pos_1, PieceType::KNIGHT);
+
+    auto black_knight_pos_1 = Position(File::G, Rank::EIGHT);
+    auto black_knight_pos_2 = Position(File::H, Rank::SIX);
+    auto black_1_to_2 = dummy_move(black_knight_pos_1, black_knight_pos_2, PieceType::KNIGHT);
+    //auto black_2_to_1 = dummy_move(black_knight_pos_2, black_knight_pos_1, PieceType::KNIGHT);
+
+    std::unordered_set<std::string> states;
+
+    states.insert(board.to_fen_string());
+
+    board.do_move(white_1_to_2);
+
+    states.insert(board.to_fen_string());
+
+    board.do_move(black_1_to_2);
+
+    states.insert(board.to_fen_string());
+
+    board.do_move(white_2_to_1);
+
+    states.insert(board.to_fen_string());
+
+    EXPECT_EQ(states.size(), 4);
+}
+
 {
     Chessboard board;
     Chessboard board_copy = board;
