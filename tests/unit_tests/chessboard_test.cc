@@ -490,15 +490,15 @@ TEST(Draw, FiftyLastTurns1)
 {
     Chessboard board;
 
-    auto white_rook_pos_1 = Position(File::B, Rank::ONE);
-    auto white_rook_pos_2 = Position(File::A, Rank::THREE);
-    auto white_1_to_2 = dummy_move(white_rook_pos_1, white_rook_pos_2, PieceType::ROOK);
-    auto white_2_to_1 = dummy_move(white_rook_pos_2, white_rook_pos_1, PieceType::ROOK);
+    auto white_knight_pos_1 = Position(File::B, Rank::ONE);
+    auto white_knight_pos_2 = Position(File::A, Rank::THREE);
+    auto white_1_to_2 = dummy_move(white_knight_pos_1, white_knight_pos_2, PieceType::KNIGHT);
+    auto white_2_to_1 = dummy_move(white_knight_pos_2, white_knight_pos_1, PieceType::KNIGHT);
 
-    auto black_rook_pos_1 = Position(File::G, Rank::EIGHT);
-    auto black_rook_pos_2 = Position(File::H, Rank::SIX);
-    auto black_1_to_2 = dummy_move(black_rook_pos_1, black_rook_pos_2, PieceType::ROOK);
-    auto black_2_to_1 = dummy_move(black_rook_pos_2, black_rook_pos_1, PieceType::ROOK);
+    auto black_knight_pos_1 = Position(File::G, Rank::EIGHT);
+    auto black_knight_pos_2 = Position(File::H, Rank::SIX);
+    auto black_1_to_2 = dummy_move(black_knight_pos_1, black_knight_pos_2, PieceType::KNIGHT);
+    auto black_2_to_1 = dummy_move(black_knight_pos_2, black_knight_pos_1, PieceType::KNIGHT);
 
     const auto nb_turns = 50;
     for (auto half_turn = 0; half_turn < 2 * nb_turns; half_turn++)
@@ -507,14 +507,14 @@ TEST(Draw, FiftyLastTurns1)
 
         if (board.get_white_turn())
         {
-            if (board[white_rook_pos_1].has_value())
+            if (board[white_knight_pos_1].has_value())
                 board.do_move(white_1_to_2);
             else
                 board.do_move(white_2_to_1);
         }
         else
         {
-            if (board[black_rook_pos_1].has_value())
+            if (board[black_knight_pos_1].has_value())
                 board.do_move(black_1_to_2);
             else
                 board.do_move(black_2_to_1);
@@ -530,15 +530,15 @@ TEST(Draw, FiftyLastTurns2)
 {
     Chessboard board;
 
-    auto white_rook_pos_1 = Position(File::B, Rank::ONE);
-    auto white_rook_pos_2 = Position(File::A, Rank::THREE);
-    auto white_1_to_2 = dummy_move(white_rook_pos_1, white_rook_pos_2, PieceType::ROOK);
-    auto white_2_to_1 = dummy_move(white_rook_pos_2, white_rook_pos_1, PieceType::ROOK);
+    auto white_knight_pos_1 = Position(File::B, Rank::ONE);
+    auto white_knight_pos_2 = Position(File::A, Rank::THREE);
+    auto white_1_to_2 = dummy_move(white_knight_pos_1, white_knight_pos_2, PieceType::KNIGHT);
+    auto white_2_to_1 = dummy_move(white_knight_pos_2, white_knight_pos_1, PieceType::KNIGHT);
 
-    auto black_rook_pos_1 = Position(File::G, Rank::EIGHT);
-    auto black_rook_pos_2 = Position(File::H, Rank::SIX);
-    auto black_1_to_2 = dummy_move(black_rook_pos_1, black_rook_pos_2, PieceType::ROOK);
-    auto black_2_to_1 = dummy_move(black_rook_pos_2, black_rook_pos_1, PieceType::ROOK);
+    auto black_knight_pos_1 = Position(File::G, Rank::EIGHT);
+    auto black_knight_pos_2 = Position(File::H, Rank::SIX);
+    auto black_1_to_2 = dummy_move(black_knight_pos_1, black_knight_pos_2, PieceType::KNIGHT);
+    auto black_2_to_1 = dummy_move(black_knight_pos_2, black_knight_pos_1, PieceType::KNIGHT);
 
 
     const auto nb_turns = 49;
@@ -548,14 +548,14 @@ TEST(Draw, FiftyLastTurns2)
 
         if (board.get_white_turn())
         {
-            if (board[white_rook_pos_1].has_value())
+            if (board[white_knight_pos_1].has_value())
                 board.do_move(white_1_to_2);
             else
                 board.do_move(white_2_to_1);
         }
         else
         {
-            if (board[black_rook_pos_1].has_value())
+            if (board[black_knight_pos_1].has_value())
                 board.do_move(black_1_to_2);
             else
                 board.do_move(black_2_to_1);
