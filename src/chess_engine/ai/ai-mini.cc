@@ -43,7 +43,7 @@ namespace ai
                     log_minimax(moves[i], depth, eval);
                     if (eval > bestValue)
                     {
-                         bestValue = bestValue;
+                         bestValue = eval;
                          bestIndex = i;
                          alpha = std::max(alpha, eval);
                          if (beta <= alpha)
@@ -64,7 +64,7 @@ namespace ai
                log_minimax(moves[i], depth, eval);
                if (eval < bestValue)
                {
-                    bestValue = std::min(bestValue, eval);
+                    bestValue = eval;
                     bestIndex = i;
                     beta = std::min(alpha, eval);
                     if (beta <= alpha)

@@ -91,7 +91,6 @@ namespace listener
         chessboard_.do_move(move);
         notify_move(move, possibly_taken_piece);
 
-       
         return notify_board_state();
     }
 
