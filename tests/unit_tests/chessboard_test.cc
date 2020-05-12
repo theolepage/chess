@@ -486,7 +486,7 @@ TEST(Draw, DoubleStalemate3)
 }
 
 // NOTE Will not pass anymore if we implement the threefold repetition bonus
-TEST(Draw, FiftyLastTurns1)
+TEST(Draw, DISABLED_FiftyLastTurns1)
 {
     Chessboard board;
 
@@ -526,7 +526,7 @@ TEST(Draw, FiftyLastTurns1)
 }
 
 // NOTE Will not pass anymore if we implement the threefold repetition bonus
-TEST(Draw, FiftyLastTurns2)
+TEST(Draw, DISABLED_FiftyLastTurns2)
 {
     Chessboard board;
 
