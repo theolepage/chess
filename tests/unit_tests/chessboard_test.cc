@@ -272,7 +272,6 @@ TEST(ToFenString, AfterConstruction)
         EXPECT_EQ(Chessboard(fen_string).to_fen_string(), fen_string);
 }
 
-TEST(Checkboard, Copy)
 TEST(ToFenString, AfterMove)
 {
     Chessboard board;
@@ -306,6 +305,7 @@ TEST(ToFenString, AfterMove)
     EXPECT_EQ(states.size(), 4);
 }
 
+TEST(Copy, DoMove)
 {
     Chessboard board;
     Chessboard board_copy = board;
@@ -320,6 +320,58 @@ TEST(ToFenString, AfterMove)
 
     EXPECT_NO_PIECE(board[end]);
     EXPECT_TRUE(board.get_white_turn());
+}
+
+TEST(Copy, State)
+{
+    Chessboard board = Chessboard("4k2r/3PP3/3P4/8/8/8/8/4K3");
+    Chessboard board_copy = board;
+
+    EXPECT_EQ(board.to_fen_string(), board_copy.to_fen_string());
+}
+
+TEST(Copy, Threefold)
+{
+    Chessboard board;
+    Chessboard board_copy = board;
+
+    auto white_knight_pos_1 = Position(File::B, Rank::ONE);
+    auto white_knight_pos_2 = Position(File::A, Rank::THREE);
+    auto white_1_to_2 = dummy_move(white_knight_pos_1, white_knight_pos_2, PieceType::KNIGHT);
+    auto white_2_to_1 = dummy_move(white_knight_pos_2, white_knight_pos_1, PieceType::KNIGHT);
+
+    auto black_knight_pos_1 = Position(File::G, Rank::EIGHT);
+    auto black_knight_pos_2 = Position(File::H, Rank::SIX);
+    auto black_1_to_2 = dummy_move(black_knight_pos_1, black_knight_pos_2, PieceType::KNIGHT);
+    auto black_2_to_1 = dummy_move(black_knight_pos_2, black_knight_pos_1, PieceType::KNIGHT);
+
+    const auto nb_turns = 4;
+    for (auto half_turn = 0; half_turn < 2 * nb_turns; half_turn++)
+    {
+        EXPECT_FALSE(board_copy.is_draw());
+        EXPECT_FALSE(board_copy.threefold_repetition());
+
+        if (board_copy.get_white_turn())
+        {
+            if (board_copy[white_knight_pos_1].has_value())
+                board_copy.do_move(white_1_to_2);
+            else
+                board_copy.do_move(white_2_to_1);
+        }
+        else
+        {
+            if (board_copy[black_knight_pos_1].has_value())
+                board_copy.do_move(black_1_to_2);
+            else
+                board_copy.do_move(black_2_to_1);
+        }
+    }
+
+    EXPECT_TRUE(board_copy.is_draw());
+    EXPECT_TRUE(board_copy.threefold_repetition());
+
+    EXPECT_FALSE(board.is_draw());
+    EXPECT_FALSE(board.threefold_repetition());
 }
 
 TEST(DoMove, SimplePawnMove)
