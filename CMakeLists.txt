@@ -70,6 +70,7 @@ set(SRC_TESTS
     tests/unit_tests/ai_search_test.cc
     tests/unit_tests/ai_search2_test.cc
     tests/unit_tests/ai_search3_test.cc
+    tests/unit_tests/uci_communication_test.cc
     #FIXME
     )
 

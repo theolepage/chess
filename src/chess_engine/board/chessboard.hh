@@ -19,6 +19,7 @@
 
 // Il était tard et j'avais la flemme
 // Kèstuvafér
+// ekip
 using namespace perft_parser;
 
 namespace board
@@ -39,11 +40,15 @@ namespace board
         using opt_pos_t = std::optional<Position>;
 
         Chessboard();
+        
         Chessboard(const FenObject&);
+        
         Chessboard(const std::string& str, const Color& color):
             Chessboard(parse_perft(str + ((color == Color::WHITE) ? std::string(" w - - 0 0 0") : std::string(" b - - 0 0 0")))) {}
+        
         Chessboard(const PerftObject& perft):
             Chessboard(perft.get_fen()) {}
+        
         Chessboard(const std::string& fen_string):
             Chessboard(parse_perft(fen_string + std::string(" w - - 0 0 0"))) {}
 
@@ -88,6 +93,20 @@ namespace board
         Position get_king_position(void) const;
 
         friend std::ostream& operator<<(std::ostream& os, const Chessboard& board);
+
+        bool operator==(const Chessboard& rhs) const
+        {
+            return white_king_castling_ == rhs.white_king_castling_
+            && white_queen_castling_ == rhs.white_queen_castling_
+            && black_king_castling_ == rhs.black_king_castling_
+            && black_queen_castling_ == rhs.black_queen_castling_
+            && white_bitboards_ == rhs.white_bitboards_
+            && black_bitboards_ == rhs.black_bitboards_
+            && white_turn_ == rhs.white_turn_
+            && en_passant_ == rhs.en_passant_
+            && turn_ == rhs.turn_
+            && last_fifty_turn_ == rhs.last_fifty_turn_;
+        }
 
     private:
         /**
