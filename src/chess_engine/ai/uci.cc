@@ -3,7 +3,7 @@
 #include <fnmatch.h>
 #include <iostream>
 
-namespace ai
+namespace uci
 {
     namespace
     {

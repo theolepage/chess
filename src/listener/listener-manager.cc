@@ -5,7 +5,6 @@
 #include "listener-manager.hh"
 #include "chess_engine/board/color.hh"
 #include "chess_engine/board/piece-type.hh"
-#include "chess_engine/ai/uci.hh"
 
 #define NOTIFY(FUNC) for (auto listener : listeners_) listener->FUNC
 #define GET_COLOR() chessboard_.get_white_turn() ? board::Color::WHITE : board::Color::BLACK
@@ -92,24 +91,6 @@ namespace listener
         notify_move(move, possibly_taken_piece);
 
         return notify_board_state();
-    }
-
-    void ListenerManager::play_ai(void)
-    {
-        // FIXME
-        ai::init("NameOfOurBeautifulAi"); // change namespace
-
-        /* TODO draft
-        register_board(ai::get_board()) // FIXME do not call get board twice
-        while(True)
-        {
-            board::Chessboard board = ai::get_board();
-            board::Move move = ai.search(board)
-            ai::play_move(move_to_str(move))
-            notify_move(move)
-            notify_board_state();
-        }
-        */
     }
 
     void ListenerManager::play_pgn_moves(const std::vector<board::PgnMove> moves)

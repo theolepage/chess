@@ -65,6 +65,7 @@ namespace pgn_parser
                 return PieceType::ROOK;
         }
         assert(false);
+        return PieceType::KING;
     }
 
     board::Move string_to_move(const board::Chessboard& chessboard, const std::string& str_move)
@@ -72,11 +73,9 @@ namespace pgn_parser
         assert(str_move.size() == 4 || str_move.size() == 5);
         const board::Position start(static_cast<uint8_t>(str_move.at(0) - 'a'), (static_cast<uint8_t>(str_move.at(1) - '1')));
         const board::Position end(static_cast<uint8_t>(str_move.at(2) - 'a'), (static_cast<uint8_t>(str_move.at(3) - '1')));
-        opt_piece_t promotion;
-        if (str_move.size() == 5)
-            promotion = std::optional<PieceType>(get_piece(str_move.at(4)));
-        else
-            promotion = std::optional<PieceType>(std::nullopt);
+        opt_piece_t promotion = (str_move.size() == 5) ?
+            std::optional<PieceType>(get_piece(str_move.at(4))) :
+            std::optional<PieceType>(std::nullopt);
         auto op_piece = chessboard[start];
         assert(op_piece.has_value());
         const PieceType piece = op_piece.value().first;
