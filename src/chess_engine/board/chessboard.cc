@@ -146,6 +146,8 @@ namespace board
         symetric_init_end_ranks(PieceType::BISHOP, File::C);
         init_end_ranks(PieceType::QUEEN, File::D);
         init_end_ranks(PieceType::KING, File::E);
+
+        register_state();
     }
 
     Chessboard::Chessboard(const FenObject& fen)
@@ -184,6 +186,8 @@ namespace board
                 }
             }
         }
+
+        register_state();
     }
 
     char Chessboard::sidepiece_to_char(PieceType piecetype, Color color)
@@ -250,6 +254,16 @@ namespace board
         write_fen_board(ss);
 
         return ss.str();
+    }
+
+    void Chessboard::register_state()
+    {
+        std::string current_state = to_fen_string();
+
+        if (state_count_.find(current_state) == state_count_.end())
+            state_count_[current_state] = 1;
+        else
+            state_count_[current_state]++;
     }
 
     std::vector<Move> Chessboard::generate_legal_moves(void)
@@ -469,6 +483,8 @@ namespace board
             turn_++;
 
         white_turn_ = !white_turn_;
+
+        register_state();
     }
 
     /*// In this function we place the rook correctly, since the king will be placed back thanks to do_move
@@ -644,8 +660,11 @@ namespace board
 
     bool Chessboard::threefold_repetition()
     {
-        // FIXME
-        return false;
+        std::string current_state = to_fen_string();
+
+        assert(state_count_.find(current_state) != state_count_.end());
+
+        return state_count_[current_state] >= 3;
     }
 
     bool Chessboard::is_draw(void)

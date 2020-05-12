@@ -6,6 +6,7 @@
 #include <vector>
 #include <optional>
 #include <algorithm>
+#include <unordered_map>
 
 #include "chessboard-interface.hh"
 #include "parsing/perft_parser/perft-parser.hh"
@@ -99,6 +100,11 @@ namespace board
         std::array<bitboard_t, nb_pieces> white_bitboards_;
         std::array<bitboard_t, nb_pieces> black_bitboards_;
 
+        // a hash table which key corresponds to a fen string representing
+        // a state of the board and which value is the number of occurences
+        // of this state during the game
+        std::unordered_map<std::string, short> state_count_;
+
         bool white_turn_;
 
         bool white_king_castling_;
@@ -113,6 +119,8 @@ namespace board
 
         std::ostream& write_fen_rank(std::ostream& os, Rank rank);
         std::ostream& write_fen_board(std::ostream& os);
+
+        void register_state();
 
         const bitboard_t& get_bitboard(PieceType piecetype, Color color) const;
         bitboard_t& get_bitboard(PieceType piecetype, Color color);
