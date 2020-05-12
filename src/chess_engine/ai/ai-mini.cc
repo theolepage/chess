@@ -76,6 +76,6 @@ namespace ai
 
      board::Move AiMini::search(board::Chessboard chessboard)
      {
-          return minimax(chessboard, 4, INT16_MIN, INT16_MAX, true).second.value();
+          return minimax(chessboard, 3, INT16_MIN, INT16_MAX, true).second.value();
      }
 }

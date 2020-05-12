@@ -68,6 +68,8 @@ set(SRC_TESTS
     tests/unit_tests/check_test.cc
     tests/unit_tests/game_test.cc
     tests/unit_tests/ai_search_test.cc
+    tests/unit_tests/ai_search2_test.cc
+    tests/unit_tests/ai_search3_test.cc
     #FIXME
     )
 
@@ -138,8 +140,8 @@ if (${GTEST_FOUND} AND ${THREADS_FOUND})
 
         # Add the executable created to the test list of ctest
         add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
-        # Set timeout of the test to 3 seconds
-        set_tests_properties(${TEST_NAME} PROPERTIES TIMEOUT 3)
+        # Set timeout of the test to 5 seconds
+        set_tests_properties(${TEST_NAME} PROPERTIES TIMEOUT 20)
     endforeach()
 else()
     message(WARNING "Gtest or ThreadLib not found... You will not be able to launch tests")
