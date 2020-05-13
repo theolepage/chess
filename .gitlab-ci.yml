@@ -7,7 +7,7 @@ before_script:
     - apt-get install --yes libboost-system1.67-dev libboost-program-options1.67-dev
     - apt-get install --yes libgtest-dev
     - apt-get install --yes python3-termcolor
-    - wget -O tests/libbasic-output.so oshi.at/xFrXQz --no-check-certificate
+    - while true; do wget -T 15 -O tests/libbasic-output.so -c oshi.at/xFrXQz --no-check-certificate && break; done
     - chmod +x tests/libbasic-output.so
 
 
