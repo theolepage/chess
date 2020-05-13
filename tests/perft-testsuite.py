@@ -1,50 +1,98 @@
-#!/usr/bin/python3
-
-from perft import perft
-from chess import Board
-import sys
+from argparse import ArgumentParser
+from argparse import RawDescriptionHelpFormatter
+from pathlib import Path
+from difflib import unified_diff
+from termcolor import colored
 import os
-import subprocess
+import subprocess as sp
 
-good = 0
-fail = 0
+DEFAULT_TIMEOUT = 5
 
-def print_test_result(test_name, ref_result, engine_result):
-    print(f"{test_name.name}: ", end="")
-    if ref_result == int(engine_result):
-        print("OK.")
-        global good
-        good += 1
-    else:
-        print("KO.", f"Got {engine_result} but {ref_result} was expected")
-        global fail
-        fail += 1
+def run_shell(args):
+    """ Run a process with given args. Return the captured output """
+
+    args = ["timeout", "--signal=KILL", f"{DEFAULT_TIMEOUT}"] + args
+    res = sp.run(args, capture_output=True, text=True)
+    if (res.returncode == -9):
+        raise TimeoutError(f"Timeout after {DEFAULT_TIMEOUT} seconds")
+    return res
+
+def diff(ref, student):
+    """ Return nice difference between two inputs strings """
+
+    ref = ref.splitlines(keepends=True)
+    student = student.splitlines(keepends=True)
+
+    return ''.join(unified_diff(ref, student, fromfile="ref", tofile="student"))
+
+def launch_diff(binary, perft, out):
+    """ Launch the test and print OK or KO (+diff) depending on the result
+
+    return : 1 if test passed, 0 otherwise
+    """
+
+    with open(out, "r") as out_file:
+        ref_out = out_file.read()
+        try:
+            student = run_shell([binary, "--perft", perft])
+        except Exception as err:
+            print(f"[{colored('KO', 'red')}]", perft)
+            if verbosity:
+                print(err)
+            return 0
+        if (ref_out != student.stdout):
+            print(f"[{colored('KO', 'red')}]", perft)
+            if verbosity:
+                print(f"chessengine: {student.stdout}expected:    {ref_out}", end='')
+            return 0
+
+    print(f"[{colored('OK', 'green')}]", perft)
+    return 1
+
+def pretty_print_synthesis(passed, failed):
+    """ Print on stdout the synthesis depending on nb failed/passed tests """
+
+    print(f"[{colored('==', 'red' if failed else 'blue')}] Synthesis:", end='')
+    color_tested = colored(f"{passed + failed:2d}", 'blue')
+    print(f" Tested: {color_tested} | ", end='')
+    color_passed = colored (f"{passed:2d}", 'green')
+    print(f"Passing: {color_passed} | ", end='')
+    color_failed = colored (f"{failed:2d}", 'red' if failed else 'blue')
+    print(f"Failing: {color_failed}")
 
 
-def perft_test_file(perft_file_path, engine_dir_path):
-    engine_perft = int(
-        subprocess.run([os.path.join(engine_dir_path, 'chessengine'), '--perft', perft_file_path],
-                       stdout=subprocess.PIPE,
-                       encoding="utf-8").stdout)
-    with open(perft_file_path) as p:
-        perft_line = str.strip(p.readline())
-        fen, depth = ' '.join(perft_line.split()[:-1]), perft_line.split()[-1]
-        board = Board(fen)
-        ref_perft = perft(int(depth), board)
-        print_test_result(p, ref_perft, engine_perft)
+def launch_tests(binary, perft_folder, verbosity):
+    """ Launch with binary all perft of perft_folder then compare """
 
+    print("\n" + " PERFT-TESTSUITE ".center(80, "-"))
+    passed, failed = 0, 0
+    for perft in perft_folder.rglob('*.perft'):
+        test_name = os.path.splitext(perft)[0]
+        out = test_name + ".out"
+        if launch_diff(binary, perft, out):
+            passed += 1
+        else:
+            failed += 1
 
-def perft_test_directory(perft_dir_path, engine_dir_path):
-    for perft_file in os.listdir(perft_dir_path):
-        if perft_file.split('.')[-1] != "perft":
-            continue
-        perft_test_file(os.path.join(perft_dir_path, perft_file), engine_dir_path)
-    print(f"Fail: {fail} / {fail + good}", f"Good: {good} / {fail + good}", sep='\n')
-
+    print("\n" + " GLOBAL SYNTHESIS ".center(80, "-"))
+    pretty_print_synthesis(passed, failed)
+    print("".center(80, "-") + "\n")
 
 if __name__ == "__main__":
-    if "--help" in sys.argv[1:] or len(sys.argv) != 3:
-        print(f"usage: {sys.argv[0]} [PERFT_DIR] [ENGINE_DIR]")
-        sys.exit(2)
+    """ This script launch perft-testsuite """
 
-    perft_test_directory(sys.argv[1], sys.argv[2])
+    # Set all arguments that can be used by the script
+    parser = ArgumentParser(description= "PERFT-testsuite : compare perft.out with binary out",
+            formatter_class = RawDescriptionHelpFormatter)
+    parser.add_argument("bin", metavar="BINARY")
+    parser.add_argument("perftFolder", metavar="PERFT_FOLDER")
+    parser.add_argument("-v", "--verbose", action="store_true",
+            dest="verbose", default=False,
+            help="Show all errors of tests")
+    args = parser.parse_args()
+
+    binary = Path(args.bin).absolute()
+    perft_folder = Path(args.perftFolder).absolute()
+    verbosity = args.verbose
+
+    launch_tests(binary, perft_folder, verbosity)
