@@ -202,7 +202,7 @@ namespace rule
         return Move(from, to, piece, capture, false, false, false, false);
     }
 
-    std::optional<Move> register_castling(Chessboard& board,
+    std::optional<Move> register_castling(const Chessboard& board,
                                           const Color& color,
                                           bool king_castling)
     {
@@ -213,55 +213,24 @@ namespace rule
         const Position new_king = Position(king_castling ? File::G : File::C, rank);
         // Position new_rook = Position(king_castling ? File::F : File::D, rank);
 
-        // Keep castling state of opponent 
-        Color opposite_color = (color == Color::WHITE) ? Color::BLACK : Color::WHITE;
-        bool opposite_king_castling = board.get_king_castling(opposite_color);
-        bool opposite_queen_castling = board.get_queen_castling(opposite_color);
-
         // Check if allowed to do a castling
         if (have_pieces_between(board, king, rook)
             || (king_castling && !board.get_king_castling(color))
             || (!king_castling && !board.get_queen_castling(color)))
             return std::nullopt;
 
-        // Update castling state
-        if (king_castling)
-        {
-            board.set_king_castling(color, false);
-            if (opposite_king_castling) board.set_king_castling(opposite_color, false);
-        }
-        else
-        {
-            board.set_queen_castling(color, false);
-            if (opposite_queen_castling) board.set_queen_castling(opposite_color, false);
-        }
-
+        // Check if king would be in check for each pos between king and new_king
         bool not_in_check = true;
         const auto temp_positions = get_positions_between(king, new_king);
         Chessboard board_copy = board;
         Position prev_step = king;
-
-        for (size_t i = 1; i < temp_positions.size(); i++)
+        for (size_t i = 0; i < temp_positions.size(); i++)
         {
             const Position step = temp_positions.at(i);
-            const Move temp_move = Move(prev_step, step, PieceType::KING, false, false, false, false, false);
-            board_copy.do_move(temp_move);
-            board_copy.set_white_turn(!board_copy.get_white_turn());
+            board_copy.move_piece(prev_step, step, PieceType::KING, color);
             if (board_copy.is_check())
                 not_in_check = false;
             prev_step = step;
-        }
-
-        // Restore castling state
-        if (king_castling)
-        {
-            board.set_king_castling(color, true);
-            if (opposite_king_castling) board.set_king_castling(opposite_color, true);
-        }
-        else
-        {
-            board.set_queen_castling(color, true);
-            if (opposite_queen_castling) board.set_queen_castling(opposite_color, true);
         }
 
         std::optional<Move> res = std::nullopt;
@@ -301,7 +270,7 @@ namespace rule
         return true;
     }
 
-    std::vector<Move> generate_moves(Chessboard& board,
+    std::vector<Move> generate_moves(const Chessboard& board,
                                      const PieceType& piece)
     {
         std::vector<Move> res;
@@ -336,7 +305,7 @@ namespace rule
         return res;
     }
 
-    std::vector<Move> generate_pawn_moves(Chessboard& board)
+    std::vector<Move> generate_pawn_moves(const Chessboard& board)
     {
         std::vector<Move> res;
         const Color color = board.get_white_turn() ? Color::WHITE : Color::BLACK;
@@ -406,32 +375,32 @@ namespace rule
         return res;
     }
 
-    std::vector<Move> generate_king_moves(Chessboard& board)
+    std::vector<Move> generate_king_moves(const Chessboard& board)
     {
         return generate_moves(board, PieceType::KING);
     }
 
-    std::vector<Move> generate_bishop_moves(Chessboard& board)
+    std::vector<Move> generate_bishop_moves(const Chessboard& board)
     {
         return generate_moves(board, PieceType::BISHOP);
     }
 
-    std::vector<Move> generate_rook_moves(Chessboard& board)
+    std::vector<Move> generate_rook_moves(const Chessboard& board)
     {
         return generate_moves(board, PieceType::ROOK);
     }
 
-    std::vector<Move> generate_queen_moves(Chessboard& board)
+    std::vector<Move> generate_queen_moves(const Chessboard& board)
     {
         return generate_moves(board, PieceType::QUEEN);
     }
 
-    std::vector<Move> generate_knight_moves(Chessboard& board)
+    std::vector<Move> generate_knight_moves(const Chessboard& board)
     {
         return generate_moves(board, PieceType::KNIGHT);
     }
 
-    std::vector<Move> generate_all_moves(Chessboard& board)
+    std::vector<Move> generate_all_moves(const Chessboard& board)
     {
         std::vector<Move> moves;
 
