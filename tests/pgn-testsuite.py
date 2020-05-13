@@ -6,7 +6,7 @@ from termcolor import colored
 import os
 import subprocess as sp
 
-DEFAULT_TIMEOUT = 2
+DEFAULT_TIMEOUT = 20
 
 def run_shell(args):
     """ Run a process with given args. Return the captured output """
