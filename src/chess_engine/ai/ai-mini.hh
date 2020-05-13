@@ -9,7 +9,5 @@ namespace ai
      {
      public:
           board::Move search(board::Chessboard& chessboard) const;
-
-          int evaluate(board::Chessboard&) const;
      };
 }

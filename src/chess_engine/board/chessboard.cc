@@ -429,25 +429,6 @@ namespace board
             update_black_castling_bools(move);
     }
 
-    unsigned Chessboard::get_point_value(const Color color) const
-    {
-        unsigned point_value = 0;
-
-        for (const auto& piecetype : piecetype_array)
-        {
-            const auto piecetype_i = utils::utype(piecetype);
-            point_value += piecetype_value[piecetype_i] * get_bitboard_count(piecetype, color);
-        }
-
-        return point_value;
-    }
-
-    // point value implementation
-    int Chessboard::evaluate(void) const
-    {
-        return get_point_value(Color::WHITE) - get_point_value(Color::BLACK);
-    }
-
     void Chessboard::do_move(const Move& move)
     {
         const Position& start = move.start_get();

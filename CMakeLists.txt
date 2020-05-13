@@ -59,6 +59,7 @@ set(MAIN_ENGINE
 set(SRC_ENGINE
     src/chess_engine/ai/ai-launcher.cc
     src/chess_engine/ai/ai-mini.cc
+    src/chess_engine/ai/evaluation.cc
     src/chess_engine/ai/uci.cc
     src/chess_engine/board/rule.cc
     src/chess_engine/board/chessboard.cc
@@ -87,6 +88,7 @@ set(SRC_TESTS
     tests/unit_tests/game_test.cc
     tests/unit_tests/ai_search_test.cc
     tests/unit_tests/ai_search2_test.cc
+    tests/unit_tests/evaluate_test.cc
     tests/unit_tests/uci_communication_test.cc
     #FIXME
     )
