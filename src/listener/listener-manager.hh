@@ -27,8 +27,6 @@ namespace listener
             return chessboard_[position];
         }
 
-        void play_ai(void);
-
         void play_pgn_moves(const std::vector<board::PgnMove> moves);
 
         void add_listener(void* dll, Listener* listener);

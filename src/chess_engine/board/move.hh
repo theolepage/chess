@@ -27,11 +27,11 @@ namespace board
         bool operator==(const Move& move) const;
         bool operator!=(const Move& move) const;
 
-        const Position& start_get() const;
-        const Position& end_get() const;
-        PieceType piece_get() const;
-        bool capture_get() const;
-        bool double_pawn_push_get() const;
+        const Position& start_get(void) const;
+        const Position& end_get(void) const;
+        PieceType piece_get(void) const;
+        bool capture_get(void) const;
+        bool double_pawn_push_get(void) const;
         bool queen_castling_get() const;
         bool king_castling_get() const;
         bool castling_get() const;
