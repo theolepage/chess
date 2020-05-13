@@ -91,6 +91,19 @@ set(SRC_TESTS
     #FIXME
     )
 
+# MAKE CHECK TARGET
+add_custom_target(check
+    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+    COMMAND python3 ${CMAKE_SOURCE_DIR}/tests/pgn-testsuite.py
+             -v ${CMAKE_SOURCE_DIR}/chessengine
+             ${CMAKE_SOURCE_DIR}/tests/libbasic-output.so
+             ${CMAKE_SOURCE_DIR}/tests/given_pgn
+    COMMAND python3 ${CMAKE_SOURCE_DIR}/tests/perft-testsuite.py
+             -v ${CMAKE_SOURCE_DIR}/chessengine
+             ${CMAKE_SOURCE_DIR}/tests/given_perft;
+    COMMAND ${CMAKE_CTEST_COMMAND}
+)
+
 # BUILD OPTIONS
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra -pedantic")
@@ -126,6 +139,7 @@ set_target_properties(chessengine PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}) # binary destination
 target_sources(chessengine PRIVATE ${MAIN_ENGINE})
 target_link_libraries(chessengine PRIVATE SRC_ENGINE_OBJ ${LIBRARIES})
+add_dependencies(check chessengine)
 
 # STATIC TARGET
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
@@ -134,20 +148,9 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
         RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}) # binary destination
     target_sources(chessengine-static PRIVATE ${MAIN_ENGINE})
     target_link_libraries(chessengine-static PRIVATE SRC_ENGINE_OBJ ${LIBRARIES} -static)
+    add_dependencies(check chessengine-static)
 endif()
 
-# MAKE CHECK TARGET
-add_custom_target(check
-    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
-    COMMAND python3 ${CMAKE_SOURCE_DIR}/tests/pgn-testsuite.py
-             -v ${CMAKE_SOURCE_DIR}/chessengine
-             ${CMAKE_SOURCE_DIR}/tests/libbasic-output.so
-             ${CMAKE_SOURCE_DIR}/tests/given_pgn
-    COMMAND python3 ${CMAKE_SOURCE_DIR}/tests/perft-testsuite.py
-             -v ${CMAKE_SOURCE_DIR}/chessengine
-             ${CMAKE_SOURCE_DIR}/tests/given_perft;
-    COMMAND ${CMAKE_CTEST_COMMAND}
-)
 
 # TESTS
 find_package(GTest)

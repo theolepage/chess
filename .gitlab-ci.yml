@@ -11,10 +11,10 @@ build and tests:
     script:
         - mkdir build && cd build
         - cmake ..
-        - make
-        - ctest --verbose
+        - make check
         - cd ..
     artifacts:
         paths:
             - build
             - chessengine
+            - chessengine-static
