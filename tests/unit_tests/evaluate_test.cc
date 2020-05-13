@@ -5,20 +5,18 @@
 using namespace board;
 using namespace ai;
 
-TEST(Evaluate, Equality)
+TEST(Evaluate, EmptyBoard)
 {
-    Chessboard board = Chessboard("1b2k3/5q1n/3p4/8/1K5P/3P4/2Q2R2/8");
+    Chessboard board = Chessboard("8/8/8/8/8/8/8/8");
 
     EXPECT_EQ(evaluate(board), 0);
 }
 
 TEST(Evaluate, WhiteAdvantage)
 {
-    Chessboard board = Chessboard("1b2k3/5p1n/3p4/8/1K5P/3P4/2Q2R2/8");
+    Chessboard board = Chessboard("nP6/PP6/8/8/8/8/8/8");
 
-    const auto score = 8; //white is winning
-
-    EXPECT_EQ(evaluate(board), score);
+    EXPECT_GT(evaluate(board), 0);
 }
 
 int main(int argc, char **argv) {
