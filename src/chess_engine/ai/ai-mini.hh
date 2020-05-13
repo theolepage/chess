@@ -8,8 +8,8 @@ namespace ai
      class AiMini final
      {
      public:
-          board::Move search(board::Chessboard chessboard);
+          board::Move search(board::Chessboard& chessboard) const;
 
-          int evaluate(board::Chessboard);
+          int evaluate(board::Chessboard&) const;
      };
 }

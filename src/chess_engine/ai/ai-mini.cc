@@ -9,9 +9,11 @@ namespace ai
 {
      using evalAndMove = std::pair<int16_t, std::optional<board::Move>>;
 
-     static evalAndMove minimax(board::Chessboard chessboard,
-                                               int16_t depth, int16_t alpha,
-                                               int16_t beta, bool isMaxPlayer)
+     static evalAndMove minimax(board::Chessboard& chessboard,
+                                   const int16_t depth,
+                                   int16_t alpha,
+                                   int16_t beta,
+                                   const bool isMaxPlayer)
      {
           if (chessboard.is_draw())
                return evalAndMove(0, std::nullopt);
@@ -32,7 +34,7 @@ namespace ai
                {
                     board::Chessboard chessboard_ = chessboard;
                     chessboard_.do_move(moves[i]);
-                    int16_t eval = minimax(chessboard_, depth - 1, alpha, beta,
+                    const int16_t eval = minimax(chessboard_, depth - 1, alpha, beta,
                                            !isMaxPlayer).first;
                     if (eval > bestValue)
                     {
@@ -66,7 +68,7 @@ namespace ai
           return evalAndMove(bestValue, moves[bestIndex]);
      }
 
-     board::Move AiMini::search(board::Chessboard chessboard)
+     board::Move AiMini::search(board::Chessboard& chessboard) const
      {
           return minimax(chessboard, 3, INT16_MIN, INT16_MAX,
                          chessboard.get_white_turn()).second.value();
