@@ -5,7 +5,10 @@ before_script:
     - apt-get install --yes libboost1.67-dev
     - apt-get install --yes libboost-system1.67-dev libboost-program-options1.67-dev
     - apt-get install --yes libgtest-dev
+    - apt-get install --yes python-pip
     - apt-get install --yes python-termcolor
+    - pip install --user -r tests/requirements.txt
+
 
 build and tests:
     stage: build
