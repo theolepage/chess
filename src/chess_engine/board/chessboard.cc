@@ -289,6 +289,12 @@ namespace board
         return legal_moves;
     }
 
+    // FIXME
+    bool Chessboard::has_legal_moves()
+    {
+        return !generate_legal_moves().empty();
+    }
+
     void Chessboard::register_double_pawn_push(const Move& move, const Color color)
     {
         const Position& start = move.start_get();
@@ -658,12 +664,12 @@ namespace board
 
     bool Chessboard::is_pat(void)
     {
-        return !is_check() && generate_legal_moves().empty();
+        return !is_check() && !has_legal_moves();
     }
 
     bool Chessboard::is_checkmate(void)
     {
-        return is_check() && generate_legal_moves().empty();
+        return is_check() && !has_legal_moves();
     }
 
     bool Chessboard::threefold_repetition()
