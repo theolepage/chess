@@ -15,6 +15,7 @@ namespace ai
             pgn_parser::add_move_to_board(chessboard, uci::get_board());
             board::Move move = ai.search(chessboard);
             uci::play_move(pgn_parser::move_to_string(move));
+            chessboard.do_move(move);
         }
     }
 }

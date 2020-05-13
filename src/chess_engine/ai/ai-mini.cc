@@ -9,12 +9,6 @@ namespace ai
 {
      using evalAndMove = std::pair<int16_t, std::optional<board::Move>>;
 
-     static void log_minimax(board::Move move, int16_t depth, int16_t eval)
-     {
-          std::cout << "depth: " << depth << " | eval : " << eval << " | ";
-          std::cout << move << std::endl;
-     }
-
      static evalAndMove minimax(board::Chessboard chessboard,
                                                int16_t depth, int16_t alpha,
                                                int16_t beta, bool isMaxPlayer)
@@ -27,7 +21,7 @@ namespace ai
           if (depth == 0)
                return evalAndMove(chessboard.evaluate(), std::nullopt);
 
-          //TODO opti generate_legal_moves
+          //TODO opti generate_legal_moves (order ?)
           std::vector<board::Move> moves = chessboard.generate_legal_moves();
 
           if (isMaxPlayer)
@@ -40,7 +34,6 @@ namespace ai
                     chessboard_.do_move(moves[i]);
                     int16_t eval = minimax(chessboard_, depth - 1, alpha, beta,
                                            !isMaxPlayer).first;
-                    log_minimax(moves[i], depth, eval);
                     if (eval > bestValue)
                     {
                          bestValue = eval;
@@ -61,12 +54,11 @@ namespace ai
                chessboard_.do_move(moves[i]);
                int16_t eval = minimax(chessboard_, depth - 1, alpha, beta,
                                         !isMaxPlayer).first;
-               log_minimax(moves[i], depth, eval);
                if (eval < bestValue)
                {
                     bestValue = eval;
                     bestIndex = i;
-                    beta = std::min(alpha, eval);
+                    beta = std::min(beta, eval);
                     if (beta <= alpha)
                          break;
                }
@@ -76,6 +68,7 @@ namespace ai
 
      board::Move AiMini::search(board::Chessboard chessboard)
      {
-          return minimax(chessboard, 3, INT16_MIN, INT16_MAX, true).second.value();
+          return minimax(chessboard, 3, INT16_MIN, INT16_MAX,
+                         chessboard.get_white_turn()).second.value();
      }
 }
