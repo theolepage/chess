@@ -15,25 +15,23 @@ namespace ai
                                    int16_t beta,
                                    const bool isMaxPlayer)
      {
-          if (chessboard.is_draw())
+          const std::vector<board::Move> legal_moves = chessboard.generate_legal_moves();
+          if (chessboard.is_draw(legal_moves))
                return evalAndMove(0, std::nullopt);
-          if (chessboard.is_checkmate())
+          if (chessboard.is_checkmate(legal_moves))
                return evalAndMove(isMaxPlayer ? INT16_MIN : INT16_MAX,
                                   std::nullopt);
           if (depth == 0)
                return evalAndMove(chessboard.evaluate(), std::nullopt);
 
-          //TODO opti generate_legal_moves (order ?)
-          std::vector<board::Move> moves = chessboard.generate_legal_moves();
-
           if (isMaxPlayer)
           {
                int16_t bestValue = INT16_MIN;
                size_t bestIndex = 0;
-               for (size_t i = 0; i < moves.size(); i++)
+               for (size_t i = 0; i < legal_moves.size(); i++)
                {
                     board::Chessboard chessboard_ = chessboard;
-                    chessboard_.do_move(moves[i]);
+                    chessboard_.do_move(legal_moves[i]);
                     const int16_t eval = minimax(chessboard_, depth - 1, alpha, beta,
                                            !isMaxPlayer).first;
                     if (eval > bestValue)
@@ -45,15 +43,15 @@ namespace ai
                               break;
                     }
                }
-               return evalAndMove(bestValue, moves[bestIndex]);
+               return evalAndMove(bestValue, legal_moves[bestIndex]);
           }
           // else
           int16_t bestValue = INT16_MAX;
           size_t bestIndex = 0;
-          for (size_t i = 0; i < moves.size(); i++)
+          for (size_t i = 0; i < legal_moves.size(); i++)
           {
                board::Chessboard chessboard_ = chessboard;
-               chessboard_.do_move(moves[i]);
+               chessboard_.do_move(legal_moves[i]);
                int16_t eval = minimax(chessboard_, depth - 1, alpha, beta,
                                         !isMaxPlayer).first;
                if (eval < bestValue)
@@ -65,7 +63,7 @@ namespace ai
                          break;
                }
           }
-          return evalAndMove(bestValue, moves[bestIndex]);
+          return evalAndMove(bestValue, legal_moves[bestIndex]);
      }
 
      board::Move AiMini::search(board::Chessboard& chessboard) const

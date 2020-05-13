@@ -1,13 +1,9 @@
-// start: 3.207s
-// opti for loop: 3.0s
-
-// get authorized pos
-
 #include <vector>
 
 #include "chess_engine/board/chessboard.hh"
 #include "chess_engine/board/move.hh"
 #include "chess_engine/board/rule.hh"
+#include "utils/utype.hh"
 
 using namespace board;
 
@@ -79,13 +75,13 @@ namespace rule
                                                const Color& color)
     {
         std::vector<Position> res;
-        for (size_t file = 0; file < Chessboard::width; file++)
+        for (uint8_t rank = 0; rank < Chessboard::width; ++rank)
         {
-            for (size_t rank = 0; rank < Chessboard::width; rank++)
+            const std::bitset<Chessboard::width> line = board(static_cast<Rank>(rank), piece, color);
+            for (uint8_t file = 0; file < Chessboard::width; ++file)
             {
-                Position pos(static_cast<File>(file), static_cast<Rank>(rank));
-                if (board(pos, piece, color).has_value())
-                    res.push_back(pos);
+                if (line[file])
+                    res.emplace_back(Position(file, rank));
             }
         }
         return res;

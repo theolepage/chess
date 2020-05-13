@@ -75,11 +75,15 @@ namespace board
 
         bool is_check(void);
         bool is_checkmate(void);
+        bool is_checkmate(const std::vector<board::Move>& legal_moves);
         bool is_pat(void);
+        bool is_pat(const std::vector<board::Move>& legal_moves);
         bool threefold_repetition(void);
         bool is_draw(void);
+        bool is_draw(const std::vector<board::Move>& legal_moves);
 
         opt_piece_t operator[](const Position& position) const override;
+        std::bitset<width> operator()(const Rank rank, const PieceType piece, const Color color) const;
         opt_piece_t operator()(const Position& position, const PieceType& piece, const Color& color) const;
         void move_piece(const Position& start, const Position& end, const PieceType piecetype, const Color color);
 
