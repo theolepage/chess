@@ -13,6 +13,67 @@ using namespace board;
 
 namespace rule
 {
+    static void register_pos(std::vector<Position>& v,
+                             std::vector<std::optional<Position>> positions)
+    {
+        for (auto pos : positions)
+            if (pos)
+                v.push_back(*pos);
+    }
+
+    static void register_pos_line(std::vector<Position>& v,
+                                  const Chessboard& board,
+                                  const Position& from,
+                                  int file,
+                                  int rank)
+    {
+        std::optional<Position> pos = from.move(file, rank);
+        while (pos)
+        {
+            v.push_back(*pos);
+            if (board[*pos].has_value())
+                break;
+
+            pos = pos->move(file, rank);
+        }
+    }
+
+    bool is_king_checked(const Chessboard& board)
+    {
+        const Color opponent_color = !board.get_white_turn() ? Color::WHITE : Color::BLACK;
+        const Position king_pos = board.get_king_position();
+
+        // Find threatening positions
+        std::vector<Position> threatening_pawns;
+        register_pos(threatening_pawns, {
+            king_pos.move(-1, opponent_color == Color::WHITE ? -1 : 1),
+            king_pos.move( 1, opponent_color == Color::WHITE ? -1 : 1)
+        });
+        auto threatening_knights = get_authorized_pos(board, PieceType::KNIGHT, king_pos);
+        auto threatening_kings = get_authorized_pos(board, PieceType::KING, king_pos);;
+        auto threatening_lines = get_authorized_pos(board, PieceType::ROOK, king_pos);;
+        auto threatening_diagonals = get_authorized_pos(board, PieceType::BISHOP, king_pos);
+        
+        for (auto pos : threatening_pawns)
+            if (board(pos, PieceType::PAWN, opponent_color).has_value())
+                return true;
+        for (auto pos : threatening_knights)
+            if (board(pos, PieceType::KNIGHT, opponent_color).has_value())
+                return true;
+        for (auto pos : threatening_kings)
+            if (board(pos, PieceType::KING, opponent_color).has_value())
+                return true;
+        for (auto pos : threatening_lines)
+            if (board(pos, PieceType::ROOK, opponent_color).has_value()
+                || board(pos, PieceType::QUEEN, opponent_color).has_value())
+                return true;
+        for (auto pos : threatening_diagonals)
+            if (board(pos, PieceType::BISHOP, opponent_color).has_value()
+                || board(pos, PieceType::QUEEN, opponent_color).has_value())
+                return true;
+        return false;
+    }
+
     std::vector<Position> get_pieces_positions(const Chessboard& board,
                                                const PieceType& piece,
                                                const Color& color)
@@ -70,31 +131,6 @@ namespace rule
             if (board[positions.at(i)].has_value())
                 res = true;
         return res;
-    }
-
-    static void register_pos(std::vector<Position>& v,
-                             std::vector<std::optional<Position>> positions)
-    {
-        for (auto pos : positions)
-            if (pos)
-                v.push_back(*pos);
-    }
-
-    static void register_pos_line(std::vector<Position>& v,
-                                  const Chessboard& board,
-                                  const Position& from,
-                                  int file,
-                                  int rank)
-    {
-        std::optional<Position> pos = from.move(file, rank);
-        while (pos)
-        {
-            v.push_back(*pos);
-            if (board[*pos].has_value())
-                break;
-
-            pos = pos->move(file, rank);
-        }
     }
 
     std::vector<Position> get_authorized_pos(const Chessboard& board,

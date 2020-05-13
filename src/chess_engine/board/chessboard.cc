@@ -642,18 +642,7 @@ namespace board
 
     bool Chessboard::is_check(void)
     {
-        const Position king_pos = get_king_position();
-
-        // little hack to get the opponent turns
-        white_turn_ = !white_turn_;
-        const auto possible_moves = rule::generate_all_moves(*this);
-        white_turn_ = !white_turn_;
-
-        for (const Move& move : possible_moves)
-            if (move.end_get() == king_pos)
-                return true;
-
-        return false;
+        return rule::is_king_checked(*this);
     }
 
     bool Chessboard::is_pat(void)

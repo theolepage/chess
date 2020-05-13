@@ -91,7 +91,7 @@ namespace board
         bool get_queen_castling(const Color& color) const;
         void set_king_castling(const Color& color, bool state);
         void set_queen_castling(const Color& color, bool state);
-
+        
         Position get_king_position(void) const;
 
         friend std::ostream& operator<<(std::ostream& os, const Chessboard& board);

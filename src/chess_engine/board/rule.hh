@@ -12,6 +12,8 @@ using namespace board;
 
 namespace rule
 {
+    bool is_king_checked(const Chessboard& board);
+    
     bool have_pieces_between(const Chessboard& board,
                               const Position& x,
                               const Position& y);
