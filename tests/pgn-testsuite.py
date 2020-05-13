@@ -6,7 +6,7 @@ from termcolor import colored
 import os
 import subprocess as sp
 
-DEFAULT_TIMEOUT = 20
+DEFAULT_TIMEOUT = 5
 
 def run_shell(args):
     """ Run a process with given args. Return the captured output """
@@ -33,7 +33,13 @@ def launch_diff(binary, listener, pgn, out):
 
     with open(out, "r") as out_file:
         ref_out = out_file.read()
-        student = run_shell([binary, "--pgn", pgn, "-l", listener])
+        try:
+            student = run_shell([binary, "--pgn", pgn, "-l", listener])
+        except exception as err:
+            print(f"[{colored('KO', 'red')}]", pgn)
+            if verbosity:
+                print(err)
+            return 0
         if (ref_out != student.stdout):
             print(f"[{colored('KO', 'red')}]", pgn)
             if verbosity:
@@ -58,6 +64,7 @@ def pretty_print_synthesis(passed, failed):
 def launch_tests(binary, listener, pgn_folder, verbosity):
     """ Launch with binary and listener all pgn of pgn_folder then compare """
 
+    print("\n" + " PGN-TESTSUITE ".center(80, "-"))
     passed, failed = 0, 0
     for pgn in pgn_folder.rglob('*.pgn'):
         test_name = os.path.splitext(pgn)[0]

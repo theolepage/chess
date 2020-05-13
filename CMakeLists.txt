@@ -165,3 +165,28 @@ if (${GTEST_FOUND} AND ${THREADS_FOUND})
 else()
     message(WARNING "Gtest or ThreadLib not found... You will not be able to launch tests")
 endif()
+
+# MAKE CHECK
+# Create a check.sh to launch custom target "check"
+file(WRITE "${CMAKE_BINARY_DIR}/tmp/check.sh"
+    "make; \
+    python3 ${CMAKE_SOURCE_DIR}/tests/pgn-testsuite.py \
+        -v ${CMAKE_SOURCE_DIR}/chessengine \
+        ${CMAKE_SOURCE_DIR}/tests/libbasic-output.so \
+        ${CMAKE_SOURCE_DIR}/tests/given_pgn;\
+    python3 ${CMAKE_SOURCE_DIR}/tests/perft-testsuite.py \
+        -v ${CMAKE_SOURCE_DIR}/chessengine \
+        ${CMAKE_SOURCE_DIR}/tests/given_perft;\
+    ctest;"
+)
+file(
+    COPY "${CMAKE_BINARY_DIR}/tmp/check.sh"
+    DESTINATION "${CMAKE_BINARY_DIR}"
+    FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+    GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+)
+# Add custom target named check launching check.sh script
+add_custom_target(check
+    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+    COMMAND "${CMAKE_BINARY_DIR}/check.sh"
+)
