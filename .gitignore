@@ -78,3 +78,4 @@ tags
 mini.cc
 notes
 bench_perft
+__pycache__
