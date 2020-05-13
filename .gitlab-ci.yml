@@ -16,10 +16,11 @@ make check:
     script:
         - mkdir build && cd build
         - cmake ..
-        - make check -j8
+        - make check -j20
         - cd ..
     artifacts:
         paths:
             - build
             - chessengine
             - chessengine-static
+            - tests/libbasic-output.so
