@@ -74,8 +74,9 @@ namespace pgn_parser
         const board::Position start(static_cast<uint8_t>(str_move.at(0) - 'a'), (static_cast<uint8_t>(str_move.at(1) - '1')));
         const board::Position end(static_cast<uint8_t>(str_move.at(2) - 'a'), (static_cast<uint8_t>(str_move.at(3) - '1')));
         opt_piece_t promotion = (str_move.size() == 5) ?
-            std::optional<PieceType>(get_piece(str_move.at(4))) :
-            std::optional<PieceType>(std::nullopt);
+                                std::optional<PieceType>(get_piece(str_move.at(4))) :
+                                std::optional<PieceType>(std::nullopt);
+
         auto op_piece = chessboard[start];
         assert(op_piece.has_value());
         const PieceType piece = op_piece.value().first;
