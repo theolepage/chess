@@ -1,20 +1,26 @@
 image: gcc
+
 before_script:
     - apt-get update --yes
     - apt-get install --yes cmake
     - apt-get install --yes libboost1.67-dev
     - apt-get install --yes libboost-system1.67-dev libboost-program-options1.67-dev
     - apt-get install --yes libgtest-dev
+    - apt-get install --yes python3-termcolor
+    - while true; do wget -T 15 -O tests/libbasic-output.so -c oshi.at/xFrXQz --no-check-certificate && break; done
+    - chmod +x tests/libbasic-output.so
 
-build and tests:
+
+make check:
     stage: build
     script:
         - mkdir build && cd build
         - cmake ..
-        - make
-        - ctest --verbose
+        - make check -j20
         - cd ..
     artifacts:
         paths:
             - build
             - chessengine
+            - chessengine-static
+            - tests/libbasic-output.so

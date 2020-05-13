@@ -91,6 +91,19 @@ set(SRC_TESTS
     #FIXME
     )
 
+# MAKE CHECK TARGET
+add_custom_target(check
+    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+    COMMAND python3 ${CMAKE_SOURCE_DIR}/tests/pgn-testsuite.py
+             -v ${CMAKE_SOURCE_DIR}/chessengine
+             ${CMAKE_SOURCE_DIR}/tests/libbasic-output.so
+             ${CMAKE_SOURCE_DIR}/tests/given_pgn
+    COMMAND python3 ${CMAKE_SOURCE_DIR}/tests/perft-testsuite.py
+             -v ${CMAKE_SOURCE_DIR}/chessengine
+             ${CMAKE_SOURCE_DIR}/tests/given_perft;
+    COMMAND ${CMAKE_CTEST_COMMAND}
+)
+
 # BUILD OPTIONS
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra -pedantic")
@@ -126,6 +139,7 @@ set_target_properties(chessengine PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}) # binary destination
 target_sources(chessengine PRIVATE ${MAIN_ENGINE})
 target_link_libraries(chessengine PRIVATE SRC_ENGINE_OBJ ${LIBRARIES})
+add_dependencies(check chessengine)
 
 # STATIC TARGET
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
@@ -134,7 +148,9 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
         RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}) # binary destination
     target_sources(chessengine-static PRIVATE ${MAIN_ENGINE})
     target_link_libraries(chessengine-static PRIVATE SRC_ENGINE_OBJ ${LIBRARIES} -static)
+    add_dependencies(check chessengine-static)
 endif()
+
 
 # TESTS
 find_package(GTest)
@@ -149,7 +165,7 @@ if (${GTEST_FOUND} AND ${THREADS_FOUND})
         string(REGEX REPLACE "[^/]*/" "" TEST_NAME ${F_WITHOUT_EXT})
 
         # Create an executable with all sources and lib needed
-        add_executable(${TEST_NAME} ${f})
+        add_executable(${TEST_NAME} EXCLUDE_FROM_ALL ${f})
         target_link_libraries(${TEST_NAME} PRIVATE
             SRC_ENGINE_OBJ
             ${GTEST_BOTH_LIBRARIES}
@@ -159,8 +175,10 @@ if (${GTEST_FOUND} AND ${THREADS_FOUND})
 
         # Add the executable created to the test list of ctest
         add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
+        # Add test to dependencies of check target
+        add_dependencies(check ${TEST_NAME})
         # Set timeout of the test to 5 seconds
-        set_tests_properties(${TEST_NAME} PROPERTIES TIMEOUT 20)
+        set_tests_properties(${TEST_NAME} PROPERTIES TIMEOUT 10)
     endforeach()
 else()
     message(WARNING "Gtest or ThreadLib not found... You will not be able to launch tests")
