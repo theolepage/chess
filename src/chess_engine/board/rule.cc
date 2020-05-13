@@ -10,9 +10,9 @@ using namespace board;
 namespace rule
 {
     static void register_pos(std::vector<Position>& v,
-                             std::vector<std::optional<Position>> positions)
+                             const std::vector<std::optional<Position>>& positions)
     {
-        for (auto pos : positions)
+        for (const auto& pos : positions)
             if (pos)
                 v.push_back(*pos);
     }
@@ -20,8 +20,8 @@ namespace rule
     static void register_pos_line(std::vector<Position>& v,
                                   const Chessboard& board,
                                   const Position& from,
-                                  int file,
-                                  int rank)
+                                  const int file,
+                                  const int rank)
     {
         std::optional<Position> pos = from.move(file, rank);
         while (pos)
