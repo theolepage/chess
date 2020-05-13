@@ -407,18 +407,12 @@ namespace rule
         const auto queen_moves = generate_queen_moves(board);
         const auto knight_moves = generate_knight_moves(board);
 
-        for (const auto& move : pawn_moves)
-            moves.push_back(move);
-        for (const auto& move : king_moves)
-            moves.push_back(move);
-        for (const auto& move : bishop_moves)
-            moves.push_back(move);
-        for (const auto& move : rook_moves)
-            moves.push_back(move);
-        for (const auto& move : queen_moves)
-            moves.push_back(move);
-        for (const auto& move : knight_moves)
-            moves.push_back(move);
+        moves.insert(moves.end(), pawn_moves.begin(), pawn_moves.end());
+        moves.insert(moves.end(), knight_moves.begin(), knight_moves.end());
+        moves.insert(moves.end(), bishop_moves.begin(), bishop_moves.end());
+        moves.insert(moves.end(), rook_moves.begin(), rook_moves.end());
+        moves.insert(moves.end(), queen_moves.begin(), queen_moves.end());
+        moves.insert(moves.end(), king_moves.begin(), king_moves.end());
 
         return moves;
     }

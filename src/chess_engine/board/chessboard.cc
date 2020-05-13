@@ -293,6 +293,12 @@ namespace board
         return legal_moves;
     }
 
+    // FIXME
+    bool Chessboard::has_legal_moves()
+    {
+        return !generate_legal_moves().empty();
+    }
+
     void Chessboard::register_double_pawn_push(const Move& move, const Color color)
     {
         const Position& start = move.start_get();
@@ -425,25 +431,6 @@ namespace board
             update_white_castling_bools(move);
         else
             update_black_castling_bools(move);
-    }
-
-    unsigned Chessboard::get_point_value(const Color color) const
-    {
-        unsigned point_value = 0;
-
-        for (const auto& piecetype : piecetype_array)
-        {
-            const auto piecetype_i = utils::utype(piecetype);
-            point_value += piecetype_value[piecetype_i] * get_bitboard_count(piecetype, color);
-        }
-
-        return point_value;
-    }
-
-    // point value implementation
-    int Chessboard::evaluate(void) const
-    {
-        return get_point_value(Color::WHITE) - get_point_value(Color::BLACK);
     }
 
     void Chessboard::do_move(const Move& move)
@@ -651,7 +638,7 @@ namespace board
 
     bool Chessboard::is_pat(void)
     {
-        return !is_check() && generate_legal_moves().empty();
+        return !is_check() && !has_legal_moves();
     }
 
     bool Chessboard::is_pat(const std::vector<board::Move>& legal_moves)
@@ -661,7 +648,7 @@ namespace board
 
     bool Chessboard::is_checkmate(void)
     {
-        return is_check() && generate_legal_moves().empty();
+        return is_check() && !has_legal_moves();
     }
 
     bool Chessboard::is_checkmate(const std::vector<board::Move>& legal_moves)

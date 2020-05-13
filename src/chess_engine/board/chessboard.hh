@@ -57,13 +57,15 @@ namespace board
         static char sidepiece_to_char(const side_piece_t& sidepiece);
         std::string to_fen_string(void) const;
 
+        const bitboard_t& get_bitboard(const PieceType piecetype, const Color color) const;
+        bitboard_t& get_bitboard(const PieceType piecetype, const Color color);
+        size_t get_bitboard_count(const PieceType piecetype, const Color color) const;
+
         std::vector<Move> generate_legal_moves(void);
 
         // return the same value than generate_legal_moves().empty(),
         // without generating superfluous moves
         bool has_legal_moves(void);
-
-        int evaluate(void) const;
 
         // Assume that move is legal
         void do_move(const Move& move);
@@ -147,9 +149,6 @@ namespace board
 
         void register_state();
 
-        const bitboard_t& get_bitboard(const PieceType piecetype, const Color color) const;
-        bitboard_t& get_bitboard(const PieceType piecetype, const Color color);
-        size_t get_bitboard_count(const PieceType piecetype, const Color color) const;
         void set_piece(const Position& pos, const PieceType piecetype, const Color color);
         void unset_piece(const Position& pos, const PieceType piecetype, const Color color);
         void change_piece_type(const Position& pos, const PieceType old_type, const PieceType new_type, const Color color);
