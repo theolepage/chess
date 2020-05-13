@@ -45,25 +45,25 @@ namespace rule
             king_pos.move(-1, opponent_color == Color::WHITE ? -1 : 1),
             king_pos.move( 1, opponent_color == Color::WHITE ? -1 : 1)
         });
-        auto threatening_knights = get_authorized_pos(board, PieceType::KNIGHT, king_pos);
-        auto threatening_kings = get_authorized_pos(board, PieceType::KING, king_pos);;
-        auto threatening_lines = get_authorized_pos(board, PieceType::ROOK, king_pos);;
-        auto threatening_diagonals = get_authorized_pos(board, PieceType::BISHOP, king_pos);
+        const auto threatening_knights = get_authorized_pos(board, PieceType::KNIGHT, king_pos);
+        const auto threatening_kings = get_authorized_pos(board, PieceType::KING, king_pos);
+        const auto threatening_lines = get_authorized_pos(board, PieceType::ROOK, king_pos);
+        const auto threatening_diagonals = get_authorized_pos(board, PieceType::BISHOP, king_pos);
         
-        for (auto pos : threatening_pawns)
+        for (const auto& pos : threatening_pawns)
             if (board(pos, PieceType::PAWN, opponent_color).has_value())
                 return true;
-        for (auto pos : threatening_knights)
+        for (const auto& pos : threatening_knights)
             if (board(pos, PieceType::KNIGHT, opponent_color).has_value())
                 return true;
-        for (auto pos : threatening_kings)
+        for (const auto& pos : threatening_kings)
             if (board(pos, PieceType::KING, opponent_color).has_value())
                 return true;
-        for (auto pos : threatening_lines)
+        for (const auto& pos : threatening_lines)
             if (board(pos, PieceType::ROOK, opponent_color).has_value()
                 || board(pos, PieceType::QUEEN, opponent_color).has_value())
                 return true;
-        for (auto pos : threatening_diagonals)
+        for (const auto& pos : threatening_diagonals)
             if (board(pos, PieceType::BISHOP, opponent_color).has_value()
                 || board(pos, PieceType::QUEEN, opponent_color).has_value())
                 return true;
@@ -274,11 +274,11 @@ namespace rule
         const auto pieces_positions = get_pieces_positions(board, piece, color);
 
         // Generate regular moves
-        for (Position from : pieces_positions)
+        for (const Position& from : pieces_positions)
         {
             // Step 1: Authorized (on the correct trajectory)
-            auto authorized_pos = get_authorized_pos(board, piece, from);
-            for (auto to : authorized_pos)
+            const auto authorized_pos = get_authorized_pos(board, piece, from);
+            for (const auto& to : authorized_pos)
             {
                 // Step 2: Possible (cell occupied, capture?)
                 const auto move = get_possible_move(board, piece, color, from, to);
