@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 
 #include <sstream>
+#include <unordered_set>
 
 #include "chess_engine/board/chessboard.hh"
 #include "utils/utype.hh"
@@ -243,35 +244,68 @@ TEST(Constructor, PerftObjectTurn)
     EXPECT_FALSE(black_turn_board.get_white_turn());
 }
 
-TEST(Checkboard, ToFenString)
+TEST(ToFenString, AfterConstruction)
 {
     auto fen_strings = {
-    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",
-    "r2k3r/pppppppp/8/8/8/8/PPPPPPPP/R2K3R",
-    "4k2r/8/8/8/8/8/8/R3K3",
-    "r3k2r/pp1ppPpp/8/2pP4/2P2P2/1P4P1/P6P/R3K2R",
-    "r3k2r/pp1pp1pp/8/2pPPp2/2P2P2/1P4P1/P6P/R3K2R",
-    "4r3/8/4k3/8/4K3/8/8/4R3",
-    "1r4K1/r7/k7/8/8/8/8/8",
-    "4k2r/3PP3/3P4/8/8/8/8/4K3",
-    "4k2r/8/8/3PP3/8/8/8/4K3",
-    "r3k2r/8/8/8/8/8/8/2R1K2R",
-    "4k3/8/8/8/8/8/8/R3K2R",
-    "8/1n4N1/2k5/8/8/5K2/1N4n1/8",
-    "B6b/8/8/8/2K5/4k3/8/b6B",
-    "7k/RR6/8/8/8/8/rr6/7K",
-    "7k/8/8/1p6/P7/8/8/7K",
-    "n1n5/1Pk5/8/8/8/8/5Kp1/5N1N",
-    "n1n5/PPPk4/8/8/8/8/4Kppp/5N1N",
-    "r3k2r/8/8/8/8/8/8/1R2K2R",
-    "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R"
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",
+        "r2k3r/pppppppp/8/8/8/8/PPPPPPPP/R2K3R",
+        "4k2r/8/8/8/8/8/8/R3K3",
+        "r3k2r/pp1ppPpp/8/2pP4/2P2P2/1P4P1/P6P/R3K2R",
+        "r3k2r/pp1pp1pp/8/2pPPp2/2P2P2/1P4P1/P6P/R3K2R",
+        "4r3/8/4k3/8/4K3/8/8/4R3",
+        "1r4K1/r7/k7/8/8/8/8/8",
+        "4k2r/3PP3/3P4/8/8/8/8/4K3",
+        "4k2r/8/8/3PP3/8/8/8/4K3",
+        "r3k2r/8/8/8/8/8/8/2R1K2R",
+        "4k3/8/8/8/8/8/8/R3K2R",
+        "8/1n4N1/2k5/8/8/5K2/1N4n1/8",
+        "B6b/8/8/8/2K5/4k3/8/b6B",
+        "7k/RR6/8/8/8/8/rr6/7K",
+        "7k/8/8/1p6/P7/8/8/7K",
+        "n1n5/1Pk5/8/8/8/8/5Kp1/5N1N",
+        "n1n5/PPPk4/8/8/8/8/4Kppp/5N1N",
+        "r3k2r/8/8/8/8/8/8/1R2K2R",
+        "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R"
     };
 
     for (auto fen_string : fen_strings)
         EXPECT_EQ(Chessboard(fen_string).to_fen_string(), fen_string);
 }
 
-TEST(Checkboard, Copy)
+TEST(ToFenString, AfterMove)
+{
+    Chessboard board;
+
+    auto white_knight_pos_1 = Position(File::B, Rank::ONE);
+    auto white_knight_pos_2 = Position(File::A, Rank::THREE);
+    auto white_1_to_2 = dummy_move(white_knight_pos_1, white_knight_pos_2, PieceType::KNIGHT);
+    auto white_2_to_1 = dummy_move(white_knight_pos_2, white_knight_pos_1, PieceType::KNIGHT);
+
+    auto black_knight_pos_1 = Position(File::G, Rank::EIGHT);
+    auto black_knight_pos_2 = Position(File::H, Rank::SIX);
+    auto black_1_to_2 = dummy_move(black_knight_pos_1, black_knight_pos_2, PieceType::KNIGHT);
+    //auto black_2_to_1 = dummy_move(black_knight_pos_2, black_knight_pos_1, PieceType::KNIGHT);
+
+    std::unordered_set<std::string> states;
+
+    states.insert(board.to_fen_string());
+
+    board.do_move(white_1_to_2);
+
+    states.insert(board.to_fen_string());
+
+    board.do_move(black_1_to_2);
+
+    states.insert(board.to_fen_string());
+
+    board.do_move(white_2_to_1);
+
+    states.insert(board.to_fen_string());
+
+    EXPECT_EQ(states.size(), 4);
+}
+
+TEST(Copy, DoMove)
 {
     Chessboard board;
     Chessboard board_copy = board;
@@ -286,6 +320,58 @@ TEST(Checkboard, Copy)
 
     EXPECT_NO_PIECE(board[end]);
     EXPECT_TRUE(board.get_white_turn());
+}
+
+TEST(Copy, State)
+{
+    Chessboard board = Chessboard("4k2r/3PP3/3P4/8/8/8/8/4K3");
+    Chessboard board_copy = board;
+
+    EXPECT_EQ(board.to_fen_string(), board_copy.to_fen_string());
+}
+
+TEST(Copy, Threefold)
+{
+    Chessboard board;
+    Chessboard board_copy = board;
+
+    auto white_knight_pos_1 = Position(File::B, Rank::ONE);
+    auto white_knight_pos_2 = Position(File::A, Rank::THREE);
+    auto white_1_to_2 = dummy_move(white_knight_pos_1, white_knight_pos_2, PieceType::KNIGHT);
+    auto white_2_to_1 = dummy_move(white_knight_pos_2, white_knight_pos_1, PieceType::KNIGHT);
+
+    auto black_knight_pos_1 = Position(File::G, Rank::EIGHT);
+    auto black_knight_pos_2 = Position(File::H, Rank::SIX);
+    auto black_1_to_2 = dummy_move(black_knight_pos_1, black_knight_pos_2, PieceType::KNIGHT);
+    auto black_2_to_1 = dummy_move(black_knight_pos_2, black_knight_pos_1, PieceType::KNIGHT);
+
+    const auto nb_turns = 4;
+    for (auto half_turn = 0; half_turn < 2 * nb_turns; half_turn++)
+    {
+        EXPECT_FALSE(board_copy.is_draw());
+        EXPECT_FALSE(board_copy.threefold_repetition());
+
+        if (board_copy.get_white_turn())
+        {
+            if (board_copy[white_knight_pos_1].has_value())
+                board_copy.do_move(white_1_to_2);
+            else
+                board_copy.do_move(white_2_to_1);
+        }
+        else
+        {
+            if (board_copy[black_knight_pos_1].has_value())
+                board_copy.do_move(black_1_to_2);
+            else
+                board_copy.do_move(black_2_to_1);
+        }
+    }
+
+    EXPECT_TRUE(board_copy.is_draw());
+    EXPECT_TRUE(board_copy.threefold_repetition());
+
+    EXPECT_FALSE(board.is_draw());
+    EXPECT_FALSE(board.threefold_repetition());
 }
 
 TEST(DoMove, SimplePawnMove)
@@ -486,19 +572,19 @@ TEST(Draw, DoubleStalemate3)
 }
 
 // NOTE Will not pass anymore if we implement the threefold repetition bonus
-TEST(Draw, FiftyLastTurns1)
+TEST(Draw, DISABLED_FiftyLastTurns1)
 {
     Chessboard board;
 
-    auto white_rook_pos_1 = Position(File::B, Rank::ONE);
-    auto white_rook_pos_2 = Position(File::A, Rank::THREE);
-    auto white_1_to_2 = dummy_move(white_rook_pos_1, white_rook_pos_2, PieceType::ROOK);
-    auto white_2_to_1 = dummy_move(white_rook_pos_2, white_rook_pos_1, PieceType::ROOK);
+    auto white_knight_pos_1 = Position(File::B, Rank::ONE);
+    auto white_knight_pos_2 = Position(File::A, Rank::THREE);
+    auto white_1_to_2 = dummy_move(white_knight_pos_1, white_knight_pos_2, PieceType::KNIGHT);
+    auto white_2_to_1 = dummy_move(white_knight_pos_2, white_knight_pos_1, PieceType::KNIGHT);
 
-    auto black_rook_pos_1 = Position(File::G, Rank::EIGHT);
-    auto black_rook_pos_2 = Position(File::H, Rank::SIX);
-    auto black_1_to_2 = dummy_move(black_rook_pos_1, black_rook_pos_2, PieceType::ROOK);
-    auto black_2_to_1 = dummy_move(black_rook_pos_2, black_rook_pos_1, PieceType::ROOK);
+    auto black_knight_pos_1 = Position(File::G, Rank::EIGHT);
+    auto black_knight_pos_2 = Position(File::H, Rank::SIX);
+    auto black_1_to_2 = dummy_move(black_knight_pos_1, black_knight_pos_2, PieceType::KNIGHT);
+    auto black_2_to_1 = dummy_move(black_knight_pos_2, black_knight_pos_1, PieceType::KNIGHT);
 
     const auto nb_turns = 50;
     for (auto half_turn = 0; half_turn < 2 * nb_turns; half_turn++)
@@ -507,14 +593,14 @@ TEST(Draw, FiftyLastTurns1)
 
         if (board.get_white_turn())
         {
-            if (board[white_rook_pos_1].has_value())
+            if (board[white_knight_pos_1].has_value())
                 board.do_move(white_1_to_2);
             else
                 board.do_move(white_2_to_1);
         }
         else
         {
-            if (board[black_rook_pos_1].has_value())
+            if (board[black_knight_pos_1].has_value())
                 board.do_move(black_1_to_2);
             else
                 board.do_move(black_2_to_1);
@@ -526,19 +612,19 @@ TEST(Draw, FiftyLastTurns1)
 }
 
 // NOTE Will not pass anymore if we implement the threefold repetition bonus
-TEST(Draw, FiftyLastTurns2)
+TEST(Draw, DISABLED_FiftyLastTurns2)
 {
     Chessboard board;
 
-    auto white_rook_pos_1 = Position(File::B, Rank::ONE);
-    auto white_rook_pos_2 = Position(File::A, Rank::THREE);
-    auto white_1_to_2 = dummy_move(white_rook_pos_1, white_rook_pos_2, PieceType::ROOK);
-    auto white_2_to_1 = dummy_move(white_rook_pos_2, white_rook_pos_1, PieceType::ROOK);
+    auto white_knight_pos_1 = Position(File::B, Rank::ONE);
+    auto white_knight_pos_2 = Position(File::A, Rank::THREE);
+    auto white_1_to_2 = dummy_move(white_knight_pos_1, white_knight_pos_2, PieceType::KNIGHT);
+    auto white_2_to_1 = dummy_move(white_knight_pos_2, white_knight_pos_1, PieceType::KNIGHT);
 
-    auto black_rook_pos_1 = Position(File::G, Rank::EIGHT);
-    auto black_rook_pos_2 = Position(File::H, Rank::SIX);
-    auto black_1_to_2 = dummy_move(black_rook_pos_1, black_rook_pos_2, PieceType::ROOK);
-    auto black_2_to_1 = dummy_move(black_rook_pos_2, black_rook_pos_1, PieceType::ROOK);
+    auto black_knight_pos_1 = Position(File::G, Rank::EIGHT);
+    auto black_knight_pos_2 = Position(File::H, Rank::SIX);
+    auto black_1_to_2 = dummy_move(black_knight_pos_1, black_knight_pos_2, PieceType::KNIGHT);
+    auto black_2_to_1 = dummy_move(black_knight_pos_2, black_knight_pos_1, PieceType::KNIGHT);
 
 
     const auto nb_turns = 49;
@@ -548,14 +634,14 @@ TEST(Draw, FiftyLastTurns2)
 
         if (board.get_white_turn())
         {
-            if (board[white_rook_pos_1].has_value())
+            if (board[white_knight_pos_1].has_value())
                 board.do_move(white_1_to_2);
             else
                 board.do_move(white_2_to_1);
         }
         else
         {
-            if (board[black_rook_pos_1].has_value())
+            if (board[black_knight_pos_1].has_value())
                 board.do_move(black_1_to_2);
             else
                 board.do_move(black_2_to_1);
@@ -571,6 +657,54 @@ TEST(Draw, FiftyLastTurns2)
                              PieceType::PAWN));
 
     EXPECT_FALSE(board.is_draw());
+}
+
+TEST(Draw, Threefold)
+{
+    Chessboard board;
+
+    auto white_knight_pos_1 = Position(File::B, Rank::ONE);
+    auto white_knight_pos_2 = Position(File::A, Rank::THREE);
+    auto white_1_to_2 = dummy_move(white_knight_pos_1, white_knight_pos_2, PieceType::KNIGHT);
+    auto white_2_to_1 = dummy_move(white_knight_pos_2, white_knight_pos_1, PieceType::KNIGHT);
+
+    auto black_knight_pos_1 = Position(File::G, Rank::EIGHT);
+    auto black_knight_pos_2 = Position(File::H, Rank::SIX);
+    auto black_1_to_2 = dummy_move(black_knight_pos_1, black_knight_pos_2, PieceType::KNIGHT);
+    auto black_2_to_1 = dummy_move(black_knight_pos_2, black_knight_pos_1, PieceType::KNIGHT);
+
+    std::unordered_set<std::string> states;
+
+    states.insert(board.to_fen_string());
+
+    const auto nb_turns = 4;
+    for (auto half_turn = 0; half_turn < 2 * nb_turns; half_turn++)
+    {
+        EXPECT_FALSE(board.is_draw());
+        EXPECT_FALSE(board.threefold_repetition());
+
+        if (board.get_white_turn())
+        {
+            if (board[white_knight_pos_1].has_value())
+                board.do_move(white_1_to_2);
+            else
+                board.do_move(white_2_to_1);
+        }
+        else
+        {
+            if (board[black_knight_pos_1].has_value())
+                board.do_move(black_1_to_2);
+            else
+                board.do_move(black_2_to_1);
+        }
+
+        states.insert(board.to_fen_string());
+    }
+
+    EXPECT_EQ(states.size(), 4);
+
+    EXPECT_TRUE(board.is_draw());
+    EXPECT_TRUE(board.threefold_repetition());
 }
 
 TEST(Checkmate, True)
