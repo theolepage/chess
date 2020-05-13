@@ -283,8 +283,12 @@ namespace board
         const std::vector<Move> possible_moves = rule::generate_all_moves(*this);
 
         for (const Move& move : possible_moves)
+        {
             if (is_possible_move_legal(move))
+            {
                 legal_moves.push_back(move);
+            }
+        }
 
         return legal_moves;
     }
@@ -642,18 +646,7 @@ namespace board
 
     bool Chessboard::is_check(void)
     {
-        const Position king_pos = get_king_position();
-
-        // little hack to get the opponent turns
-        white_turn_ = !white_turn_;
-        const auto possible_moves = rule::generate_all_moves(*this);
-        white_turn_ = !white_turn_;
-
-        for (const Move& move : possible_moves)
-            if (move.end_get() == king_pos)
-                return true;
-
-        return false;
+        return rule::is_king_checked(*this);
     }
 
     bool Chessboard::is_pat(void)
@@ -661,9 +654,19 @@ namespace board
         return !is_check() && generate_legal_moves().empty();
     }
 
+    bool Chessboard::is_pat(const std::vector<board::Move>& legal_moves)
+    {
+        return !is_check() && legal_moves.empty();
+    }
+
     bool Chessboard::is_checkmate(void)
     {
         return is_check() && generate_legal_moves().empty();
+    }
+
+    bool Chessboard::is_checkmate(const std::vector<board::Move>& legal_moves)
+    {
+        return is_check() && legal_moves.empty();
     }
 
     bool Chessboard::threefold_repetition()
@@ -678,6 +681,11 @@ namespace board
     bool Chessboard::is_draw(void)
     {
         return last_fifty_turn_ >= 50 || is_pat() || threefold_repetition();
+    }
+
+    bool Chessboard::is_draw(const std::vector<board::Move>& legal_moves)
+    {
+        return last_fifty_turn_ >= 50 || is_pat(legal_moves) || threefold_repetition();
     }
 
     bool Chessboard::get_white_turn(void) const
@@ -742,6 +750,29 @@ namespace board
             }
         }
 
+        return std::nullopt;
+    }
+
+    std::bitset<Chessboard::width> Chessboard::operator()(const Rank rank, const PieceType piece, const Color color) const
+    {
+        if (color == Color::BLACK)
+        {
+            return black_bitboards_[static_cast<uint8_t>(piece)][static_cast<uint8_t>(rank)];
+        }
+        else
+        {
+            return white_bitboards_[static_cast<uint8_t>(piece)][static_cast<uint8_t>(rank)];
+        }
+    }
+    
+    Chessboard::opt_piece_t Chessboard::operator()(const Position& pos, const PieceType& piece, const Color& color) const
+    {
+        const size_t rank_i = utils::utype(pos.get_rank());
+        const size_t file_i = utils::utype(pos.get_file());
+        const bitboard_t& bitboard = get_bitboard(piece, color);
+
+        if (bitboard[rank_i][file_i])
+            return std::make_pair(piece, color);
         return std::nullopt;
     }
 }

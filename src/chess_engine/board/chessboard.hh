@@ -75,11 +75,17 @@ namespace board
 
         bool is_check(void);
         bool is_checkmate(void);
+        bool is_checkmate(const std::vector<board::Move>& legal_moves);
         bool is_pat(void);
+        bool is_pat(const std::vector<board::Move>& legal_moves);
         bool threefold_repetition(void);
         bool is_draw(void);
+        bool is_draw(const std::vector<board::Move>& legal_moves);
 
         opt_piece_t operator[](const Position& position) const override;
+        std::bitset<width> operator()(const Rank rank, const PieceType piece, const Color color) const;
+        opt_piece_t operator()(const Position& position, const PieceType& piece, const Color& color) const;
+        void move_piece(const Position& start, const Position& end, const PieceType piecetype, const Color color);
 
         opt_pos_t get_en_passant() const;
 
@@ -90,7 +96,7 @@ namespace board
         bool get_queen_castling(const Color& color) const;
         void set_king_castling(const Color& color, bool state);
         void set_queen_castling(const Color& color, bool state);
-
+        
         Position get_king_position(void) const;
 
         friend std::ostream& operator<<(std::ostream& os, const Chessboard& board);
@@ -146,7 +152,6 @@ namespace board
         size_t get_bitboard_count(const PieceType piecetype, const Color color) const;
         void set_piece(const Position& pos, const PieceType piecetype, const Color color);
         void unset_piece(const Position& pos, const PieceType piecetype, const Color color);
-        void move_piece(const Position& start, const Position& end, const PieceType piecetype, const Color color);
         void change_piece_type(const Position& pos, const PieceType old_type, const PieceType new_type, const Color color);
 
         void init_end_ranks(const PieceType piecetype, const File file);
