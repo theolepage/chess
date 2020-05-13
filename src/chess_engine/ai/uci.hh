@@ -2,7 +2,8 @@
 
 #include <string>
 
-namespace ai
+// Interface to play with the chess engine with ai
+namespace uci
 {
     /** Initialize the communication with the GUI. This function should be
      * called only once at the begining of a game.

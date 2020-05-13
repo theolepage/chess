@@ -1,38 +1,167 @@
-# OPTIMISATION FLAGS : FIXME
-
-set(OPT_FLAGS)
-
-# END OPTIMIZATION FLAGS
-# SOURCES : FIXME
-
-set(SRC_ENGINE)
-include_directories()
-
-# END SOURCES
-
-
 # SETUP
 cmake_minimum_required(VERSION 3.12)
-project(Chess)
+project(Chess
+        DESCRIPTION "Chess Engine & Chess AI using standard protocols"
+        VERSION 0.1
+        HOMEPAGE_URL "https://gitlab.cri.epita.fr/theo.lepage/chess"
+        LANGUAGES CXX)
+
+#[[
+----- USAGE -----
+1. Create and go to a directory of build (preference : debug or release) :
+    - `mkdir build_debug` / `mkdir build_release`
+    - `cd build_debug` / `cd build_release`
+    (Use `build_debug` folder to use a Debug BUILD_TYPE)
+
+2. Generate cmake files in build directory with the good options :
+    - `cmake .. [OPTIONS]`
+        - Set Compiler  : -DCMAKE_C_COMPILER=/usr/bin/g++
+        - Debug build   : -DCMAKE_BUILD_TYPE=Debug
+        - Release build : -DCMAKE_BUILD_TYPE=Release
+
+3. Use make as usual in the wanted build_directory: (use -j8 to go swifty)
+    - `make`
+    - `make all`
+    - `make clean`
+    - `make check`
+    - `make -B`
+    - verbose option : `VERBOSE=1 make`
+
+4. verbose tests
+    - ctest --verbose
+]]
+
+# OPTIMISATION FLAGS
+set(OPT_FLAGS
+    -Ofast # Standard compliance is no more
+    -march=native # Allowed to use CPU special instruction set
+    -flto # Link time optimizer
+    -funroll-loops # Self explanatory & enables other opti (rename register, fweb)
+
+    # All below accelate not much & are dangerous, use only if all test pass + works on PIE
+    -fmerge-all-constants # Self explanatory but dangerous and not bug speed up
+    -fgcse-sm # subexpression elimination
+    -fgcse-las # Subexpression elimination
+    -fgcse-after-reload # Clean up redundant spilling
+    -fdelete-null-pointer-checks # Self expl
+    -fdevirtualize-speculatively # Opti call to virtual fonc
+    -fdevirtualize-at-ltrans # Opti call to virtual fonc
+    -fno-lifetime-dse # Dangerous if we use field of object after object destruction
+    -ftree-loop-im # Loop invariant motion on trees
+
+    #FIXME
+    )
+string(REPLACE ";" " " OPT_FLAGS "${OPT_FLAGS}")
+
+# SOURCES
+set(MAIN_ENGINE
+    src/main.cc)
+set(SRC_ENGINE
+    src/chess_engine/ai/ai-launcher.cc
+    src/chess_engine/ai/ai-mini.cc
+    src/chess_engine/ai/uci.cc
+    src/chess_engine/board/rule.cc
+    src/chess_engine/board/chessboard.cc
+    src/parsing/option_parser/option-parser.cc
+    src/parsing/perft_parser/perft-parser.cc
+    src/parsing/pgn_parser/pgn-exception.cc
+    src/parsing/pgn_parser/pgn-move.cc
+    src/parsing/pgn_parser/pgn-parser.cc
+    src/listener/listener-manager.cc
+    )
+include_directories(src
+                    #FIXME
+                    )
+
+# TESTS
+set(SRC_TESTS
+    tests/unit_tests/example_test.cc
+    tests/unit_tests/example2_test.cc
+    tests/unit_tests/perft_parser_test.cc
+    tests/unit_tests/chessboard_test.cc
+    tests/unit_tests/fenrank_test.cc
+    tests/unit_tests/fenobject_test.cc
+    tests/unit_tests/rule_test.cc
+    tests/unit_tests/possible_move_test.cc
+    tests/unit_tests/check_test.cc
+    tests/unit_tests/game_test.cc
+    tests/unit_tests/ai_search_test.cc
+    tests/unit_tests/ai_search2_test.cc
+    tests/unit_tests/uci_communication_test.cc
+    #FIXME
+    )
 
 # BUILD OPTIONS
 set(CMAKE_CXX_STANDARD 17)
-
-if (NOT CMAKE_BUILD_TYPE)
-    message(STATUS "No build type selected, default to Release")
-    set(CMAKE_BUILD_TYPE "Release")
-endif()
-
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra -pedantic")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${OPT_FLAGS}")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Og -g3 -fsanitize=address")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g3 -fsanitize=address")
+string(REPLACE "-O3" "" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+
+# BUILD_TYPE (if not defined by the user)
+if (NOT CMAKE_BUILD_TYPE)
+    string(REGEX REPLACE ".*/build_" "" BUILD_NAME ${CMAKE_BINARY_DIR})
+    # Default BUILD_TYPE is Release
+    set(CMAKE_BUILD_TYPE Release)
+    # If folder is named "build_debug" BUILD_TYPE is set to: Debug
+    if(${BUILD_NAME} STREQUAL "Debug" OR ${BUILD_NAME} STREQUAL "debug")
+        set(CMAKE_BUILD_TYPE Debug)
+    endif()
+    message(STATUS "Build type : ${CMAKE_BUILD_TYPE}")
+endif()
 
 # LIBRARIES
-set(Boost_USE_STATIC_LIBS ON)
+if (CMAKE_BUILD_TYPE STREQUAL "Release")
+    set(Boost_USE_STATIC_LIBS ON)
+endif()
 find_package(Boost REQUIRED COMPONENTS system program_options)
 set(LIBRARIES Boost::system Boost::program_options ${CMAKE_DL_LIBS})
 
+# LIBRARIE OF SRC_FILES
+add_library(SRC_ENGINE_OBJ ${SRC_ENGINE})
+
 # CHESSENGINE
 add_executable(chessengine)
-target_sources(chessengine PRIVATE ${SRC_ENGINE})
-target_link_libraries(chessengine PRIVATE ${LIBRARIES} -static)
+set_target_properties(chessengine PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}) # binary destination
+target_sources(chessengine PRIVATE ${MAIN_ENGINE})
+target_link_libraries(chessengine PRIVATE SRC_ENGINE_OBJ ${LIBRARIES})
+
+# STATIC TARGET
+if (CMAKE_BUILD_TYPE STREQUAL "Release")
+    add_executable(chessengine-static)
+    set_target_properties(chessengine-static PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}) # binary destination
+    target_sources(chessengine-static PRIVATE ${MAIN_ENGINE})
+    target_link_libraries(chessengine-static PRIVATE SRC_ENGINE_OBJ ${LIBRARIES} -static)
+endif()
+
+# TESTS
+find_package(GTest)
+find_package (Threads)
+if (${GTEST_FOUND} AND ${THREADS_FOUND})
+    enable_testing()
+    # For each test file create an executable of test. Launched using ctest
+    foreach(f IN LISTS SRC_TESTS)
+        message(STATUS "TESTS : building file : ${f}")
+        # Find the test_name by deleting the extension and the parent_dir
+        string(REGEX REPLACE "\\.[^.]*$" "" F_WITHOUT_EXT ${f})
+        string(REGEX REPLACE "[^/]*/" "" TEST_NAME ${F_WITHOUT_EXT})
+
+        # Create an executable with all sources and lib needed
+        add_executable(${TEST_NAME} ${f})
+        target_link_libraries(${TEST_NAME} PRIVATE
+            SRC_ENGINE_OBJ
+            ${GTEST_BOTH_LIBRARIES}
+            ${CMAKE_THREAD_LIBS_INIT}
+            ${LIBRARIES}
+        )
+
+        # Add the executable created to the test list of ctest
+        add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
+        # Set timeout of the test to 5 seconds
+        set_tests_properties(${TEST_NAME} PROPERTIES TIMEOUT 20)
+    endforeach()
+else()
+    message(WARNING "Gtest or ThreadLib not found... You will not be able to launch tests")
+endif()

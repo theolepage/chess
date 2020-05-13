@@ -1,0 +1,20 @@
+image: gcc
+before_script:
+    - apt-get update --yes
+    - apt-get install --yes cmake
+    - apt-get install --yes libboost1.67-dev
+    - apt-get install --yes libboost-system1.67-dev libboost-program-options1.67-dev
+    - apt-get install --yes libgtest-dev
+
+build and tests:
+    stage: build
+    script:
+        - mkdir build && cd build
+        - cmake ..
+        - make
+        - ctest --verbose
+        - cd ..
+    artifacts:
+        paths:
+            - build
+            - chessengine

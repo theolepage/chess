@@ -2,6 +2,10 @@
 
 #include <array>
 #include <optional>
+#include <cstdint>
+#include <stdexcept>
+
+#include "utils/utype.hh"
 
 namespace board
 {
@@ -9,22 +13,28 @@ namespace board
      * piece type present on the board. The char associated
      * with each value is the ascii char representing the
      * piece on the board */
-    enum class PieceType
+    enum class PieceType : uint8_t
     {
-        QUEEN,
-        ROOK,
-        BISHOP,
-        KNIGHT,
-        PAWN,
-        KING, // Last position allows better optimization (order-move)
+        QUEEN = 0,
+        ROOK = 1,
+        BISHOP = 2,
+        KNIGHT = 3,
+        PAWN = 4,
+        KING = 5 // Last position allows better optimization (order-move)
     };
 
     using opt_piecetype_t = std::optional<PieceType>;
 
+    constexpr size_t nb_pieces = 6;
+
     /* Can be useful to iterate over PieceTypes */
-    constexpr std::array<PieceType, 6> piecetype_array{
+    constexpr std::array<PieceType, nb_pieces> piecetype_array{
         PieceType::QUEEN,  PieceType::ROOK, PieceType::BISHOP,
         PieceType::KNIGHT, PieceType::PAWN, PieceType::KING};
+
+    constexpr std::array<unsigned, nb_pieces> piecetype_value{
+    9, 5, 3, 3, 1, 0};
+
 
     inline PieceType char_to_piece(const char c)
     {
@@ -45,6 +55,15 @@ namespace board
         default:
             throw std::invalid_argument("Unknown piece");
         }
+    }
+
+    constexpr char empty_cell_char = ' ';
+
+    inline char piece_to_char(const PieceType piece)
+    {
+        constexpr std::array<char, nb_pieces> piece_chars = {'Q', 'R', 'B', 'N', 'P', 'K'};
+
+        return piece_chars[utils::utype(piece)];
     }
 
 } // namespace board
