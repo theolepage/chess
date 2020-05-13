@@ -58,11 +58,10 @@ namespace board
     }
 
     constexpr char empty_cell_char = ' ';
+    constexpr std::array<char, nb_pieces> piece_chars = {'Q', 'R', 'B', 'N', 'P', 'K'};
 
     inline char piece_to_char(const PieceType piece)
     {
-        constexpr std::array<char, nb_pieces> piece_chars = {'Q', 'R', 'B', 'N', 'P', 'K'};
-
         return piece_chars[utils::utype(piece)];
     }
 

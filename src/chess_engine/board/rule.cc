@@ -3,6 +3,7 @@
 #include "chess_engine/board/chessboard.hh"
 #include "chess_engine/board/move.hh"
 #include "chess_engine/board/rule.hh"
+#include "utils/utype.hh"
 
 using namespace board;
 
@@ -14,17 +15,13 @@ namespace rule
     {
         std::vector<Position> res;
 
-        for (size_t file = 0; file < Chessboard::width; file++)
+        for (uint8_t rank = 0; rank < Chessboard::width; ++rank)
         {
-            for (size_t rank = 0; rank < Chessboard::width; rank++)
+            const std::bitset<Chessboard::width> line = board(static_cast<Rank>(rank), piece, color);
+            for (uint8_t file = 0; file < Chessboard::width; ++file)
             {
-                Position pos(static_cast<File>(file), static_cast<Rank>(rank));
-                if (board[pos].has_value()
-                    && board[pos]->first == piece
-                    && board[pos]->second == color)
-                {
-                    res.push_back(pos);
-                }
+                if (line[file])
+                    res.emplace_back(Position(file, rank));
             }
         }
 
@@ -188,12 +185,14 @@ namespace rule
         if (king_castling)
         {
             board.set_king_castling(color, false);
-            if (opposite_king_castling) board.set_king_castling(opposite_color, false);
+            if (opposite_king_castling)
+                board.set_king_castling(opposite_color, false);
         }
         else
         {
             board.set_queen_castling(color, false);
-            if (opposite_queen_castling) board.set_queen_castling(opposite_color, false);
+            if (opposite_queen_castling)
+                board.set_queen_castling(opposite_color, false);
         }
 
         bool not_in_check = true;
@@ -296,7 +295,7 @@ namespace rule
         return res;
     }
 
-    std::vector<Move> generate_pawn_moves(Chessboard& board)
+    std::vector<Move> generate_pawn_moves(Chessboard& board) // TODO optimize
     {
         std::vector<Move> res;
         const Color color = board.get_white_turn() ? Color::WHITE : Color::BLACK;
