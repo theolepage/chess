@@ -136,6 +136,19 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
     target_link_libraries(chessengine-static PRIVATE SRC_ENGINE_OBJ ${LIBRARIES} -static)
 endif()
 
+# MAKE CHECK TARGET
+add_custom_target(check
+    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+    COMMAND python3 ${CMAKE_SOURCE_DIR}/tests/pgn-testsuite.py
+             -v ${CMAKE_SOURCE_DIR}/chessengine
+             ${CMAKE_SOURCE_DIR}/tests/libbasic-output.so
+             ${CMAKE_SOURCE_DIR}/tests/given_pgn
+    COMMAND python3 ${CMAKE_SOURCE_DIR}/tests/perft-testsuite.py
+             -v ${CMAKE_SOURCE_DIR}/chessengine
+             ${CMAKE_SOURCE_DIR}/tests/given_perft;
+    COMMAND ${CMAKE_CTEST_COMMAND}
+)
+
 # TESTS
 find_package(GTest)
 find_package (Threads)
@@ -149,7 +162,7 @@ if (${GTEST_FOUND} AND ${THREADS_FOUND})
         string(REGEX REPLACE "[^/]*/" "" TEST_NAME ${F_WITHOUT_EXT})
 
         # Create an executable with all sources and lib needed
-        add_executable(${TEST_NAME} ${f})
+        add_executable(${TEST_NAME} EXCLUDE_FROM_ALL ${f})
         target_link_libraries(${TEST_NAME} PRIVATE
             SRC_ENGINE_OBJ
             ${GTEST_BOTH_LIBRARIES}
@@ -159,34 +172,11 @@ if (${GTEST_FOUND} AND ${THREADS_FOUND})
 
         # Add the executable created to the test list of ctest
         add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
+        # Add test to dependencies of check target
+        add_dependencies(check ${TEST_NAME})
         # Set timeout of the test to 5 seconds
-        set_tests_properties(${TEST_NAME} PROPERTIES TIMEOUT 20)
+        set_tests_properties(${TEST_NAME} PROPERTIES TIMEOUT 10)
     endforeach()
 else()
     message(WARNING "Gtest or ThreadLib not found... You will not be able to launch tests")
 endif()
-
-# MAKE CHECK
-# Create a check.sh to launch custom target "check"
-file(WRITE "${CMAKE_BINARY_DIR}/tmp/check.sh"
-    "make; \
-    python3 ${CMAKE_SOURCE_DIR}/tests/pgn-testsuite.py \
-        -v ${CMAKE_SOURCE_DIR}/chessengine \
-        ${CMAKE_SOURCE_DIR}/tests/libbasic-output.so \
-        ${CMAKE_SOURCE_DIR}/tests/given_pgn;\
-    python3 ${CMAKE_SOURCE_DIR}/tests/perft-testsuite.py \
-        -v ${CMAKE_SOURCE_DIR}/chessengine \
-        ${CMAKE_SOURCE_DIR}/tests/given_perft;\
-    ctest;"
-)
-file(
-    COPY "${CMAKE_BINARY_DIR}/tmp/check.sh"
-    DESTINATION "${CMAKE_BINARY_DIR}"
-    FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-    GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
-)
-# Add custom target named check launching check.sh script
-add_custom_target(check
-    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
-    COMMAND "${CMAKE_BINARY_DIR}/check.sh"
-)
