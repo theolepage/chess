@@ -6,11 +6,12 @@
 #include <fstream>
 #include <dlfcn.h>
 
+#include "chess_engine/ai/ai-launcher.hh"
+#include "listener/listener.hh"
 #include "listener/listener-manager.hh"
 #include "parsing/pgn_parser/pgn-parser.hh"
 #include "parsing/perft_parser/perft-object.hh"
 #include "parsing/perft_parser/perft-parser.hh"
-#include "listener/listener.hh"
 
 using namespace boost::program_options;
 
@@ -151,7 +152,7 @@ namespace option_parser
                 else if (vm.count("perft"))
                     on_perft(perft_path);
                 else
-                    manager.play_ai();
+                    ai::play_ai();
             }
         }
         catch (const error &ex)

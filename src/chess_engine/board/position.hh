@@ -1,7 +1,6 @@
 #pragma once
 
 #include <utility>
-#include <cctype>
 #include <cassert>
 #include <iostream>
 
@@ -44,7 +43,7 @@ namespace board
         // (x, y)
         Position(File file, Rank rank);
 
-        Position(u_int8_t x, u_int8_t y)
+        Position(uint8_t x, uint8_t y)
         {
             file_ = static_cast<File>(x);
             rank_ =  static_cast<Rank>(y);

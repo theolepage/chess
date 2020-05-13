@@ -33,13 +33,32 @@ project(Chess
 
 # OPTIMISATION FLAGS
 set(OPT_FLAGS
+    -Ofast # Standard compliance is no more
+    -march=native # Allowed to use CPU special instruction set
+    -flto # Link time optimizer
+    -funroll-loops # Self explanatory & enables other opti (rename register, fweb)
+
+    # All below accelate not much & are dangerous, use only if all test pass + works on PIE
+    -fmerge-all-constants # Self explanatory but dangerous and not bug speed up
+    -fgcse-sm # subexpression elimination
+    -fgcse-las # Subexpression elimination
+    -fgcse-after-reload # Clean up redundant spilling
+    -fdelete-null-pointer-checks # Self expl
+    -fdevirtualize-speculatively # Opti call to virtual fonc
+    -fdevirtualize-at-ltrans # Opti call to virtual fonc
+    -fno-lifetime-dse # Dangerous if we use field of object after object destruction
+    -ftree-loop-im # Loop invariant motion on trees
+
     #FIXME
     )
+string(REPLACE ";" " " OPT_FLAGS "${OPT_FLAGS}")
 
 # SOURCES
 set(MAIN_ENGINE
     src/main.cc)
 set(SRC_ENGINE
+    src/chess_engine/ai/ai-launcher.cc
+    src/chess_engine/ai/ai-mini.cc
     src/chess_engine/ai/uci.cc
     src/chess_engine/board/rule.cc
     src/chess_engine/board/chessboard.cc
@@ -66,6 +85,9 @@ set(SRC_TESTS
     tests/unit_tests/possible_move_test.cc
     tests/unit_tests/check_test.cc
     tests/unit_tests/game_test.cc
+    tests/unit_tests/ai_search_test.cc
+    tests/unit_tests/ai_search2_test.cc
+    tests/unit_tests/uci_communication_test.cc
     #FIXME
     )
 
@@ -74,6 +96,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra -pedantic")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${OPT_FLAGS}")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g3 -fsanitize=address")
+string(REPLACE "-O3" "" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
 
 # BUILD_TYPE (if not defined by the user)
 if (NOT CMAKE_BUILD_TYPE)
@@ -136,8 +159,8 @@ if (${GTEST_FOUND} AND ${THREADS_FOUND})
 
         # Add the executable created to the test list of ctest
         add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
-        # Set timeout of the test to 3 seconds
-        set_tests_properties(${TEST_NAME} PROPERTIES TIMEOUT 3)
+        # Set timeout of the test to 5 seconds
+        set_tests_properties(${TEST_NAME} PROPERTIES TIMEOUT 20)
     endforeach()
 else()
     message(WARNING "Gtest or ThreadLib not found... You will not be able to launch tests")

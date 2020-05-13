@@ -20,6 +20,7 @@
 
 // Il était tard et j'avais la flemme
 // Kèstuvafér
+// ekip
 using namespace perft_parser;
 
 namespace board
@@ -40,17 +41,21 @@ namespace board
         using opt_pos_t = std::optional<Position>;
 
         Chessboard();
+        
         Chessboard(const FenObject&);
+        
         Chessboard(const std::string& str, const Color& color):
             Chessboard(parse_perft(str + ((color == Color::WHITE) ? std::string(" w - - 0 0 0") : std::string(" b - - 0 0 0")))) {}
+        
         Chessboard(const PerftObject& perft):
             Chessboard(perft.get_fen()) {}
+        
         Chessboard(const std::string& fen_string):
             Chessboard(parse_perft(fen_string + std::string(" w - - 0 0 0"))) {}
 
-        static char sidepiece_to_char(PieceType piecetype, Color color);
-        static char sidepiece_to_char(side_piece_t sidepiece);
-        std::string to_fen_string();
+        static char sidepiece_to_char(const PieceType piecetype, const Color color);
+        static char sidepiece_to_char(const side_piece_t& sidepiece);
+        std::string to_fen_string(void) const;
 
         std::vector<Move> generate_legal_moves(void);
 
@@ -58,20 +63,20 @@ namespace board
         // without generating superfluous moves
         bool has_legal_moves(void);
 
-        int evaluate(Color color);
+        int evaluate(void) const;
 
         // Assume that move is legal
         void do_move(const Move& move);
-        void undo_move(const Move& move, const option_parser::BoardState& state);
+        //void undo_move(const Move& move, const option_parser::BoardState& state);
 
         bool is_move_legal(const Move& move);
-        bool is_possible_move_legal(const Move& move);
+        bool is_possible_move_legal(const Move& move) const;
         bool is_move_possible(const Move& move);
 
         bool is_check(void);
         bool is_checkmate(void);
         bool is_pat(void);
-        bool threefold_repetition();
+        bool threefold_repetition(void);
         bool is_draw(void);
 
         opt_piece_t operator[](const Position& position) const override;
@@ -89,6 +94,20 @@ namespace board
         Position get_king_position(void) const;
 
         friend std::ostream& operator<<(std::ostream& os, const Chessboard& board);
+
+        bool operator==(const Chessboard& rhs) const
+        {
+            return white_king_castling_ == rhs.white_king_castling_
+            && white_queen_castling_ == rhs.white_queen_castling_
+            && black_king_castling_ == rhs.black_king_castling_
+            && black_queen_castling_ == rhs.black_queen_castling_
+            && white_bitboards_ == rhs.white_bitboards_
+            && black_bitboards_ == rhs.black_bitboards_
+            && white_turn_ == rhs.white_turn_
+            && en_passant_ == rhs.en_passant_
+            && turn_ == rhs.turn_
+            && last_fifty_turn_ == rhs.last_fifty_turn_;
+        }
 
     private:
         /**
@@ -117,32 +136,32 @@ namespace board
         unsigned turn_;
         unsigned last_fifty_turn_;
 
-        std::ostream& write_fen_rank(std::ostream& os, Rank rank);
-        std::ostream& write_fen_board(std::ostream& os);
+        std::ostream& write_fen_rank(std::ostream& os, const Rank rank) const;
+        std::ostream& write_fen_board(std::ostream& os) const;
 
         void register_state();
 
-        const bitboard_t& get_bitboard(PieceType piecetype, Color color) const;
-        bitboard_t& get_bitboard(PieceType piecetype, Color color);
-        size_t get_bitboard_count(PieceType piecetype, Color color);
-        void set_piece(const Position& pos, PieceType piecetype, Color color);
-        void unset_piece(const Position& pos, PieceType piecetype, Color color);
-        void move_piece(const Position& start, const Position& end, PieceType piecetype, Color color);
-        void change_piece_type(const Position& pos, PieceType old_type, PieceType new_type, Color color);
+        const bitboard_t& get_bitboard(const PieceType piecetype, const Color color) const;
+        bitboard_t& get_bitboard(const PieceType piecetype, const Color color);
+        size_t get_bitboard_count(const PieceType piecetype, const Color color) const;
+        void set_piece(const Position& pos, const PieceType piecetype, const Color color);
+        void unset_piece(const Position& pos, const PieceType piecetype, const Color color);
+        void move_piece(const Position& start, const Position& end, const PieceType piecetype, const Color color);
+        void change_piece_type(const Position& pos, const PieceType old_type, const PieceType new_type, const Color color);
 
-        void init_end_ranks(PieceType piecetype, File file);
-        void symetric_init_end_ranks(PieceType piecetype, File file);
+        void init_end_ranks(const PieceType piecetype, const File file);
+        void symetric_init_end_ranks(const PieceType piecetype, const File file);
 
-        unsigned get_point_value(Color color);
+        unsigned get_point_value(const Color color) const;
 
-        void register_double_pawn_push(const Move& move, Color color);
-        void forget_en_passant();
+        void register_double_pawn_push(const Move& move, const Color color);
+        void forget_en_passant(void);
         void update_last_fifty_turn(const Move& move);
-        void eat_en_passant(const Move& move, Color color);
-        void move_castling_rook(const Move& move, Color color);
+        void eat_en_passant(const Move& move, const Color color);
+        void move_castling_rook(const Move& move, const Color color);
         void update_white_castling_bools(const Move& move);
         void update_black_castling_bools(const Move& move);
-        void update_castling_bools(const Move& move, Color color);
+        void update_castling_bools(const Move& move, const Color color);
     };
 
     /*
