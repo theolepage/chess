@@ -23,7 +23,8 @@ namespace rule
     std::vector<Position> get_positions_between(const Position& x,
                                                 const Position& y);
     
-    std::vector<Position> get_authorized_pos(const PieceType& piece,
+    std::vector<Position> get_authorized_pos(const Chessboard& board,
+                                             const PieceType& piece,
                                              const Position& from);
 
     std::optional<Move> get_possible_move(const Chessboard& board,

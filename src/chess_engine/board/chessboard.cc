@@ -744,4 +744,15 @@ namespace board
 
         return std::nullopt;
     }
+
+    Chessboard::opt_piece_t Chessboard::operator()(const Position& pos, const PieceType& piece, const Color& color) const
+    {
+        const size_t rank_i = utils::utype(pos.get_rank());
+        const size_t file_i = utils::utype(pos.get_file());
+        const bitboard_t& bitboard = get_bitboard(piece, color);
+
+        if (bitboard[rank_i][file_i])
+            return std::make_pair(piece, color);
+        return std::nullopt;
+    }
 }

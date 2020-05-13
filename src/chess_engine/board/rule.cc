@@ -1,3 +1,8 @@
+// start: 3.207s
+// opti for loop: 3.0s
+
+// get authorized pos
+
 #include <vector>
 
 #include "chess_engine/board/chessboard.hh"
@@ -13,21 +18,15 @@ namespace rule
                                                const Color& color)
     {
         std::vector<Position> res;
-
         for (size_t file = 0; file < Chessboard::width; file++)
         {
             for (size_t rank = 0; rank < Chessboard::width; rank++)
             {
                 Position pos(static_cast<File>(file), static_cast<Rank>(rank));
-                if (board[pos].has_value()
-                    && board[pos]->first == piece
-                    && board[pos]->second == color)
-                {
+                if (board(pos, piece, color).has_value())
                     res.push_back(pos);
-                }
             }
         }
-
         return res;
     }
 
@@ -66,8 +65,9 @@ namespace rule
                              const Position& y)
     {
         bool res = false;
-        for (Position pos : get_positions_between(x, y))
-            if (board[pos].has_value() && pos != y && pos != x)
+        auto positions = get_positions_between(x, y);
+        for (size_t i = 1; !res && i < positions.size() - 1; i++)
+            if (board[positions.at(i)].has_value())
                 res = true;
         return res;
     }
@@ -81,6 +81,7 @@ namespace rule
     }
 
     static void register_pos_line(std::vector<Position>& v,
+                                  const Chessboard& board,
                                   const Position& from,
                                   int file,
                                   int rank)
@@ -89,11 +90,15 @@ namespace rule
         while (pos)
         {
             v.push_back(*pos);
+            if (board[*pos].has_value())
+                break;
+
             pos = pos->move(file, rank);
         }
     }
 
-    std::vector<Position> get_authorized_pos(const PieceType& piece,
+    std::vector<Position> get_authorized_pos(const Chessboard& board,
+                                             const PieceType& piece,
                                              const Position& from)
     {
         std::vector<Position> res;
@@ -117,17 +122,17 @@ namespace rule
         }
         if (piece == PieceType::ROOK || piece == PieceType::QUEEN)
         {
-            register_pos_line(res, from, -1,  0);   // line left
-            register_pos_line(res, from,  1,  0);   // line right
-            register_pos_line(res, from,  0,  1);   // line up
-            register_pos_line(res, from,  0, -1);   // line down
+            register_pos_line(res, board, from, -1,  0);   // line left
+            register_pos_line(res, board, from,  1,  0);   // line right
+            register_pos_line(res, board, from,  0,  1);   // line up
+            register_pos_line(res, board, from,  0, -1);   // line down
         }
         if (piece == PieceType::BISHOP || piece == PieceType::QUEEN)
         {
-            register_pos_line(res, from, -1,  1);   // diagonal up left
-            register_pos_line(res, from,  1,  1);   // diagonal up right
-            register_pos_line(res, from, -1, -1);   // diagonal down left
-            register_pos_line(res, from,  1, -1);   // diagonal down right
+            register_pos_line(res, board, from, -1,  1);   // diagonal up left
+            register_pos_line(res, board, from,  1,  1);   // diagonal up right
+            register_pos_line(res, board, from, -1, -1);   // diagonal down left
+            register_pos_line(res, board, from,  1, -1);   // diagonal down right
         }
 
         return res;
@@ -141,15 +146,14 @@ namespace rule
     {
         // Cannot move a piece to a cell that already
         // contains another piece of the same color.
-        if (board[to] && board[to]->second == color)
+        auto piece_at_dest = board[to];
+        if (piece_at_dest && piece_at_dest->second == color)
             return std::nullopt;
 
         // Cannot move a piece to a cell if this move requires this
         // piece to go through a cell that already contains another
         // piece - regardless of its color (except for the Knight).
-        if (piece != PieceType::KNIGHT)
-            if (have_pieces_between(board, from, to))
-                return std::nullopt;
+        // Already handled in get_authorized_pos()
 
         // Handle "en passant": if cell is free and is
         // board.en_passant_ it is a capture.
@@ -158,7 +162,7 @@ namespace rule
 
         // At this stage, board at position to is free
         // or occupied by the opposite color.
-        bool capture = board[to].has_value();
+        bool capture = piece_at_dest.has_value();
         return Move(from, to, piece, capture, false, false, false, false);
     }
 
@@ -272,7 +276,7 @@ namespace rule
         for (Position from : pieces_positions)
         {
             // Step 1: Authorized (on the correct trajectory)
-            auto authorized_pos = get_authorized_pos(piece, from);
+            auto authorized_pos = get_authorized_pos(board, piece, from);
             for (auto to : authorized_pos)
             {
                 // Step 2: Possible (cell occupied, capture?)

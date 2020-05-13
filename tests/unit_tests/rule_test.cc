@@ -86,15 +86,15 @@ TEST(rule, get_authorized_pos_simple)
 {
     Chessboard board = Chessboard();
     
-    std::vector<Position> rook = get_authorized_pos(PieceType::ROOK, Position(File::A, Rank::ONE));
-    std::vector<Position> knight = get_authorized_pos(PieceType::KNIGHT, Position(File::B, Rank::ONE));
-    std::vector<Position> king = get_authorized_pos(PieceType::KING, Position(File::E, Rank::ONE));
-    std::vector<Position> queen = get_authorized_pos(PieceType::QUEEN, Position(File::D, Rank::ONE));
+    std::vector<Position> rook = get_authorized_pos(board, PieceType::ROOK, Position(File::A, Rank::ONE));
+    std::vector<Position> knight = get_authorized_pos(board, PieceType::KNIGHT, Position(File::B, Rank::ONE));
+    std::vector<Position> king = get_authorized_pos(board, PieceType::KING, Position(File::E, Rank::ONE));
+    std::vector<Position> queen = get_authorized_pos(board, PieceType::QUEEN, Position(File::D, Rank::ONE));
 
-    EXPECT_EQ(rook.size(), 14);
+    EXPECT_EQ(rook.size(), 2);
     EXPECT_EQ(knight.size(), 3);
     EXPECT_EQ(king.size(), 5);
-    EXPECT_EQ(queen.size(), 21);
+    EXPECT_EQ(queen.size(), 5);
 }
 
 TEST(rule, get_possible_move_pawn)
@@ -145,13 +145,13 @@ TEST(rule, get_possible_move_queen)
         PieceType::QUEEN,
         Color::BLACK,
         Position(File::D, Rank::EIGHT),
-        Position(File::F, Rank::SIX));
+        Position(File::E, Rank::SEVEN));
 
     std::optional<Move> forward_2 = get_possible_move(board,
         PieceType::QUEEN,
         Color::BLACK,
         Position(File::D, Rank::EIGHT),
-        Position(File::D, Rank::SIX));
+        Position(File::D, Rank::SEVEN));
 
     EXPECT_EQ(forward_1.has_value(), false);
     EXPECT_EQ(forward_2.has_value(), false);

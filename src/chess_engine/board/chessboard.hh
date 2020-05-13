@@ -80,6 +80,7 @@ namespace board
         bool is_draw(void);
 
         opt_piece_t operator[](const Position& position) const override;
+        opt_piece_t operator()(const Position& position, const PieceType& piece, const Color& color) const;
 
         opt_pos_t get_en_passant() const;
 
