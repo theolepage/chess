@@ -646,18 +646,7 @@ namespace board
 
     bool Chessboard::is_check(void)
     {
-        const Position king_pos = get_king_position();
-
-        // little hack to get the opponent turns
-        white_turn_ = !white_turn_;
-        const auto possible_moves = rule::generate_all_moves(*this);
-        white_turn_ = !white_turn_;
-
-        for (const Move& move : possible_moves)
-            if (move.end_get() == king_pos)
-                return true;
-
-        return false;
+        return rule::is_king_checked(*this);
     }
 
     bool Chessboard::is_pat(void)
@@ -774,5 +763,16 @@ namespace board
         {
             return white_bitboards_[static_cast<uint8_t>(piece)][static_cast<uint8_t>(rank)];
         }
+    }
+    
+    Chessboard::opt_piece_t Chessboard::operator()(const Position& pos, const PieceType& piece, const Color& color) const
+    {
+        const size_t rank_i = utils::utype(pos.get_rank());
+        const size_t file_i = utils::utype(pos.get_file());
+        const bitboard_t& bitboard = get_bitboard(piece, color);
+
+        if (bitboard[rank_i][file_i])
+            return std::make_pair(piece, color);
+        return std::nullopt;
     }
 }
