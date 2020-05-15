@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "ai-mini.hh"
+#include "evaluation.hh"
 #include "chess_engine/board/color.hh"
 
 namespace ai
@@ -22,7 +23,7 @@ namespace ai
                return evalAndMove(isMaxPlayer ? INT16_MIN : INT16_MAX,
                                   std::nullopt);
           if (depth == 0)
-               return evalAndMove(chessboard.evaluate(), std::nullopt);
+               return evalAndMove(evaluate(chessboard), std::nullopt);
 
           if (isMaxPlayer)
           {

@@ -32,10 +32,6 @@ namespace board
         PieceType::QUEEN,  PieceType::ROOK, PieceType::BISHOP,
         PieceType::KNIGHT, PieceType::PAWN, PieceType::KING};
 
-    constexpr std::array<unsigned, nb_pieces> piecetype_value{
-    9, 5, 3, 3, 1, 0};
-
-
     inline PieceType char_to_piece(const char c)
     {
         switch (c)
