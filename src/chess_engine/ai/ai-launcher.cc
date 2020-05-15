@@ -7,7 +7,7 @@ namespace ai
 {
     void play_ai(void)
     {
-        uci::init("NameOfOurBeautifulAi");
+        uci::init("bLiPbLoP");
         AiMini ai = AiMini();
         board::Chessboard chessboard = board::Chessboard();
         while(true)
