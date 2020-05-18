@@ -1,8 +1,9 @@
-#!/usr/bin/env python
-
 import os
 import chess
-from fen_eval import fen_eval
+import chess.pgn
+from fen_eval import perft_eval
+from fen_eval import dummy_fen_to_perft
+from pathlib import Path
 
 def which(bin_name):
     path = os.getenv('PATH')
@@ -14,10 +15,47 @@ def which(bin_name):
 stockfish_path = which('stockfish')
 chessengine_path = '../chessengine'
 
-# FIXME
-fen_strings = ["k7/pp3ppp/8/3p4/8/2P4P/PP3PP1/K3R3", # deadly open file for black king
-"k7/pp3ppp/2p1p3/3p4/8/2P4P/PP3PP1/K3R3" # precedent fen with closed black pawn shied
-]
+fen_directory = 'fen/'
+perft_directory = 'given_perft/'
+pgn_directory = 'pgn/'
+
+def pgn_to_perft_string(pgn_path):
+    with open(pgn_path, "r") as pgn_file:
+        game = chess.pgn.read_game(pgn_file)
+
+    game = game.end()
+    board = game.board()
+
+    return board.fen()
+
+def cut_last_word(string):
+    return string.rsplit(' ', 1)[0]
+
+# return all the perft strings collected from the ones in fen/
+# and the ones representing the board constructed
+def get_perft_strings():
+    perft_strings = []
+
+    for filename in os.listdir(fen_directory):
+        if filename.endswith(".fen"):
+            fen_path = fen_directory + filename
+            with open (fen_path, "r") as fen_file:
+                perft_strings.append(dummy_fen_to_perft(fen_file.readline().rstrip("\n")))
+
+    for filename in os.listdir(pgn_directory):
+        if filename.endswith(".pgn"):
+            pgn_path = pgn_directory + filename
+            perft_strings.append(pgn_to_perft_string(pgn_path))
+
+    for filename in os.listdir(perft_directory):
+        if filename.endswith(".perft"):
+            perft_path = perft_directory + filename
+            with open (perft_path, "r") as perft_file:
+                perft_strings.append(cut_last_word(perft_file.readline().rstrip("\n")))
+
+    return perft_strings
+
+perft_strings = get_perft_strings()
 
 # This is usefull to normalize Score objects to integers
 # and should be a large value
@@ -35,11 +73,11 @@ def score_to_centipawns(pov_score):
 
     return score.score(mate_score=mate_score)
 
-def ref_eval(fen):
-    return score_to_centipawns(fen_eval(fen, stockfish_path))
+def ref_eval(perft):
+    return score_to_centipawns(perft_eval(perft, stockfish_path))
 
-def eval(fen):
-    return score_to_centipawns(fen_eval(fen, chessengine_path))
+def eval(perft):
+    return score_to_centipawns(perft_eval(perft, chessengine_path))
 
 def identity(x):
     return x
@@ -69,74 +107,77 @@ def index_by_key(list, elt, key=identity):
 
     return list_with_key_applied.index(elt)
 
-def get_choice_dissonance(fen_couple, fen_and_ref_value_couples, fen_and_value_couples):
-    first_fen, second_fen = fen_couple
+def get_choice_dissonance(perft_couple, perft_and_ref_value_couples, perft_and_value_couples):
+    first_perft, second_perft = perft_couple
 
-    first_fen_ref_index = index_by_key(fen_and_ref_value_couples, first_fen, key=first)
-    second_fen_ref_index = index_by_key(fen_and_ref_value_couples, second_fen, key=first)
+    first_perft_ref_index = index_by_key(perft_and_ref_value_couples, first_perft, key=first)
+    second_perft_ref_index = index_by_key(perft_and_ref_value_couples, second_perft, key=first)
 
-    first_fen_index = index_by_key(fen_and_value_couples, first_fen, key=first)
-    second_fen_index = index_by_key(fen_and_value_couples, second_fen, key=first)
+    first_perft_index = index_by_key(perft_and_value_couples, first_perft, key=first)
+    second_perft_index = index_by_key(perft_and_value_couples, second_perft, key=first)
 
-    first_fen_ref_value = second(fen_and_ref_value_couples[first_fen_ref_index])
-    second_fen_ref_value = second(fen_and_ref_value_couples[second_fen_ref_index])
+    first_perft_ref_value = second(perft_and_ref_value_couples[first_perft_ref_index])
+    second_perft_ref_value = second(perft_and_ref_value_couples[second_perft_ref_index])
 
-    first_fen_value = second(fen_and_value_couples[first_fen_index])
-    second_fen_value = second(fen_and_value_couples[second_fen_index])
+    first_perft_value = second(perft_and_value_couples[first_perft_index])
+    second_perft_value = second(perft_and_value_couples[second_perft_index])
 
-    if (first_fen_ref_index <= second_fen_ref_index and first_fen_index <= second_fen_index) \
-       or (second_fen_ref_index <= first_fen_ref_index and second_fen_index <= first_fen_index):
+    if (first_perft_ref_index <= second_perft_ref_index and first_perft_index <= second_perft_index) \
+       or (second_perft_ref_index <= first_perft_ref_index and second_perft_index <= first_perft_index):
         return None
 
-    return {'fen_string_1': first_fen,
-            'fen_string_1_ref_value': first_fen_ref_value,
-            'fen_string_1_value': first_fen_value,
-            'fen_string_2': second_fen,
-            'fen_string_2_ref_value': second_fen_ref_value,
-            'fen_string_2_value': second_fen_value}
+    return {'perft_string_1': first_perft,
+            'perft_string_1_ref_value': first_perft_ref_value,
+            'perft_string_1_value': first_perft_value,
+            'perft_string_2': second_perft,
+            'perft_string_2_ref_value': second_perft_ref_value,
+            'perft_string_2_value': second_perft_value}
 
-def get_winner_dissonance(fen, fen_and_ref_value_couples, fen_and_value_couples):
-    fen_ref_index = index_by_key(fen_and_ref_value_couples, fen, key=first)
-    fen_index = index_by_key(fen_and_value_couples, fen, key=first)
+def get_winner_dissonance(perft, perft_and_ref_value_couples, perft_and_value_couples):
+    perft_ref_index = index_by_key(perft_and_ref_value_couples, perft, key=first)
+    perft_index = index_by_key(perft_and_value_couples, perft, key=first)
 
-    fen_ref_value = second(fen_and_ref_value_couples[fen_ref_index])
-    fen_value = second(fen_and_value_couples[fen_index])
+    perft_ref_value = second(perft_and_ref_value_couples[perft_ref_index])
+    perft_value = second(perft_and_value_couples[perft_index])
 
-    if (fen_ref_value <= 0 and fen_value <= 0) or (fen_ref_value > 0 and fen_value > 0):
+    if (perft_ref_value <= 0 and perft_value <= 0) or (perft_ref_value > 0 and perft_value > 0):
         return None
 
-    return {'fen_string': fen,
-            'fen_string_ref_value': fen_ref_value,
-            'fen_string_value': fen_value}
+    return {'perft_string': perft,
+            'perft_string_ref_value': perft_ref_value,
+            'perft_string_value': perft_value}
 
 
 # Assumes that the couples are sorted by value
-def dissonances(fen_and_ref_value_couples, fen_and_value_couples):
+def dissonances(perft_and_ref_value_couples, perft_and_value_couples):
     winner_dissonances = []
     choice_dissonances = []
 
-    for fen in fen_strings:
-        winner_dissonance = get_winner_dissonance(fen, fen_and_ref_value_couples, fen_and_value_couples)
+    for perft in perft_strings:
+        winner_dissonance = get_winner_dissonance(perft, perft_and_ref_value_couples, perft_and_value_couples)
         if winner_dissonance:
             winner_dissonances.append(winner_dissonance)
 
-    for fen_couple in n_choose_2(fen_strings):
-        choice_dissonance = get_choice_dissonance(fen_couple, fen_and_ref_value_couples, fen_and_value_couples)
+    for perft_couple in n_choose_2(perft_strings):
+        choice_dissonance = get_choice_dissonance(perft_couple, perft_and_ref_value_couples, perft_and_value_couples)
         if choice_dissonance:
             choice_dissonances.append(choice_dissonance)
 
     return {'winner_dissonances': winner_dissonances, 'choice_dissonances': choice_dissonances}
 
 def evaluate_eval_fun(eval_fun):
-    fen_and_ref_value_couples = [(fen, ref_eval(fen)) for fen in fen_strings]
-    fen_and_value_couples = [(fen, eval_fun(fen)) for fen in fen_strings]
+    perft_and_ref_value_couples = [(perft, ref_eval(perft)) for perft in perft_strings]
+    perft_and_value_couples = [(perft, eval_fun(perft)) for perft in perft_strings]
 
-    fen_and_ref_value_couples.sort(key=second)
-    fen_and_value_couples.sort(key=second)
+    perft_and_ref_value_couples.sort(key=second)
+    perft_and_value_couples.sort(key=second)
 
-    print(fen_and_ref_value_couples)
-    print(fen_and_value_couples)
+    print(perft_and_ref_value_couples)
+    print(perft_and_value_couples)
 
-    return dissonances(fen_and_ref_value_couples, fen_and_value_couples)
+    return dissonances(perft_and_ref_value_couples, perft_and_value_couples)
 
-print(evaluate_eval_fun(eval))
+dissonances = evaluate_eval_fun(eval)
+print("nb perft tested: " + str(len(perft_strings)))
+print("nb winner dissonances: " + str(len(dissonances["winner_dissonances"])))
+print("nb choice dissonances: " + str(len(dissonances["choice_dissonances"])))
