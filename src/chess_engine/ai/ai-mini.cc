@@ -72,8 +72,10 @@ namespace ai
 
      board::Move AiMini::search(board::Chessboard& chessboard) const
      {
-          auto evalMove = minimax(chessboard, 3, INT16_MIN, INT16_MAX,
+          int16_t depth = 3;
+          auto eval_move = minimax(chessboard, depth, INT16_MIN, INT16_MAX,
                                   chessboard.get_white_turn());
-          return evalMove.second.value();
+          uci::info(depth, eval_move.first);
+          return eval_move.second.value();
      }
 }
