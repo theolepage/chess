@@ -49,6 +49,13 @@ namespace board
             rank_ =  static_cast<Rank>(y);
         }
 
+        Position(int i)
+        {
+            assert(i >= 0 && i < 64);
+            file_ = static_cast<File>(i % 8);
+            rank_ =  static_cast<Rank>(i / 8);
+        }
+
         Position(char file, char rank)
         {
             assert(islower(file) && isdigit(rank));
@@ -59,6 +66,7 @@ namespace board
 
         File get_file() const;
         Rank get_rank() const;
+        int get_index(void) const;
 
         bool operator==(const Position& pos) const;
         bool operator!=(const Position& pos) const;

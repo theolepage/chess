@@ -43,4 +43,9 @@ namespace board
         return os;
     }
 
+    inline int get_index(void) const
+    {
+        return static_cast<int>(file_) + static_cast<int>(rank_) * 8;
+    }
+
 } // namespace board
