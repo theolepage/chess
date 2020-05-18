@@ -10,7 +10,7 @@ using namespace board;
 namespace rule
 {
     static void register_pos(std::vector<Position>& v,
-                             const std::vector<std::optional<Position>>& positions)
+            const std::vector<std::optional<Position>>& positions)
     {
         for (const auto& pos : positions)
             if (pos)
@@ -36,20 +36,29 @@ namespace rule
 
     bool is_king_checked(const Chessboard& board)
     {
-        const Color opponent_color = !board.get_white_turn() ? Color::WHITE : Color::BLACK;
+        const Color opponent_color = !board.get_white_turn() ? Color::WHITE
+                                                             : Color::BLACK;
         const Position king_pos = board.get_king_position();
 
         // Find threatening positions
         std::vector<Position> threatening_pawns;
         register_pos(threatening_pawns, {
             king_pos.move(-1, opponent_color == Color::WHITE ? -1 : 1),
-            king_pos.move( 1, opponent_color == Color::WHITE ? -1 : 1)
+            king_pos.move(1, opponent_color == Color::WHITE ? -1 : 1)
         });
-        const auto threatening_knights = get_authorized_pos(board, PieceType::KNIGHT, king_pos);
-        const auto threatening_kings = get_authorized_pos(board, PieceType::KING, king_pos);
-        const auto threatening_lines = get_authorized_pos(board, PieceType::ROOK, king_pos);
-        const auto threatening_diagonals = get_authorized_pos(board, PieceType::BISHOP, king_pos);
-        
+        const auto threatening_knights = get_authorized_pos(board,
+                                                            PieceType::KNIGHT,
+                                                            king_pos);
+        const auto threatening_kings = get_authorized_pos(board,
+                                                          PieceType::KING,
+                                                          king_pos);
+        const auto threatening_lines = get_authorized_pos(board,
+                                                          PieceType::ROOK,
+                                                          king_pos);
+        const auto threatening_diagonals = get_authorized_pos(board,
+                                                             PieceType::BISHOP,
+                                                             king_pos);
+
         for (const auto& pos : threatening_pawns)
             if (board(pos, PieceType::PAWN, opponent_color).has_value())
                 return true;
@@ -77,7 +86,8 @@ namespace rule
         std::vector<Position> res;
         for (uint8_t rank = 0; rank < Chessboard::width; ++rank)
         {
-            const std::bitset<Chessboard::width> line = board(static_cast<Rank>(rank), piece, color);
+            const std::bitset<Chessboard::width> line =
+                    board(static_cast<Rank>(rank), piece, color);
             for (uint8_t file = 0; file < Chessboard::width; ++file)
             {
                 if (line[file])
@@ -100,7 +110,7 @@ namespace rule
         int shift_file = y_file - x_file;
         if (shift_file > 0) shift_file = 1;
         else if (shift_file < 0) shift_file = -1;
-        
+
         int shift_rank = y_rank - x_rank;
         if (shift_rank > 0) shift_rank = 1;
         else if (shift_rank < 0) shift_rank = -1;
@@ -138,33 +148,33 @@ namespace rule
         if (piece == PieceType::KING)
         {
             register_pos(res, {
-                from.move(-1,  1), from.move(0,  1), from.move(1,  1), // top
-                from.move(-1,  0), from.move(1,  0),                   // center
-                from.move(-1, -1), from.move(0, -1), from.move(1, -1)  // bottom
+                from.move(-1,  1), from.move(0,  1), from.move(1,  1), //top
+                from.move(-1,  0), from.move(1,  0),                   //center
+                from.move(-1, -1), from.move(0, -1), from.move(1, -1)  //bottom
             });
         }
         if (piece == PieceType::KNIGHT)
         {
             register_pos(res, {
                 from.move(-1,  2), from.move(-2,  1),   // top left
-                from.move( 1,  2), from.move( 2,  1),   // top right
+                from.move(1,  2), from.move(2,  1),   // top right
                 from.move(-1, -2), from.move(-2, -1),   // bottom left
-                from.move( 1, -2), from.move( 2, -1)    // bottom right
+                from.move(1, -2), from.move(2, -1)    // bottom right
             });
         }
         if (piece == PieceType::ROOK || piece == PieceType::QUEEN)
         {
-            register_pos_line(res, board, from, -1,  0);   // line left
-            register_pos_line(res, board, from,  1,  0);   // line right
-            register_pos_line(res, board, from,  0,  1);   // line up
-            register_pos_line(res, board, from,  0, -1);   // line down
+            register_pos_line(res, board, from, -1,  0); // line left
+            register_pos_line(res, board, from,  1,  0); // line right
+            register_pos_line(res, board, from,  0,  1); // line up
+            register_pos_line(res, board, from,  0, -1); // line down
         }
         if (piece == PieceType::BISHOP || piece == PieceType::QUEEN)
         {
-            register_pos_line(res, board, from, -1,  1);   // diagonal up left
-            register_pos_line(res, board, from,  1,  1);   // diagonal up right
-            register_pos_line(res, board, from, -1, -1);   // diagonal down left
-            register_pos_line(res, board, from,  1, -1);   // diagonal down right
+            register_pos_line(res, board, from, -1,  1); // diagonal up left
+            register_pos_line(res, board, from,  1,  1); // diagonal up right
+            register_pos_line(res, board, from, -1, -1); // diagonal down left
+            register_pos_line(res, board, from,  1, -1); // diagonal down right
         }
 
         return res;
@@ -205,9 +215,12 @@ namespace rule
         // Find positions of king and rook
         const Rank rank = (color == Color::WHITE) ? Rank::ONE : Rank::EIGHT;
         const Position king = Position(File::E, rank);
-        const Position rook = Position(king_castling ? File::H : File::A, rank);
-        const Position new_king = Position(king_castling ? File::G : File::C, rank);
-        // Position new_rook = Position(king_castling ? File::F : File::D, rank);
+        const Position rook = Position(king_castling ? File::H
+                                                     : File::A, rank);
+        const Position new_king = Position(king_castling ? File::G
+                                                         : File::C, rank);
+        // Position new_rook = Position(king_castling ? File::F
+        //                                            : File::D, rank);
 
         // Check if allowed to do a castling
         if (have_pieces_between(board, king, rook)
@@ -215,7 +228,8 @@ namespace rule
             || (!king_castling && !board.get_queen_castling(color)))
             return std::nullopt;
 
-        // Check if king would be in check for each pos between king and new_king
+        // Check if king would be in check for each pos between
+        // king and new_king
         bool not_in_check = true;
         const auto temp_positions = get_positions_between(king, new_king);
         Chessboard board_copy = board;
@@ -233,9 +247,11 @@ namespace rule
         if (not_in_check)
         {
             if (king_castling)
-                res = Move(king, new_king, PieceType::KING, false, false, false, true, false);
+                res = Move(king, new_king, PieceType::KING,
+                           false, false, false, true, false);
             else
-                res = Move(king, new_king, PieceType::KING, false, false, true, false, false);
+                res = Move(king, new_king, PieceType::KING,
+                           false, false, true, false, false);
         }
         return res;
     }
@@ -247,7 +263,8 @@ namespace rule
                             bool capture)
     {
         // Have the pawn reached the end?
-        if (to.get_rank() != (color == Color::BLACK ? Rank::ONE : Rank::EIGHT))
+        if (to.get_rank() != (color == Color::BLACK ? Rank::ONE
+                                                    : Rank::EIGHT))
             return false;
 
         // Create the moves
@@ -270,8 +287,10 @@ namespace rule
                                      const PieceType& piece)
     {
         std::vector<Move> res;
-        const Color color = board.get_white_turn() ? Color::WHITE : Color::BLACK;
-        const auto pieces_positions = get_pieces_positions(board, piece, color);
+        const Color color = board.get_white_turn() ? Color::WHITE
+                                                   : Color::BLACK;
+        const auto pieces_positions = get_pieces_positions(board, piece,
+                                                           color);
 
         // Generate regular moves
         for (const Position& from : pieces_positions)
@@ -281,7 +300,8 @@ namespace rule
             for (const auto& to : authorized_pos)
             {
                 // Step 2: Possible (cell occupied, capture?)
-                const auto move = get_possible_move(board, piece, color, from, to);
+                const auto move = get_possible_move(board, piece, color,
+                                                    from, to);
                 if (move)
                     res.push_back(*move);
             }
@@ -289,8 +309,10 @@ namespace rule
             // Handle castling moves
             if (piece == PieceType::KING)
             {
-                const auto king_castling = register_castling(board, color, true);
-                const auto queen_castling = register_castling(board, color, false);
+                const auto king_castling = register_castling(board, color,
+                                                             true);
+                const auto queen_castling = register_castling(board, color,
+                                                              false);
                 if (king_castling)
                     res.push_back(*king_castling);
                 if (queen_castling)
@@ -304,9 +326,11 @@ namespace rule
     std::vector<Move> generate_pawn_moves(const Chessboard& board)
     {
         std::vector<Move> res;
-        const Color color = board.get_white_turn() ? Color::WHITE : Color::BLACK;
+        const Color color = board.get_white_turn() ? Color::WHITE
+                                                   : Color::BLACK;
         const PieceType piece = PieceType::PAWN;
-        const auto pieces_positions = get_pieces_positions(board, piece, color);
+        const auto pieces_positions = get_pieces_positions(board, piece,
+                                                           color);
 
         for (Position from : pieces_positions)
         {
@@ -321,12 +345,13 @@ namespace rule
                     res.emplace_back(from, *to_forward, piece,
                                      false, false, false, false, false);
 
-                const std::optional<Position> to_forward_2 = (color == Color::BLACK)
-                    ? from.move(0, -2)
-                    : from.move(0,  2);
+                const std::optional<Position> to_forward_2 =
+                        (color == Color::BLACK)
+                        ? from.move(0, -2)
+                        : from.move(0,  2);
                 const bool first_move = (color == Color::BLACK)
-                    ? from.get_rank() == Rank::SEVEN
-                    : from.get_rank() == Rank::TWO;
+                        ? from.get_rank() == Rank::SEVEN
+                        : from.get_rank() == Rank::TWO;
                 if (first_move && to_forward_2 && !board[*to_forward_2])
                     res.emplace_back(from, *to_forward_2, piece,
                                     false, true, false, false, false);
@@ -335,12 +360,14 @@ namespace rule
             // Pawn can move to a cell diagonally in front of it on an adjacent
             // file if (and only if) the cell already contains a piece of the
             // other color on it. In this case it is also a capture.
-            const std::optional<Position> to_diag_left = (color == Color::BLACK)
-                ? from.move(-1, -1)
-                : from.move(-1,  1);
-            const std::optional<Position> to_diag_right = (color == Color::BLACK)
-                ? from.move(1, -1)
-                : from.move(1,  1);
+            const std::optional<Position> to_diag_left =
+                    (color == Color::BLACK)
+                    ? from.move(-1, -1)
+                    : from.move(-1,  1);
+            const std::optional<Position> to_diag_right =
+                    (color == Color::BLACK)
+                    ? from.move(1, -1)
+                    : from.move(1,  1);
 
             if (to_diag_left)
             {
@@ -349,11 +376,12 @@ namespace rule
                 bool en_passant = board.get_en_passant().has_value()
                     && board.get_en_passant() == *to_diag_left;
                 if (capture || en_passant)
-                    if (!register_promotion(res, from, *to_diag_left, color, true))
+                    if (!register_promotion(res, from, *to_diag_left, color,
+                                            true))
                         res.emplace_back(from, *to_diag_left, piece,
                                         true, false, false, false, en_passant);
             }
-            
+
             if (to_diag_right)
             {
                 bool capture = board[*to_diag_right]
@@ -362,10 +390,11 @@ namespace rule
                     && board.get_en_passant() == *to_diag_right;
 
                 if (capture || en_passant)
-                    if (!register_promotion(res, from, *to_diag_right, color, true))
+                    if (!register_promotion(res, from, *to_diag_right, color,
+                                            true))
                         res.emplace_back(from, *to_diag_right, piece,
                                         true, false, false, false, en_passant);
-            }            
+            }
         }
 
         return res;

@@ -16,7 +16,8 @@ namespace ai
                                    int16_t beta,
                                    const bool isMaxPlayer)
      {
-          const std::vector<board::Move> legal_moves = chessboard.generate_legal_moves();
+          const std::vector<board::Move> legal_moves =
+                    chessboard.generate_legal_moves();
           if (chessboard.is_draw(legal_moves))
                return evalAndMove(0, std::nullopt);
           if (chessboard.is_checkmate(legal_moves))
@@ -33,8 +34,9 @@ namespace ai
                {
                     board::Chessboard chessboard_ = chessboard;
                     chessboard_.do_move(legal_moves[i]);
-                    const int16_t eval = minimax(chessboard_, depth - 1, alpha, beta,
-                                           !isMaxPlayer).first;
+                    const int16_t eval = minimax(chessboard_, depth - 1,
+                                                 alpha, beta,
+                                                 !isMaxPlayer).first;
                     if (eval > bestValue)
                     {
                          bestValue = eval;

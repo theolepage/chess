@@ -7,10 +7,10 @@ namespace ai
 {
     void play_ai(void)
     {
-        uci::init("NameOfOurBeautifulAi");
+        uci::init("bLiPbLoP");
         AiMini ai = AiMini();
         board::Chessboard chessboard = board::Chessboard();
-        while(true)
+        while (true)
         {
             pgn_parser::add_move_to_board(chessboard, uci::get_board());
             board::Move move = ai.search(chessboard);
