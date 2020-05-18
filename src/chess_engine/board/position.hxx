@@ -44,7 +44,7 @@ namespace board
         return os;
     }
 
-    inline int get_index(void) const
+    inline int Position::get_index(void) const
     {
         return static_cast<int>(file_) + static_cast<int>(rank_) * 8;
     }
