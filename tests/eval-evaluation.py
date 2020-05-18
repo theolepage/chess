@@ -1,17 +1,45 @@
 #!/usr/bin/env python
 
-import random
+import os
+import chess
+from fen_eval import fen_eval
+
+def which(bin_name):
+    path = os.getenv('PATH')
+    for bin_path in path.split(os.path.pathsep):
+        bin_path = os.path.join(bin_path, bin_name)
+        if os.path.exists(bin_path) and os.access(bin_path, os.X_OK):
+            return bin_path
+
+stockfish_path = which('stockfish')
+chessengine_path = '../chessengine'
 
 # FIXME
-fen_strings = ["foo", "bar", "baz"]
+fen_strings = ["k7/pp3ppp/8/3p4/8/2P4P/PP3PP1/K3R3", # deadly open file for black king
+"k7/pp3ppp/2p1p3/3p4/8/2P4P/PP3PP1/K3R3" # precedent fen with closed black pawn shied
+]
+
+# This is usefull to normalize Score objects to integers
+# and should be a large value
+mate_score = 1000000000
+
+# There is a total order defined on centi-pawn and mate scores.
+# >>> from chess.engine import Cp, Mate, MateGiven
+# >>> Mate(-0) < Mate(-1) < Cp(-50) < Cp(200) < Mate(4) < Mate(1) < MateGiven
+# True
+def score_to_centipawns(pov_score):
+    score = pov_score.relative
+
+    if type(score) == chess.engine.Cp:
+        assert score.score() < mate_score
+
+    return score.score(mate_score=mate_score)
 
 def ref_eval(fen):
-    # FIXME
-    return random.random()
+    return score_to_centipawns(fen_eval(fen, stockfish_path))
 
 def eval(fen):
-    # FIXME
-    return random.random()
+    return score_to_centipawns(fen_eval(fen, chessengine_path))
 
 def identity(x):
     return x
@@ -106,7 +134,6 @@ def evaluate_eval_fun(eval_fun):
     fen_and_ref_value_couples.sort(key=second)
     fen_and_value_couples.sort(key=second)
 
-    # FIMXE
     print(fen_and_ref_value_couples)
     print(fen_and_value_couples)
 
