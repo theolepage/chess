@@ -28,9 +28,11 @@ namespace board
     constexpr size_t nb_pieces = 6;
 
     /* Can be useful to iterate over PieceTypes */
-    constexpr std::array<PieceType, nb_pieces> piecetype_array{
+    constexpr std::array<PieceType, nb_pieces> piecetype_array
+    {
         PieceType::QUEEN,  PieceType::ROOK, PieceType::BISHOP,
-        PieceType::KNIGHT, PieceType::PAWN, PieceType::KING};
+        PieceType::KNIGHT, PieceType::PAWN, PieceType::KING
+    };
 
     inline PieceType char_to_piece(const char c)
     {
@@ -54,8 +56,10 @@ namespace board
     }
 
     constexpr char empty_cell_char = ' ';
-    constexpr std::array<char, nb_pieces> piece_chars = {
-        'Q', 'R', 'B', 'N', 'P', 'K'};
+    constexpr std::array<char, nb_pieces> piece_chars =
+    {
+        'Q', 'R', 'B', 'N', 'P', 'K'
+    };
 
     inline char piece_to_char(const PieceType piece)
     {

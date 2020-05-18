@@ -1,6 +1,6 @@
 #pragma once
 
-#include "chess_engine/board/move.hh"
+#include "chess_engine/board/entity/move.hh"
 #include "chess_engine/board/chessboard.hh"
 
 namespace ai

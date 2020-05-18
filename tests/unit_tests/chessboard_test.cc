@@ -772,8 +772,8 @@ TEST(Castling, Illegal)
 
     for (auto move : legal_moves)
     {
-        EXPECT_FALSE(move.king_castling_get());
-        EXPECT_FALSE(move.queen_castling_get());
+        EXPECT_FALSE(move.get_king_castling());
+        EXPECT_FALSE(move.get_queen_castling());
     }
 }
 

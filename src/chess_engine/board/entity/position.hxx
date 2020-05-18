@@ -5,6 +5,27 @@ namespace board
         , rank_(rank)
     {}
 
+    inline Position::Position(int x, int y)
+    {
+        file_ = static_cast<File>(x);
+        rank_ =  static_cast<Rank>(y);
+    }
+
+    inline Position::Position(int i)
+    {
+        assert(i >= 0 && i < 64);
+        file_ = static_cast<File>(i % 8);
+        rank_ =  static_cast<Rank>(i / 8);
+    }
+
+    inline Position::Position(char file, char rank)
+    {
+        assert(islower(file) && isdigit(rank));
+        file_ = static_cast<File>(file - 'a');
+        rank_ =  static_cast<Rank>(rank - '0' - 1); 
+        // + 1 because ONE corresponds to 0
+    }
+
     inline bool Position::operator==(const Position& pos) const
     {
         return get_file() == pos.get_file() && get_rank() == pos.get_rank();
@@ -25,10 +46,10 @@ namespace board
         return rank_;
     }
 
-    inline std::optional<Position> Position::move(int file, int rank) const
+    inline std::optional<Position> Position::translate(int f, int r) const
     {
-        int new_file = static_cast<int>(file_) + file;
-        int new_rank = static_cast<int>(rank_) + rank;
+        int new_file = static_cast<int>(file_) + f;
+        int new_rank = static_cast<int>(rank_) + r;
 
         if (new_file < 0 || new_rank < 0 || new_file >= 8 || new_rank >= 8)
             return std::nullopt;
@@ -46,7 +67,16 @@ namespace board
 
     inline int Position::get_index(void) const
     {
-        return static_cast<int>(file_) + static_cast<int>(rank_) * 8;
+        // 00100000
+        // 00000000
+        // 00000000
+        // 00000000
+        // 00000000
+        // 00000000
+        // 00000000
+        // 00000000
+        // rank_ = 7     file_ = 2
+    
+        return (7 - static_cast<int>(rank_)) * 8 + static_cast<int>(file_);
     }
-
 } // namespace board

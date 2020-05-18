@@ -9,7 +9,7 @@
 #include "parsing/perft_parser/perft-object.hh"
 #include "parsing/perft_parser/fen-object.hh"
 #include "parsing/perft_parser/fen-rank.hh"
-#include "chess_engine/board/position.hh"
+#include "chess_engine/board/entity/position.hh"
 
 using namespace board;
 using namespace std;

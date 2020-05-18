@@ -10,8 +10,8 @@
 #include <cstdint>
 #include <optional>
 
-#include "position.hh"
-#include "piece-type.hh"
+#include "entity/position.hh"
+#include "entity/piece-type.hh"
 #include "defs.hh"
 #include "utils/bits-utils.hh"
 

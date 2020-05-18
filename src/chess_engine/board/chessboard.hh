@@ -12,11 +12,11 @@
 #include "parsing/perft_parser/perft-parser.hh"
 #include "parsing/perft_parser/fen-object.hh"
 #include "parsing/perft_parser/perft-object.hh"
-#include "move.hh"
 #include "parsing/option_parser/option-parser.hh"
-#include "position.hh"
-#include "piece-type.hh"
-#include "color.hh"
+#include "entity/move.hh"
+#include "entity/position.hh"
+#include "entity/piece-type.hh"
+#include "entity/color.hh"
 
 // Il était tard et j'avais la flemme
 // Kèstuvafér

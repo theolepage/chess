@@ -40,29 +40,11 @@ namespace board
     class Position final
     {
     public:
-        // (x, y)
         Position(File file, Rank rank);
+        Position(int x, int y);
+        Position(int i);
+        Position(char file, char rank);
 
-        Position(uint8_t x, uint8_t y)
-        {
-            file_ = static_cast<File>(x);
-            rank_ =  static_cast<Rank>(y);
-        }
-
-        Position(int i)
-        {
-            assert(i >= 0 && i < 64);
-            file_ = static_cast<File>(i % 8);
-            rank_ =  static_cast<Rank>(i / 8);
-        }
-
-        Position(char file, char rank)
-        {
-            assert(islower(file) && isdigit(rank));
-            file_ = static_cast<File>(file - 'a');
-            rank_ =  static_cast<Rank>(rank - '0' - 1); // + 1 because ONE
-                                                        // corresponds to 0
-        }
         Position& operator=(const Position& position) = default;
 
         File get_file() const;
@@ -72,7 +54,7 @@ namespace board
         bool operator==(const Position& pos) const;
         bool operator!=(const Position& pos) const;
 
-        std::optional<Position> move(int file, int rank) const;
+        std::optional<Position> translate(int file, int rank) const;
 
         friend std::ostream& operator<<(std::ostream& os, const Position& pos);
 

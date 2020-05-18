@@ -2,10 +2,10 @@
 
 #include "parsing/option_parser/option-parser.hh"
 #include "rule.hh"
-#include "piece-type.hh"
-#include "color.hh"
-#include "position.hh"
-#include "move.hh"
+#include "entity/piece-type.hh"
+#include "entity/color.hh"
+#include "entity/position.hh"
+#include "entity/move.hh"
 
 #include <cassert>
 #include <optional>
@@ -315,8 +315,8 @@ namespace board
     void Chessboard::register_double_pawn_push(const Move& move,
                                                const Color color)
     {
-        const Position& start = move.start_get();
-        const Position& end = move.end_get();
+        const Position& start = move.get_start();
+        const Position& end = move.get_end();
 
         const auto start_rank_i = utils::utype(start.get_rank());
         const auto en_passant_rank_i = start_rank_i +
@@ -334,7 +334,7 @@ namespace board
 
     void Chessboard::update_last_fifty_turn(const Move& move)
     {
-        if (move.capture_get() || move.piece_get() == PieceType::PAWN)
+        if (move.get_capture() || move.get_piece() == PieceType::PAWN)
             last_fifty_turn_ = 0;
         else
             if (!white_turn_)
@@ -343,7 +343,7 @@ namespace board
 
     void Chessboard::eat_en_passant(const Move& move, const Color color)
     {
-        const Position& end = move.end_get();
+        const Position& end = move.get_end();
 
         const auto en_passant_rank_i = utils::utype(end.get_rank());
         const auto eaten_pawn_rank_i = en_passant_rank_i +
@@ -359,15 +359,15 @@ namespace board
 
     void Chessboard::move_castling_rook(const Move& move, const Color color)
     {
-        const Position& end = move.end_get();
+        const Position& end = move.get_end();
 
         const auto king_file_i = utils::utype(end.get_file());
         const auto king_rank = end.get_rank();
 
-        const auto rook_start_file = move.king_castling_get() ?
+        const auto rook_start_file = move.get_king_castling() ?
                                      File::H : File::A;
         const auto rook_end_file_i = king_file_i +
-                                     (move.king_castling_get() ? -1 : 1);
+                                     (move.get_king_castling() ? -1 : 1);
         const auto rook_end_file = static_cast<File>(rook_end_file_i);
 
         const auto rook_start = Position(rook_start_file, king_rank);
@@ -381,14 +381,14 @@ namespace board
         const Position queenside_rook_pos = Position(File::A, Rank::ONE);
         const Position kingside_rook_pos = Position(File::H, Rank::ONE);
 
-        if (move.castling_get())
+        if (move.get_castling())
         {
             white_king_castling_ = false;
             white_queen_castling_ = false;
         }
         else
         {
-            const auto move_piecetype = move.piece_get();
+            const auto move_piecetype = move.get_piece();
 
             if (move_piecetype == PieceType::KING)
             {
@@ -398,7 +398,7 @@ namespace board
             }
             else if (move_piecetype == PieceType::ROOK)
             {
-                const auto rook_start = move.start_get();
+                const auto rook_start = move.get_start();
 
                 // If a rook is moved,
                 // it can only cancels one castling out of two
@@ -415,14 +415,14 @@ namespace board
         const Position queenside_rook_pos = Position(File::A, Rank::EIGHT);
         const Position kingside_rook_pos = Position(File::H, Rank::EIGHT);
 
-        if (move.castling_get())
+        if (move.get_castling())
         {
             black_king_castling_ = false;
             black_queen_castling_ = false;
         }
         else
         {
-            const auto move_piecetype = move.piece_get();
+            const auto move_piecetype = move.get_piece();
 
             if (move_piecetype == PieceType::KING)
             {
@@ -432,7 +432,7 @@ namespace board
             }
             else if (move_piecetype == PieceType::ROOK)
             {
-                const auto rook_start = move.start_get();
+                const auto rook_start = move.get_start();
 
                 // If a rook is moved,
                 // it can only cancels one castling out of two
@@ -454,10 +454,10 @@ namespace board
 
     void Chessboard::do_move(const Move& move)
     {
-        const Position& start = move.start_get();
-        const Position& end = move.end_get();
+        const Position& start = move.get_start();
+        const Position& end = move.get_end();
         const Color color = (*this)[start].value().second;
-        const PieceType piecetype = move.piece_get();
+        const PieceType piecetype = move.get_piece();
 
         // The piece that will be eaten if move is a capture
         const opt_piece_t opt_end_piece = (*this)[end];
@@ -465,18 +465,18 @@ namespace board
         move_piece(start, end, piecetype, color);
 
         // NOTE if a move is a double pawn push, then it cannot be a capture
-        if (move.double_pawn_push_get())
+        if (move.get_double_pawn_push())
             register_double_pawn_push(move, color);
         else
         {
             forget_en_passant();
             update_last_fifty_turn(move);
 
-            if (move.en_passant_get())
+            if (move.get_en_passant())
                 eat_en_passant(move, color);
-            else if (move.castling_get())
+            else if (move.get_castling())
                 move_castling_rook(move, color);
-            else if (move.capture_get())
+            else if (move.get_capture())
             {
                 assert(opt_end_piece.has_value());
                 side_piece_t eaten_piece = opt_end_piece.value();
@@ -489,9 +489,9 @@ namespace board
                 unset_piece(end, eaten_piece_type, eaten_piece_color);
             }
 
-            if (move.promotion_get().has_value())
+            if (move.get_promotion().has_value())
             {
-                const auto new_piecetype = move.promotion_get().value();
+                const auto new_piecetype = move.get_promotion().value();
                 change_piece_type(end, PieceType::PAWN, new_piecetype, color);
             }
         }
@@ -506,85 +506,17 @@ namespace board
         register_state();
     }
 
-    /*// In this function we place the rook correctly, since the king will be
-    // placed back thanks to do_move
-    void Chessboard::handle_undo_castling(const Move& move)
-    {
-        if (move.queen_castling_get())
-        {
-            // The white turn variable has not yet been toggled
-            // since it's done in do_move
-            if (white_turn_) // The black was playing
-            {
-                unset_piece(move.start_get(),
-                            move.promotion_get().value(),
-                            ((white_turn_) ? Color::WHITE : Color::BLACK));
-                set_piece(move.start_get(),
-                          PieceType::PAWN,
-                          ((white_turn_) ? Color::WHITE : Color::BLACK));
-            }
-        }
-    }
-
-    void Chessboard::undo_move(const Move& move,
-                               const option_parser::BoardState& state)
-    {
-        // Handle special case or just make move in reverse
-        if (move.king_castling_get() || move.queen_castling_get())
-        {
-            handle_undo_castling(move);
-        }
-
-        const Move reversed = move.get_reverse();
-        do_move(reversed);
-
-        // Then restore any eaten piece that was at end position
-        // We stored where the pawn was eaten so en passant is handled
-        if (state.ate)
-        {
-            // The white was currently playing, a black piece was eaten
-            set_piece(Position(state.eaten_x, state.eaten_y),
-                      static_cast<PieceType>(state.piece_type),
-                      ((white_turn_) ? Color::BLACK : Color::WHITE));
-        }
-
-        // If there was a promotion we need to restore as a pawn
-        if (move.promotion_get().has_value())
-        {
-            unset_piece(move.start_get(),
-                        move.promotion_get().value(),
-                        ((white_turn_) ? Color::WHITE : Color::BLACK));
-            set_piece(move.start_get(),
-                      PieceType::PAWN,
-                      ((white_turn_) ? Color::WHITE : Color::BLACK));
-        }
-
-
-        // Now restore the state flags
-
-        white_king_castling_ = state.white_king_castling;
-        white_queen_castling_ = state.white_queen_castling;
-        black_king_castling_ = state.black_king_castling;
-        black_queen_castling_ = state.black_queen_castling;
-
-        // Also need to restore en passant flag
-        if (state.en_passant)
-        {
-            en_passant_ = Position(state.en_passant_y, state.en_passant_y);
-        }
-    }*/
-
     bool Chessboard::is_move_possible(const Move& move)
     {
         // Move is invalid if in start the piece is not there or bad color
         // Scope is soooo perf, swiftly
         {
-            const auto opt_piece = (*this)[move.start_get()];
+            const auto opt_piece = (*this)[move.get_start()];
             if (!opt_piece.has_value())
             {
                 return false;
             }
-            else if (opt_piece.value().first != move.piece_get()
+            else if (opt_piece.value().first != move.get_piece()
                     || opt_piece.value().second != (white_turn_ ? Color::WHITE
                                                                : Color::BLACK))
             {
@@ -594,7 +526,7 @@ namespace board
 
         std::vector<Move> possible_piecetype_moves;
 
-        switch (move.piece_get())
+        switch (move.get_piece())
         {
             case PieceType::QUEEN:
                 possible_piecetype_moves = rule::generate_queen_moves(*this);

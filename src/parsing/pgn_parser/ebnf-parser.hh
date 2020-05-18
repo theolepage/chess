@@ -8,8 +8,8 @@
 #include <string_view>
 
 #include "chess_engine/board/chessboard.hh"
-#include "chess_engine/board/move.hh"
-#include "chess_engine/board/piece-type.hh"
+#include "chess_engine/board/entity/move.hh"
+#include "chess_engine/board/entity/piece-type.hh"
 #include "parsing/perft_parser/perft-parser.hh"
 #include "utils/utype.hh"
 
@@ -22,17 +22,17 @@ namespace pgn_parser
     std::string move_to_string(const board::Move& move)
     {
         std::string result;
-        result.push_back((char)(utils::utype(move.start_get().get_file())
+        result.push_back((char)(utils::utype(move.get_start().get_file())
                                 + 'a'));
-        result.push_back((char)(utils::utype(move.start_get().get_rank())
+        result.push_back((char)(utils::utype(move.get_start().get_rank())
                                 + '1'));
-        result.push_back((char)(utils::utype(move.end_get().get_file())
+        result.push_back((char)(utils::utype(move.get_end().get_file())
                                 + 'a'));
-        result.push_back((char)(utils::utype(move.end_get().get_rank())
+        result.push_back((char)(utils::utype(move.get_end().get_rank())
                                 + '1'));
-        if (move.promotion_get().has_value())
+        if (move.get_promotion().has_value())
         {
-            switch(move.promotion_get().value())
+            switch(move.get_promotion().value())
             {
                 case board::PieceType::QUEEN:
                     result.append("q");

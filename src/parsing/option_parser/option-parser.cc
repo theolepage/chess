@@ -12,7 +12,6 @@
 #include "parsing/pgn_parser/pgn-parser.hh"
 #include "parsing/perft_parser/perft-object.hh"
 #include "parsing/perft_parser/perft-parser.hh"
-#include "chess_engine/board/magic-bitboard.hh"
 
 using namespace boost::program_options;
 
@@ -166,7 +165,6 @@ namespace option_parser
                 std::cout << desc << '\n'; // print help message
             else
             {
-                board::MagicBitboard::init();
                 if (vm.count("listeners"))
                     load_listerners(listeners_path, manager);
                 if (vm.count("pgn"))
