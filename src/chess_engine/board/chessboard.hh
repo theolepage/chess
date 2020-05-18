@@ -41,25 +41,30 @@ namespace board
         using opt_pos_t = std::optional<Position>;
 
         Chessboard();
-        
+
         Chessboard(const FenObject&);
-        
+
         Chessboard(const std::string& str, const Color& color):
-            Chessboard(parse_perft(str + ((color == Color::WHITE) ? std::string(" w - - 0 0 0") : std::string(" b - - 0 0 0")))) {}
-        
+            Chessboard(parse_perft(str + ((color == Color::WHITE)
+                                           ? std::string(" w - - 0 0 0")
+                                           : std::string(" b - - 0 0 0")))) {}
+
         Chessboard(const PerftObject& perft):
             Chessboard(perft.get_fen()) {}
-        
-        Chessboard(const std::string& fen_string):
-            Chessboard(parse_perft(fen_string + std::string(" w - - 0 0 0"))) {}
 
-        static char sidepiece_to_char(const PieceType piecetype, const Color color);
+        Chessboard(const std::string& fen_string):
+            Chessboard(parse_perft(fen_string + std::string(" w - - 0 0 0"))){}
+
+        static char sidepiece_to_char(const PieceType piecetype,
+                                      const Color color);
         static char sidepiece_to_char(const side_piece_t& sidepiece);
         std::string to_fen_string(void) const;
 
-        const bitboard_t& get_bitboard(const PieceType piecetype, const Color color) const;
+        const bitboard_t& get_bitboard(const PieceType piecetype,
+                                       const Color color) const;
         bitboard_t& get_bitboard(const PieceType piecetype, const Color color);
-        size_t get_bitboard_count(const PieceType piecetype, const Color color) const;
+        size_t get_bitboard_count(const PieceType piecetype,
+                                  const Color color) const;
 
         std::vector<Move> generate_legal_moves(void);
 
@@ -69,7 +74,8 @@ namespace board
 
         // Assume that move is legal
         void do_move(const Move& move);
-        //void undo_move(const Move& move, const option_parser::BoardState& state);
+        // void undo_move(const Move& move,
+        //                const option_parser::BoardState& state);
 
         bool is_move_legal(const Move& move);
         bool is_possible_move_legal(const Move& move) const;
@@ -85,9 +91,13 @@ namespace board
         bool is_draw(const std::vector<board::Move>& legal_moves);
 
         opt_piece_t operator[](const Position& position) const override;
-        std::bitset<width> operator()(const Rank rank, const PieceType piece, const Color color) const;
-        opt_piece_t operator()(const Position& position, const PieceType& piece, const Color& color) const;
-        void move_piece(const Position& start, const Position& end, const PieceType piecetype, const Color color);
+        std::bitset<width> operator()(const Rank rank, const PieceType piece,
+                                      const Color color) const;
+        opt_piece_t operator()(const Position& position,
+                               const PieceType& piece,
+                               const Color& color) const;
+        void move_piece(const Position& start, const Position& end,
+                        const PieceType piecetype, const Color color);
 
         opt_pos_t get_en_passant() const;
 
@@ -98,10 +108,11 @@ namespace board
         bool get_queen_castling(const Color& color) const;
         void set_king_castling(const Color& color, bool state);
         void set_queen_castling(const Color& color, bool state);
-        
+
         Position get_king_position(void) const;
 
-        friend std::ostream& operator<<(std::ostream& os, const Chessboard& board);
+        friend std::ostream& operator<<(std::ostream& os,
+                                        const Chessboard& board);
 
         bool operator==(const Chessboard& rhs) const
         {
@@ -128,7 +139,7 @@ namespace board
         std::array<bitboard_t, nb_pieces> black_bitboards_;
 
         // a hash table which key corresponds to a fen string representing
-        // a state of the board and which value is the number of occurences
+        // a state of the board and which value is the number of occurrences
         // of this state during the game
         std::unordered_map<std::string, short> state_count_;
 
@@ -149,12 +160,16 @@ namespace board
 
         void register_state();
 
-        void set_piece(const Position& pos, const PieceType piecetype, const Color color);
-        void unset_piece(const Position& pos, const PieceType piecetype, const Color color);
-        void change_piece_type(const Position& pos, const PieceType old_type, const PieceType new_type, const Color color);
+        void set_piece(const Position& pos, const PieceType piecetype,
+                       const Color color);
+        void unset_piece(const Position& pos, const PieceType piecetype,
+                         const Color color);
+        void change_piece_type(const Position& pos, const PieceType old_type,
+                               const PieceType new_type, const Color color);
 
         void init_end_ranks(const PieceType piecetype, const File file);
-        void symetric_init_end_ranks(const PieceType piecetype, const File file);
+        void symetric_init_end_ranks(const PieceType piecetype,
+                                     const File file);
 
         unsigned get_point_value(const Color color) const;
 
@@ -192,7 +207,8 @@ namespace board
                     const PieceType piecetype = curr_piece.value().first;
                     const Color piece_color = curr_piece.value().second;
 
-                    os << Chessboard::sidepiece_to_char(piecetype, piece_color);
+                    os << Chessboard::sidepiece_to_char(piecetype,
+                                                        piece_color);
                 }
                 else
                     os << empty_cell_char;

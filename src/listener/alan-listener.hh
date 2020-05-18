@@ -71,7 +71,8 @@ namespace listener
                                     const board::Position& from,
                                     const board::Position& to)
         {
-            cout << "[PIECE_MOVE] piece moved : " << piece_name(piece) << " from " << from << " to " << to << endl;
+            cout << "[PIECE_MOVE] piece moved : " << piece_name(piece)
+                 << " from " << from << " to " << to << endl;
             print_board();
         }
 
@@ -85,7 +86,8 @@ namespace listener
         virtual void on_piece_taken(const board::PieceType piece,
                                     const board::Position& at)
         {
-            cout << "[PIECE_TAKEN] piece taken : " << static_cast<int>(piece) << " at " << at << endl;
+            cout << "[PIECE_TAKEN] piece taken : " << static_cast<int>(piece)
+                 << " at " << at << endl;
             print_board();
         }
 
@@ -99,21 +101,24 @@ namespace listener
         virtual void on_piece_promoted(const board::PieceType piece,
                                        const board::Position& at)
         {
-            cout << "[PROMOTION] of type " << static_cast<int>(piece) << " at " << at << endl;
+            cout << "[PROMOTION] of type " << static_cast<int>(piece)
+                 << " at " << at << endl;
             print_board();
         }
 
 
         virtual void on_kingside_castling(const board::Color color)
         {
-            cout << "[KING_CASTLING] player :" << static_cast<int>(color) << endl;
+            cout << "[KING_CASTLING] player :" << static_cast<int>(color)
+                 << endl;
             print_board();
         }
 
 
         virtual void on_queenside_castling(const board::Color color)
         {
-            cout << "[QUEEN_CASTLING] player :" << static_cast<int>(color) << endl;
+            cout << "[QUEEN_CASTLING] player :" << static_cast<int>(color)
+                 << endl;
             print_board();
         }
 
@@ -139,7 +144,8 @@ namespace listener
 
         virtual void on_player_disqualified(const board::Color color)
         {
-            std::cout << "[DISQUALIFIED] player :" << static_cast<int>(color) << endl;
+            std::cout << "[DISQUALIFIED] player :" << static_cast<int>(color)
+                      << endl;
             print_board();
         }
 

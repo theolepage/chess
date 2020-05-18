@@ -85,7 +85,7 @@ TEST(rule, have_pieces_between_simple_2)
 TEST(rule, get_authorized_pos_simple)
 {
     Chessboard board = Chessboard();
-    
+
     std::vector<Position> rook = get_authorized_pos(board, PieceType::ROOK, Position(File::A, Rank::ONE));
     std::vector<Position> knight = get_authorized_pos(board, PieceType::KNIGHT, Position(File::B, Rank::ONE));
     std::vector<Position> king = get_authorized_pos(board, PieceType::KING, Position(File::E, Rank::ONE));
@@ -100,7 +100,7 @@ TEST(rule, get_authorized_pos_simple)
 TEST(rule, get_possible_move_pawn)
 {
     Chessboard board = Chessboard();
-    
+
     std::optional<Move> forward_1 = get_possible_move(board,
         PieceType::PAWN,
         Color::BLACK,
@@ -120,7 +120,7 @@ TEST(rule, get_possible_move_pawn)
 TEST(rule, get_possible_move_knight)
 {
     Chessboard board = Chessboard();
-    
+
     std::optional<Move> forward_1 = get_possible_move(board,
         PieceType::KNIGHT,
         Color::BLACK,
@@ -140,7 +140,7 @@ TEST(rule, get_possible_move_knight)
 TEST(rule, get_possible_move_queen)
 {
     Chessboard board = Chessboard();
-    
+
     std::optional<Move> forward_1 = get_possible_move(board,
         PieceType::QUEEN,
         Color::BLACK,
@@ -160,7 +160,7 @@ TEST(rule, get_possible_move_queen)
 TEST(rule, register_castling_simple)
 {
     Chessboard board = Chessboard();
-    
+
     std::optional<Move> king = register_castling(board, Color::BLACK, true);
     std::optional<Move> queen = register_castling(board, Color::BLACK, false);
 

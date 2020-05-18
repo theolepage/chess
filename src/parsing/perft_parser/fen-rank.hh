@@ -26,26 +26,32 @@ namespace perft_parser
             {
                 if (isupper(c))
                 {
-                    pieces_.emplace_back(opt_piece_t(side_piece_t(getPiece(c), board::Color::WHITE)));
+                    pieces_.emplace_back(opt_piece_t(side_piece_t(getPiece(c),
+                                                     board::Color::WHITE)));
                 }
                 else if (isdigit(c))
                 {
                     const int val = c - '0'; // Move index of value
-                    for (int j = 0; j < val; ++j) pieces_.emplace_back(std::nullopt);
+                    for (int j = 0; j < val; ++j)
+                        pieces_.emplace_back(std::nullopt);
                 }
                 else
                 {
                     assert(islower(c));
-                    pieces_.emplace_back(opt_piece_t(side_piece_t(getPiece(c), board::Color::BLACK)));
+                    pieces_.emplace_back(opt_piece_t(side_piece_t(
+                        getPiece(c), board::Color::BLACK)));
                 }
             }
         }
 
-        /** 
+        /**
         * For tests purpose
         */
         FenRank(const std::vector<opt_piece_t>& pieces) : pieces_(pieces) {}
-        bool operator==(const FenRank& rhs) const { return pieces_ == rhs.pieces_; }
+        bool operator==(const FenRank& rhs) const
+        {
+            return pieces_ == rhs.pieces_;
+        }
 
         opt_piece_t operator[](const board::File& file) const
         {

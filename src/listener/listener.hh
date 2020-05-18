@@ -136,13 +136,13 @@ namespace listener
     ** implementation.
     */
 
-#define LISTENER_EXPORT(TYPE)                                                  \
-    extern "C"                                                                 \
-    {                                                                          \
-        Listener* listener_create()                                            \
-        {                                                                      \
-            return new TYPE();                                                 \
-        }                                                                      \
+#define LISTENER_EXPORT(TYPE)                                                 \
+    extern "C"                                                                \
+    {                                                                         \
+        Listener* listener_create()                                           \
+        {                                                                     \
+            return new TYPE();                                                \
+        }                                                                     \
     }
 
 } // namespace listener

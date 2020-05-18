@@ -19,10 +19,10 @@ namespace perft_parser
                     board::Color& side_to_move,
                     std::vector<char>& castling,
                     std::optional<board::Position> en_passant) : ranks_(ranks),
-                                                          side_to_move_(side_to_move),
-                                                          castling_(castling),
-                                                          en_passant_target_(en_passant)
-                                                          {}
+                    side_to_move_(side_to_move),
+                    castling_(castling),
+                    en_passant_target_(en_passant)
+                    {}
 
         FenObject() = default;
         FenObject& operator=(const FenObject&) = default;
@@ -43,7 +43,10 @@ namespace perft_parser
 
         board::Color side_to_move_to_get(void) const { return side_to_move_; }
         std::vector<char> castling_get(void) const { return castling_; }
-        std::optional<board::Position> en_passant_target_get(void) const { return en_passant_target_; }
+        std::optional<board::Position> en_passant_target_get(void) const
+        {
+            return en_passant_target_;
+        }
 
 
     private:
