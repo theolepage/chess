@@ -22,34 +22,73 @@ def first(couple):
 def second(couple):
     return couple[1]
 
+# Construct a list of all the possible unordered couples in list
+def n_choose_2(list):
+    if len(list) == 0:
+        return []
+
+    couples_with_first = []
+
+    first, rest = list[0], list[1:]
+
+    for elt in rest:
+        couples_with_first.append((first, elt))
+
+    return couples_with_first + n_choose_2(rest)
+
 def index_by_key(list, elt, key=identity):
     list_with_key_applied = [key(list[i]) for i in range(len(list))]
 
     return list_with_key_applied.index(elt)
 
-def distance(list1, list2, key=identity):
-    distance = 0
+def fens_have_same_order(fen_couple, fen_and_value_couples_1, fen_and_value_couples_2):
+    first_fen, second_fen = fen_couple
 
-    # We put the indexes difference to the square because the bigger the
-    # difference is, the more we want to exacerbate it
-    for i in range(len(list1)):
-        distance += (index_by_key(list2, first(list1[i]), key=key) - i) ** 2
+    first_fen_index_1 = index_by_key(fen_and_value_couples_1, first_fen, key=first)
+    second_fen_index_1 = index_by_key(fen_and_value_couples_1, second_fen, key=first)
 
-    return distance
+    first_fen_index_2 = index_by_key(fen_and_value_couples_2, first_fen, key=first)
+    second_fen_index_2 = index_by_key(fen_and_value_couples_2, second_fen, key=first)
 
-def cmp_eval_functions(eval_fun_1, eval_fun_2):
-    fen_and_value_couples_1 = [(fen, eval_fun_1(fen)) for fen in fen_strings]
-    fen_and_value_couples_2 = [(fen, eval_fun_2(fen)) for fen in fen_strings]
+    return (first_fen_index_1 <= second_fen_index_1 and first_fen_index_2 <= second_fen_index_2) \
+        or (second_fen_index_1 <= first_fen_index_1 and second_fen_index_2 <= first_fen_index_2)
 
-    fen_and_value_couples_1.sort(key=second)
-    fen_and_value_couples_2.sort(key=second)
+# Assumes that the couples are sorted by value
+def dissonances(fen_and_ref_value_couples, fen_and_value_couples):
+    dissonances = []
 
-    print(fen_and_value_couples_1)
-    print(fen_and_value_couples_2)
+    for fen_couple in n_choose_2(fen_strings):
+        if not fens_have_same_order(fen_couple, fen_and_ref_value_couples, fen_and_value_couples):
+            first_fen, second_fen = fen_couple
 
-    return distance(fen_and_value_couples_1, fen_and_value_couples_2, key=first)
+            first_fen_ref_index = index_by_key(fen_and_ref_value_couples, first_fen, key=first)
+            second_fen_ref_index = index_by_key(fen_and_ref_value_couples, second_fen, key=first)
+
+            first_fen_index = index_by_key(fen_and_value_couples, first_fen, key=first)
+            second_fen_index = index_by_key(fen_and_value_couples, second_fen, key=first)
+
+            dissonances.append({'fen_string_1': first_fen,
+                                'fen_string_1_ref_value': second(fen_and_ref_value_couples[first_fen_ref_index]),
+                                'fen_string_1_value': second(fen_and_value_couples[first_fen_index]),
+                                'fen_string_2': second_fen,
+                                'fen_string_2_ref_value': second(fen_and_ref_value_couples[second_fen_ref_index]),
+                                'fen_string_2_value': second(fen_and_value_couples[second_fen_index])})
+
+    return dissonances
 
 def evaluate_eval_fun(eval_fun):
-    return cmp_eval_functions(ref_eval, eval_fun)
+    fen_and_ref_value_couples = [(fen, ref_eval(fen)) for fen in fen_strings]
+    fen_and_value_couples = [(fen, eval_fun(fen)) for fen in fen_strings]
+
+    fen_and_ref_value_couples.sort(key=second)
+    fen_and_value_couples.sort(key=second)
+
+    # FIMXE
+    print(fen_and_ref_value_couples)
+    print(fen_and_value_couples)
+
+    dissonance_list = dissonances(fen_and_ref_value_couples, fen_and_value_couples)
+
+    return (len(dissonance_list), dissonance_list)
 
 print(evaluate_eval_fun(eval))
