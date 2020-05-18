@@ -87,10 +87,15 @@ namespace ai
 
     // NOTE Should follow the exact same order than piecetype_array
     // in piece-type.hh
-    constexpr std::array<piece_square_table_t, nb_pieces> piece_square_tables = {
-    piece_square_table_queen, piece_square_table_rook, piece_square_table_bishop,
-    piece_square_table_knight, piece_square_table_pawn, piece_square_table_king
-};
+    constexpr std::array<piece_square_table_t, nb_pieces>
+            piece_square_tables = {
+                                   piece_square_table_queen,
+                                   piece_square_table_rook,
+                                   piece_square_table_bishop,
+                                   piece_square_table_knight,
+                                   piece_square_table_pawn,
+                                   piece_square_table_king
+                                   };
 
     int evaluate(const board::Chessboard& board);
 }

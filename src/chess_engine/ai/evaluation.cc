@@ -13,12 +13,15 @@ namespace ai
 
         for (auto piecetype : piecetype_array)
         {
-            const bitboard_t& white_bitboard = board.get_bitboard(piecetype, Color::WHITE);
-            const bitboard_t& black_bitboard = board.get_bitboard(piecetype, Color::BLACK);
+            const bitboard_t& white_bitboard =
+                    board.get_bitboard(piecetype, Color::WHITE);
+            const bitboard_t& black_bitboard =
+                    board.get_bitboard(piecetype, Color::BLACK);
 
             const auto piecetype_i = utils::utype(piecetype);
             const auto piecetype_value = piecetype_values[piecetype_i];
-            const auto& piecetype_square_table = piece_square_tables[piecetype_i];
+            const auto& piecetype_square_table =
+                    piece_square_tables[piecetype_i];
 
             for (size_t rank_i = 0; rank_i < width; rank_i++)
             {

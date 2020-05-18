@@ -22,7 +22,8 @@ namespace listener
             }
         }
 
-        virtual opt_piece_t operator[](const board::Position& position) const override
+        virtual opt_piece_t operator[](
+                const board::Position& position) const override
         {
             return chessboard_[position];
         }

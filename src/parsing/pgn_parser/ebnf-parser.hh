@@ -22,10 +22,14 @@ namespace pgn_parser
     std::string move_to_string(const board::Move& move)
     {
         std::string result;
-        result.push_back((char)(utils::utype(move.start_get().get_file()) + 'a'));
-        result.push_back((char)(utils::utype(move.start_get().get_rank()) + '1'));
-        result.push_back((char)(utils::utype(move.end_get().get_file()) + 'a'));
-        result.push_back((char)(utils::utype(move.end_get().get_rank()) + '1'));
+        result.push_back((char)(utils::utype(move.start_get().get_file())
+                                + 'a'));
+        result.push_back((char)(utils::utype(move.start_get().get_rank())
+                                + '1'));
+        result.push_back((char)(utils::utype(move.end_get().get_file())
+                                + 'a'));
+        result.push_back((char)(utils::utype(move.end_get().get_rank())
+                                + '1'));
         if (move.promotion_get().has_value())
         {
             switch(move.promotion_get().value())
@@ -68,21 +72,25 @@ namespace pgn_parser
         return PieceType::KING;
     }
 
-    board::Move string_to_move(const board::Chessboard& chessboard, const std::string& str_move)
+    board::Move string_to_move(const board::Chessboard& chessboard,
+                               const std::string& str_move)
     {
         assert(str_move.size() == 4 || str_move.size() == 5);
-        const board::Position start(static_cast<uint8_t>(str_move.at(0) - 'a'), (static_cast<uint8_t>(str_move.at(1) - '1')));
-        const board::Position end(static_cast<uint8_t>(str_move.at(2) - 'a'), (static_cast<uint8_t>(str_move.at(3) - '1')));
-        opt_piece_t promotion = (str_move.size() == 5) ?
-                                std::optional<PieceType>(get_piece(str_move.at(4))) :
-                                std::optional<PieceType>(std::nullopt);
+        const board::Position start(static_cast<uint8_t>(str_move.at(0) - 'a'),
+                (static_cast<uint8_t>(str_move.at(1) - '1')));
+        const board::Position end(static_cast<uint8_t>(str_move.at(2) - 'a'),
+                (static_cast<uint8_t>(str_move.at(3) - '1')));
+        opt_piece_t promotion = (str_move.size() == 5)
+                                ? std::optional<PieceType>(
+                                        get_piece(str_move.at(4)))
+                                : std::optional<PieceType>(std::nullopt);
 
         auto op_piece = chessboard[start];
         assert(op_piece.has_value());
         const PieceType piece = op_piece.value().first;
         const bool double_pawn_push = (piece == board::PieceType::PAWN)
-                                        && (std::abs(utils::utype(start.get_rank())
-                                            - utils::utype(end.get_rank())) == 2);
+                && (std::abs(utils::utype(start.get_rank())
+                        - utils::utype(end.get_rank())) == 2);
         bool queen_castling = false;
         bool king_castling = false;
 
@@ -110,17 +118,22 @@ namespace pgn_parser
             }
         }
 
+        // The pawn moved diagonally He moved diagonally yet there is no pawn
+        // where he moved (tiens tiens tiens)
         const bool en_passant = piece == board::PieceType::PAWN
-                                && start.get_file() != end.get_file() // The pawn moved diagonally
-                                && !chessboard[end].has_value(); // He moved diagonally yet there is no pawn where he moved (tiens tiens tiens)
+                                && start.get_file() != end.get_file()
+                                && !chessboard[end].has_value();
 
         const bool capture = en_passant || chessboard[end].has_value();
-        return Move(start, end, piece, capture, double_pawn_push, queen_castling, king_castling, en_passant, promotion);
+        return Move(start, end, piece, capture, double_pawn_push,
+                    queen_castling, king_castling, en_passant, promotion);
     }
 
-    void add_move_to_board(board::Chessboard& chessboard, const std::string& string_board)
+    void add_move_to_board(board::Chessboard& chessboard,
+                           const std::string& string_board)
     {
-        static bool first = true; // TODO find way better when know how protocols works
+        // TODO find way better when know how protocols works
+        static bool first = true;
         static constexpr std::string_view startpos = "startpos";
         static constexpr std::string_view move_str = "moves";
         std::vector<std::string> tokens;
@@ -139,8 +152,10 @@ namespace pgn_parser
             }
         }
 
-        if ((tokens.size() > 2 && tokens.at(1) == startpos && tokens.at(2) == move_str) // Case position start_pos moves
-            || (tokens.size() > 8 && tokens.at(8) == move_str)) // Case position fen_string param param param moves
+        if ((tokens.size() > 2 && tokens.at(1) == startpos
+             && tokens.at(2) == move_str) // Case position start_pos moves
+            || (tokens.size() > 8 && tokens.at(8) == move_str))
+                // Case position fen_string param param param moves
         {
             const std::string last_move = tokens.back();
             chessboard.do_move(string_to_move(chessboard, last_move));

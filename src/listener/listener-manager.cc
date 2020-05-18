@@ -7,12 +7,17 @@
 #include "chess_engine/board/piece-type.hh"
 
 #define NOTIFY(FUNC) for (auto listener : listeners_) listener->FUNC
-#define GET_COLOR() chessboard_.get_white_turn() ? board::Color::WHITE : board::Color::BLACK
-#define GET_OTHER_COLOR() chessboard_.get_white_turn() ? board::Color::BLACK : board::Color::WHITE
+#define GET_COLOR() chessboard_.get_white_turn()\
+                    ? board::Color::WHITE\
+                    : board::Color::BLACK
+#define GET_OTHER_COLOR() chessboard_.get_white_turn()\
+                    ? board::Color::BLACK\
+                    : board::Color::WHITE
 
 namespace listener
 {
-    void ListenerManager::notify_move(board::Move move, opt_piece_t taken_piece) const
+    void ListenerManager::notify_move(board::Move move,
+                                      opt_piece_t taken_piece) const
     {
         NOTIFY(on_piece_moved(move.piece_get(), move.start_get(),
                                     move.end_get()));
@@ -64,15 +69,6 @@ namespace listener
         if (!chessboard_.is_move_legal(move))
         {
             NOTIFY(on_player_disqualified(GET_COLOR()));
-            // TODO REMOVE THIS
-            //#ifdef DEBUG
-            /*std::cout << "[DIQUALIFYING MOVE] : " << move << std::endl;
-            opt_piece_t possibly_taken_piece = std::nullopt;
-            if (move.capture_get()) //FIXME better way ?
-                possibly_taken_piece.emplace(chessboard_[move.end_get()].value());
-            chessboard_.do_move(move);
-            notify_move(move, possibly_taken_piece);*/
-            //#endif
             return false;
         }
         opt_piece_t possibly_taken_piece = std::nullopt;
@@ -93,7 +89,8 @@ namespace listener
         return notify_board_state();
     }
 
-    void ListenerManager::play_pgn_moves(const std::vector<board::PgnMove> moves)
+    void ListenerManager::play_pgn_moves(
+            const std::vector<board::PgnMove> moves)
     {
         NOTIFY(register_board(chessboard_));
 
