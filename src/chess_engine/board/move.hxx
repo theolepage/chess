@@ -33,7 +33,8 @@ namespace board
             king_castling_ == move.king_castling_ &&
             en_passant_ == move.en_passant_;
         if (promotion_.has_value())
-            return almost_equal && promotion_.value() == move.promotion_.value();
+            return almost_equal
+                    && promotion_.value() == move.promotion_.value();
         return almost_equal;
     }
 

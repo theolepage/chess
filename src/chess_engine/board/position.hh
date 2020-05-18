@@ -60,7 +60,8 @@ namespace board
         {
             assert(islower(file) && isdigit(rank));
             file_ = static_cast<File>(file - 'a');
-            rank_ =  static_cast<Rank>(rank - '0' - 1); // + 1 cause ONE corresponds to 0
+            rank_ =  static_cast<Rank>(rank - '0' - 1); // + 1 because ONE
+                                                        // corresponds to 0
         }
         Position& operator=(const Position& position) = default;
 

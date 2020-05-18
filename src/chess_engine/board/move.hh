@@ -46,9 +46,12 @@ namespace board
                  const bool king_castling,
                  const bool en_passant,
                  const opt_piece_t &promotion);
-        Move get_reverse(void) const // Reverse start and end, doesn't compile if placed in hxx
+        // Reverse start and end, doesn't compile if placed in hxx
+        Move get_reverse(void) const
         {
-            return Move(end_, start_, piece_, capture_, double_pawn_push_, queen_castling_, king_castling_, en_passant_, promotion_);
+            return Move(end_, start_, piece_, capture_, double_pawn_push_,
+                        queen_castling_, king_castling_, en_passant_,
+                        promotion_);
         }
 
         friend std::ostream& operator<<(std::ostream& os, const Position& pos);

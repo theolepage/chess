@@ -13,7 +13,7 @@ using namespace board;
 namespace rule
 {
     bool is_king_checked(const Chessboard& board);
-    
+
     bool have_pieces_between(const Chessboard& board,
                               const Position& x,
                               const Position& y);
@@ -24,7 +24,7 @@ namespace rule
 
     std::vector<Position> get_positions_between(const Position& x,
                                                 const Position& y);
-    
+
     std::vector<Position> get_authorized_pos(const Chessboard& board,
                                              const PieceType& piece,
                                              const Position& from);

@@ -33,7 +33,8 @@ namespace board
         if (new_file < 0 || new_rank < 0 || new_file >= 8 || new_rank >= 8)
             return std::nullopt;
 
-        return Position(static_cast<File>(new_file), static_cast<Rank>(new_rank));
+        return Position(static_cast<File>(new_file),
+                        static_cast<Rank>(new_rank));
     }
 
     inline std::ostream& operator<<(std::ostream& os, const Position& pos)
