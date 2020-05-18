@@ -21,6 +21,11 @@ namespace uci
      */
     void play_move(const std::string& move);
 
+    /** Send score info to GUI
+     * score: int
+     */
+    void info(const int evaluation_score);
+
     /** Receive and return the command describing a board state
      * Format: position [startpos | fen FEN] (moves ...)
      * Eg:

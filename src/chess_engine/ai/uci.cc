@@ -38,6 +38,12 @@ namespace uci
         std::cout << "bestmove " << move << std::endl;
     }
 
+    void info(const int evaluation_score)
+    {
+        // Send the computed move
+        std::cout << "info score cp " << evaluation_score << std::endl;
+    }
+
     std::string get_board()
     {
         auto board = get_input("position *"); // Get the board
