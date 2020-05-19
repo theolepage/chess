@@ -1,8 +1,30 @@
 /*
  * To-Do
- * - [ ] Handle queen, king, pawn, knight
- * - [ ] Computations at compile time?
- * - [ ] Link MagicBitboard with engine
+ * 
+ * board.cc/hh
+ * - [X] get(PieceType)
+ * - [X] get(Color)
+ * - [ ] get(PieceType, Color)
+ * 
+ * move-initialization.cc/hh
+ * - [X] init rays
+ * - [X] init bishop and rook masks
+ * - [X] init bishop and rook attacks
+ * - [ ] init pawn, king, knight masks
+ * - [ ] rename class, singleton?
+ * - [ ] create getters (queen = bishop | rook)
+ * 
+ * move-generation.cc
+ * - [ ] Apply & ~own to results from move-initialization
+ * - [ ] Pawns: promotion, en passant, double pawn push
+ * - [ ] Kings: castling
+ * - [ ] All: non attacks, attacks
+ * - [ ] getters: generate_all_moves(), generate_piece_moves(PieceType)
+ * 
+ * chessboard.cc/hh
+ * - [ ] position_threatened()
+ * - [ ] is_check()
+ * 
 */
 
 #pragma once
