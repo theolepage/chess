@@ -7,9 +7,6 @@ import chess
 import chess.engine
 import sys
 
-def dummy_fen_to_perft(fen_string):
-    return fen_string + " b - - 0 1"
-
 def perft_eval(perft_string, engine_path):
     """ give the evaluation of the perft board from the given engine (in centipawns)"""
 
@@ -27,9 +24,6 @@ def perft_eval(perft_string, engine_path):
 
     # return evaluation score in centipawns
     return info["score"]
-
-def fen_eval(fen_string, engine_path):
-    return perft_eval(dummy_fen_to_perft, engine_path)
 
 if __name__ == "__main__":
     """ This script launch fen_eval """
