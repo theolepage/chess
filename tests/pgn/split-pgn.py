@@ -4,8 +4,6 @@ import functools
 import chess
 import chess.pgn
 
-pgn="Adams.pgn"
-
 def line_is_a_comment(line):
     return line.startswith("[")
 
@@ -66,12 +64,9 @@ def generate_perfts(pgn_path):
         perft_string = pgn_string_to_perft_string(pgn_section)
         perft_path = os.path.splitext(pgn_path)[0] + "_" + str(i + 1) + ".perft"
         with open(perft_path, "w") as perft_file:
-            # eval-evaluation.py takes a perft string without
-            # its last number
+            # eval-evaluation.py takes a perft string without its last number
             perft_file.write(cut_last_word(perft_string))
 
-
-generate_perfts(pgn)
     # for filename in os.listdir(pgn_directory):
     #     if filename.endswith(".pgn"):
     #         pgn_path = pgn_directory + filename
