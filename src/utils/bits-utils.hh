@@ -4,6 +4,11 @@
 
 namespace utils
 {
+    inline int is_bit_set(const uint64_t bit, const int index)
+    {
+        return (bit >> index) & 1ULL;
+    }
+
     // Get the least significant bit position and remove it from n
     inline int pop_lsb(uint64_t& n)
     {

@@ -1,5 +1,4 @@
 #include "chessboard.hh"
-
 #include "parsing/option_parser/option-parser.hh"
 #include "rule.hh"
 #include "entity/piece-type.hh"
@@ -13,127 +12,6 @@
 
 namespace board
 {
-    using side_piece_t = std::pair<PieceType, Color>;
-    using opt_piece_t = std::optional<side_piece_t>;
-    using opt_pos_t = std::optional<board::Position>;
-
-    const Chessboard::bitboard_t& Chessboard::get_bitboard(PieceType piecetype,
-                                                           Color color) const
-    {
-        const auto piecetype_i = utils::utype(piecetype);
-
-        return color == Color::WHITE ?
-            white_bitboards_[piecetype_i] :
-            black_bitboards_[piecetype_i];
-    }
-
-    // TODO can we do better than code duplication ?
-    Chessboard::bitboard_t& Chessboard::get_bitboard(PieceType piecetype,
-                                                     Color color)
-    {
-        const auto piecetype_i = utils::utype(piecetype);
-
-        return color == Color::WHITE ?
-            white_bitboards_[piecetype_i] :
-            black_bitboards_[piecetype_i];
-    }
-
-    size_t Chessboard::get_bitboard_count(const PieceType piecetype,
-                                          const Color color) const
-    {
-        const bitboard_t& bitboard = get_bitboard(piecetype, color);
-
-        size_t count = 0;
-
-        for (const auto& line : bitboard)
-            count += line.count();
-
-        return count;
-    }
-
-    void Chessboard::set_piece(const Position& pos,
-                                const PieceType piecetype,
-                                const Color color)
-    {
-        bitboard_t& piece_bitboard = get_bitboard(piecetype, color);
-
-        const auto pos_rank_i = utils::utype(pos.get_rank());
-        const auto pos_file_i = utils::utype(pos.get_file());
-
-        piece_bitboard[pos_rank_i].set(pos_file_i);
-    }
-
-    void Chessboard::unset_piece(const Position& pos,
-                                const PieceType piecetype,
-                                const Color color)
-    {
-        bitboard_t& piece_bitboard = get_bitboard(piecetype, color);
-
-        const auto pos_rank_i = utils::utype(pos.get_rank());
-        const auto pos_file_i = utils::utype(pos.get_file());
-
-        piece_bitboard[pos_rank_i].reset(pos_file_i);
-    }
-
-    void Chessboard::move_piece(const Position& start,
-                                const Position& end,
-                                const PieceType piecetype,
-                                const Color color)
-    {
-        unset_piece(start, piecetype, color);
-        set_piece(end, piecetype, color);
-    }
-
-    void Chessboard::change_piece_type(const Position& pos,
-                                        const PieceType old_type,
-                                        const PieceType new_type,
-                                        const Color color)
-    {
-        unset_piece(pos, old_type, color);
-        set_piece(pos, new_type, color);
-    }
-
-    void Chessboard::init_end_ranks(const PieceType piecetype, const File file)
-    {
-        constexpr Rank white_end_rank = Rank::ONE;
-        constexpr Rank black_end_rank = Rank::EIGHT;
-
-        set_piece(Position(file, white_end_rank), piecetype, Color::WHITE);
-        set_piece(Position(file, black_end_rank), piecetype, Color::BLACK);
-    }
-
-    File symetric_file(const File file)
-    {
-        switch (file)
-        {
-        case File::A:
-            return File::H;
-        case File::B:
-            return File::G;
-        case File::C:
-            return File::F;
-        case File::D:
-            return File::E;
-        case File::E:
-            return File::D;
-        case File::F:
-            return File::C;
-        case File::G:
-            return File::B;
-        case File::H:
-            return File::A;
-        default:
-            throw std::invalid_argument("Unknown file");
-        }
-    }
-
-    void Chessboard::symetric_init_end_ranks(const PieceType piecetype,
-                                             const File file)
-    {
-        init_end_ranks(piecetype, file);
-        init_end_ranks(piecetype, symetric_file(file));
-    }
-
     Chessboard::Chessboard()
     {
         white_turn_ = true;
@@ -210,17 +88,25 @@ namespace board
         register_state();
     }
 
-    char Chessboard::sidepiece_to_char(const PieceType piecetype,
-                                       const Color color)
-    {
-        const char piece_char = piece_to_char(piecetype);
+    Chessboard::Chessboard(const std::string& str, const Color& color)
+            : Chessboard(parse_perft(str + ((color == Color::WHITE)
+                                           ? std::string(" w - - 0 0 0")
+                                           : std::string(" b - - 0 0 0"))))
+    {}
 
-        return color == Color::WHITE ? piece_char : tolower(piece_char);
-    }
+    Chessboard::Chessboard(const PerftObject& perft)
+            : Chessboard(perft.get_fen())
+    {}
+
+    Chessboard::Chessboard(const std::string& fen_string)
+            : Chessboard(parse_perft(fen_string + std::string(" w - - 0 0 0")))
+    {}
 
     char Chessboard::sidepiece_to_char(const side_piece_t& sidepiece)
     {
-        return sidepiece_to_char(sidepiece.first, sidepiece.second);
+        const char piece_char = piece_to_char(sidepiece.first);
+
+        return sidepiece.second == Color::WHITE ? piece_char : tolower(piece_char);
     }
 
     std::ostream& Chessboard::write_fen_rank(std::ostream& os,
@@ -306,7 +192,6 @@ namespace board
         return legal_moves;
     }
 
-    // FIXME
     bool Chessboard::has_legal_moves()
     {
         return !generate_legal_moves().empty();
@@ -556,45 +441,15 @@ namespace board
 
     bool Chessboard::is_possible_move_legal(const Move& move) const
     {
-        // TODO try do undo
         Chessboard board_copy = *this;
         board_copy.do_move(move);
         board_copy.white_turn_ = !board_copy.white_turn_;
         return !board_copy.is_check();
-
-        /*option_parser::BoardState state;
-        fill_state(move, *this, state);
-
-        do_move(move);
-        white_turn_ = !white_turn_;
-        bool no_checked = !is_check();
-        white_turn_ = !white_turn_;
-        undo_move(move, state);
-        turn_ -= 2; // We called do_move 2 times
-
-        return no_checked;*/
     }
 
     bool Chessboard::is_move_legal(const Move& move)
     {
         return is_move_possible(move) && is_possible_move_legal(move);
-    }
-
-    Position Chessboard::get_king_position(void) const
-    {
-        const auto king_color = white_turn_ ? Color::WHITE : Color::BLACK;
-        const bitboard_t& king_bitboard = get_bitboard(PieceType::KING,
-                                                       king_color);
-
-        size_t rank_i = 0;
-        while (king_bitboard[rank_i].none())
-            rank_i++;
-
-        size_t file_i = 0;
-        while (!king_bitboard[rank_i][file_i])
-            file_i++;
-
-        return Position(static_cast<File>(file_i), static_cast<Rank>(rank_i));
     }
 
     bool Chessboard::is_check(void)
@@ -689,48 +544,57 @@ namespace board
 
     Chessboard::opt_piece_t Chessboard::operator[](const Position& pos) const
     {
-        static constexpr auto colors = {Color::WHITE, Color::BLACK};
-        const size_t rank_i = utils::utype(pos.get_rank());
-        const size_t file_i = utils::utype(pos.get_file());
+        return bitboards_[pos];
+    }
 
-        for (const auto piecetype : piecetype_array)
+    bool Chessboard::operator==(const Chessboard& rhs) const
+    {
+        return white_king_castling_ == rhs.white_king_castling_
+            && white_queen_castling_ == rhs.white_queen_castling_
+            && black_king_castling_ == rhs.black_king_castling_
+            && black_queen_castling_ == rhs.black_queen_castling_
+            && white_bitboards_ == rhs.white_bitboards_
+            && black_bitboards_ == rhs.black_bitboards_
+            && white_turn_ == rhs.white_turn_
+            && en_passant_ == rhs.en_passant_
+            && turn_ == rhs.turn_
+            && last_fifty_turn_ == rhs.last_fifty_turn_;
+    }
+
+    std::ostream& Chessboard::operator<<(std::ostream& os, const Chessboard& board)
+    {
+        constexpr std::string_view sep = " ";
+
+        for (int rank_i = Chessboard::width - 1; rank_i >= 0; rank_i--)
         {
-            for (const auto color : colors)
+            os << rank_i + 1;
+            for (size_t file_i = 0; file_i < Chessboard::width; file_i++)
             {
-                const bitboard_t& bitboard = get_bitboard(piecetype, color);
+                const auto file = static_cast<File>(file_i);
+                const auto rank = static_cast<Rank>(rank_i);
+                const auto curr_piece = board[Position(file, rank)];
 
-                if (bitboard[rank_i][file_i])
-                    return std::make_pair(piecetype, color);
+                os << sep;
+
+                if (curr_piece.has_value())
+                {
+                    const PieceType piecetype = curr_piece.value().first;
+                    const Color piece_color = curr_piece.value().second;
+
+                    os << Chessboard::sidepiece_to_char(piecetype,
+                                                        piece_color);
+                }
+                else
+                    os << empty_cell_char;
             }
+
+            os << std::endl;
         }
 
-        return std::nullopt;
-    }
+        os << sep;
+        for (size_t file_i = 0; file_i < Chessboard::width; file_i++)
+            os << sep << char('A' + file_i);
 
-    std::bitset<Chessboard::width> Chessboard::operator()(const Rank rank,
-            const PieceType piece, const Color color) const
-    {
-        if (color == Color::BLACK)
-        {
-            return black_bitboards_[static_cast<uint8_t>(piece)]
-                                   [static_cast<uint8_t>(rank)];
-        }
-        else
-        {
-            return white_bitboards_[static_cast<uint8_t>(piece)]
-                                   [static_cast<uint8_t>(rank)];
-        }
-    }
-
-    Chessboard::opt_piece_t Chessboard::operator()(const Position& pos,
-            const PieceType& piece, const Color& color) const
-    {
-        const size_t rank_i = utils::utype(pos.get_rank());
-        const size_t file_i = utils::utype(pos.get_file());
-        const bitboard_t& bitboard = get_bitboard(piece, color);
-
-        if (bitboard[rank_i][file_i])
-            return std::make_pair(piece, color);
-        return std::nullopt;
+        return os;
     }
 }
