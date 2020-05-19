@@ -13,9 +13,18 @@ namespace board
 
     inline Position::Position(int i)
     {
+        // 10000000
+        // 00000000
+        // 00000000
+        // 00000000
+        // 00000000
+        // 00000000
+        // 00000000
+        // 00000001
+        
         assert(i >= 0 && i < 64);
-        file_ = static_cast<File>(i % 8);
-        rank_ =  static_cast<Rank>(i / 8);
+        rank_ = static_cast<Rank>(i / 8);
+        file_ = static_cast<File>(7 - (i % 8));
     }
 
     inline Position::Position(char file, char rank)
