@@ -84,14 +84,17 @@ namespace rule
                                                const Color& color)
     {
         std::vector<Position> res;
-        for (uint8_t rank = 0; rank < Chessboard::width; ++rank)
+        for (int rank = 0; rank < 8; rank++)
         {
-            const std::bitset<Chessboard::width> line =
-                    board(static_cast<Rank>(rank), piece, color);
-            for (uint8_t file = 0; file < Chessboard::width; ++file)
+            for (int file = 0; file < 8; file++)
             {
-                if (line[file])
-                    res.emplace_back(Position(file, rank));
+                Position pos(file, rank);
+                if (board[pos].has_value()
+                    && board[pos].value().first == piece
+                    && board[pos].value().second == color)
+                {
+                    res.emplace_back(pos);
+                }
             }
         }
         return res;
@@ -237,7 +240,7 @@ namespace rule
         for (size_t i = 0; i < temp_positions.size(); i++)
         {
             const Position step = temp_positions.at(i);
-            board_copy.move_piece(prev_step, step, PieceType::KING, color);
+            board_copy.get_board().move_piece(prev_step, step, PieceType::KING, color);
             if (board_copy.is_check())
                 not_in_check = false;
             prev_step = step;

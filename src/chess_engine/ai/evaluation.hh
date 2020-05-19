@@ -7,7 +7,6 @@ namespace ai
     constexpr size_t width = board::Chessboard::width;
     constexpr size_t nb_pieces = board::nb_pieces;
 
-    using bitboard_t = board::Chessboard::bitboard_t;
     using piece_square_line_t = std::array<int, width>;
     using piece_square_table_t = std::array<piece_square_line_t, width>;
 

@@ -531,6 +531,8 @@ TEST(Draw, Stalemate)
     // This is the subject example
     Chessboard board = Chessboard("8/8/8/1k6/8/b1n5/8/K7", Color::WHITE);
 
+    EXPECT_TRUE(!board.has_legal_moves());
+    EXPECT_TRUE(!board.is_check());
     EXPECT_TRUE(board.is_draw());
     EXPECT_TRUE(board.is_pat());
 }

@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <unordered_map>
 
-#include "bit-boards.hh"
+#include "board.hh"
 #include "chessboard-interface.hh"
 #include "parsing/perft_parser/perft-parser.hh"
 #include "parsing/perft_parser/fen-object.hh"
@@ -39,6 +39,7 @@ namespace board
         Chessboard(const std::string& fen_string);
 
         static char sidepiece_to_char(const side_piece_t& sidepiece);
+        static char sidepiece_to_char(const PieceType& piece, const Color& color);
         std::string to_fen_string(void) const;
 
         std::vector<Move> generate_legal_moves(void);
@@ -56,6 +57,8 @@ namespace board
         bool is_draw(void);
         bool is_draw(const std::vector<board::Move>& legal_moves);
 
+        Board& get_board(void);
+        const Board& get_board(void) const;
         opt_pos_t get_en_passant() const;
         bool get_white_turn() const;
         void set_white_turn(bool state);
@@ -69,8 +72,13 @@ namespace board
         friend std::ostream& operator<<(std::ostream& os,
                                         const Chessboard& board);
 
+        // FIXME: TEMP
+        Position get_king_position(void) const;
+        opt_piece_t operator()(const Position& pos,
+            const PieceType& piece, const Color& color) const;
+
     private:
-        BitBoards bitboards_;
+        Board board_;
 
         // a hash table which key corresponds to a fen string representing
         // a state of the board and which value is the number of occurrences

@@ -3,6 +3,7 @@
 #include <utility>
 #include <cassert>
 #include <iostream>
+#include <optional>
 
 #include "utils/utype.hh"
 

@@ -67,7 +67,6 @@ namespace board
 
     inline int Position::get_index(void) const
     {
-        // 00100000
         // 00000000
         // 00000000
         // 00000000
@@ -75,8 +74,9 @@ namespace board
         // 00000000
         // 00000000
         // 00000000
-        // rank_ = 7     file_ = 2
-    
-        return (7 - static_cast<int>(rank_)) * 8 + static_cast<int>(file_);
+        // 10000000
+        // rank_ = 1(0)     file_ = A(0)
+        // expected = 7 (cause we set the bit at indice 7 aka 8th bit)
+        return static_cast<int>(rank_) * 8 + (7 - static_cast<int>(file_));
     }
 } // namespace board

@@ -1,84 +1,130 @@
 #include <cassert>
 
-#include "bit-boards.hh"
-#include "position.hh"
-#include "color.hh"
+#include "utils/bits-utils.hh"
+#include "board.hh"
+#include "entity/position.hh"
+#include "entity/color.hh"
+
+using namespace utils;
 
 namespace board
 {
-    using side_piece_t = std::pair<PieceType, Color>;
-    using opt_piece_t = std::optional<side_piece_t>;
-    using opt_pos_t = std::optional<Position>;
+    Board::Board()
+    {
+        whites_ = 0ULL;
+        blacks_ = 0ULL;
+        for (int i = 0; i < 6; ++i)
+            pieces_[i] = 0ULL;
+    }
 
-    opt_piece_t Board::operator[](const Position& pos) const
+    void Board::init_default()
+    {
+        for (size_t file_i = 0; file_i < 8; file_i++)
+        {
+            const auto file = static_cast<File>(file_i);
+            set_piece(Position(file, Rank::TWO),
+                      PieceType::PAWN, Color::WHITE);
+            set_piece(Position(file, Rank::SEVEN),
+                      PieceType::PAWN, Color::BLACK);
+        }
+        symetric_init_end_ranks(PieceType::ROOK, File::A);
+        symetric_init_end_ranks(PieceType::KNIGHT, File::B);
+        symetric_init_end_ranks(PieceType::BISHOP, File::C);
+        init_end_ranks(PieceType::QUEEN, File::D);
+        init_end_ranks(PieceType::KING, File::E);
+    }
+
+    Board::opt_piece_t Board::operator[](const Position& pos) const
     {
         const int index = pos.get_index();
-        const bool white = utils::is_bit_set(whites_, index);
-        const bool black = utils::is_bit_set(blacks_, index);
+        const bool white = is_bit_set(whites_, index);
+        const bool black = is_bit_set(blacks_, index);
         if (!white && !black)
             return std::nullopt;
 
         const Color piece_color = ((white) ? Color::WHITE : Color::BLACK);
-        if (utils::is_bit_set(pawns_, index))
-            return opt_piece_t(PieceType::PAWN, piece_color);
-        if (utils::is_bit_set(rooks_, index))
-            return opt_piece_t(PieceType::ROOK, piece_color);
-        if (utils::is_bit_set(knights_, index))
-            return opt_piece_t(PieceType::KNIGHT, piece_color);
-        if (utils::is_bit_set(bishops_, index))
-            return opt_piece_t(PieceType::BISHOP, piece_color);
-        if (utils::is_bit_set(queens_, index))
-            return opt_piece_t(PieceType::QUEEN, piece_color);
-        if (utils::is_bit_set(kings_, index))
-            return opt_piece_t(PieceType::KING, piece_color);
+        if (is_bit_set(get_pawns(), index))
+            return Board::side_piece_t(PieceType::PAWN, piece_color);
+        if (is_bit_set(get_rooks(), index))
+            return Board::side_piece_t(PieceType::ROOK, piece_color);
+        if (is_bit_set(get_knights(), index))
+            return Board::side_piece_t(PieceType::KNIGHT, piece_color);
+        if (is_bit_set(get_bishops(), index))
+            return Board::side_piece_t(PieceType::BISHOP, piece_color);
+        if (is_bit_set(get_queens(), index))
+            return Board::side_piece_t(PieceType::QUEEN, piece_color);
+        if (is_bit_set(get_kings(), index))
+            return Board::side_piece_t(PieceType::KING, piece_color);
 
         assert(false);
         return std::nullopt;
     }
 
-    void Chessboard::set_piece(const Position& pos,
-                                const PieceType piecetype,
-                                const Color color)
+    bool Board::operator==(const Board& rhs) const
     {
-        bitboard_t& piece_bitboard = get_bitboard(piecetype, color);
-
-        const auto pos_rank_i = utils::utype(pos.get_rank());
-        const auto pos_file_i = utils::utype(pos.get_file());
-
-        piece_bitboard[pos_rank_i].set(pos_file_i);
+        if (whites_ != rhs.whites_ || blacks_ != rhs.blacks_)
+            return false;
+        for (int i = 0; i < 6; ++i)
+            if (pieces_[i] != rhs.pieces_[i])
+                return false;
+        return true;
     }
 
-    void Chessboard::unset_piece(const Position& pos,
-                                const PieceType piecetype,
-                                const Color color)
+    void Board::set_piece(const Position& pos,
+                          const PieceType piecetype,
+                          const Color color)
     {
-        bitboard_t& piece_bitboard = get_bitboard(piecetype, color);
-
-        const auto pos_rank_i = utils::utype(pos.get_rank());
-        const auto pos_file_i = utils::utype(pos.get_file());
-
-        piece_bitboard[pos_rank_i].reset(pos_file_i);
+        const int index = pos.get_index();
+        set_bit(pieces_[static_cast<uint8_t>(piecetype)], index);
+        if (color == Color::WHITE)
+            set_bit(whites_, index);
+        else
+            set_bit(blacks_, index);
     }
 
-    void Chessboard::move_piece(const Position& start,
-                                const Position& end,
-                                const PieceType piecetype,
-                                const Color color)
+    void Board::unset_piece(const Position& pos,
+                            const PieceType piecetype,
+                            const Color color)
+    {
+        const int index = pos.get_index();
+        if (color == Color::WHITE)
+        {
+            if (!is_bit_set(blacks_ & pieces_[static_cast<uint8_t>(piecetype)], index))
+                unset_bit(pieces_[static_cast<uint8_t>(piecetype)], index);
+            unset_bit(whites_, index);
+        }
+        else
+        {
+            // if (whites & pieces_[piecetype])[index] == 0
+            //      => unset
+
+            // 
+
+            if (!is_bit_set(whites_ & pieces_[static_cast<uint8_t>(piecetype)], index))
+                unset_bit(pieces_[static_cast<uint8_t>(piecetype)], index);
+            unset_bit(blacks_, index);
+        }
+    }
+
+    void Board::move_piece(const Position& start,
+                           const Position& end,
+                           const PieceType piecetype,
+                           const Color color)
     {
         unset_piece(start, piecetype, color);
         set_piece(end, piecetype, color);
     }
 
-    void Chessboard::change_piece_type(const Position& pos,
-                                        const PieceType old_type,
-                                        const PieceType new_type,
-                                        const Color color)
+    void Board::change_piece_type(const Position& pos,
+                                  const PieceType old_type,
+                                  const PieceType new_type,
+                                  const Color color)
     {
         unset_piece(pos, old_type, color);
         set_piece(pos, new_type, color);
     }
 
-        void Chessboard::init_end_ranks(const PieceType piecetype, const File file)
+    void Board::init_end_ranks(const PieceType piecetype, const File file)
     {
         constexpr Rank white_end_rank = Rank::ONE;
         constexpr Rank black_end_rank = Rank::EIGHT;
@@ -112,11 +158,50 @@ namespace board
         }
     }
 
-    void Chessboard::symetric_init_end_ranks(const PieceType piecetype,
-                                             const File file)
+    void Board::symetric_init_end_ranks(const PieceType piecetype,
+                                        const File file)
     {
         init_end_ranks(piecetype, file);
         init_end_ranks(piecetype, symetric_file(file));
     }
 
+    uint64_t Board::get_whites(void) const
+    {
+        return whites_;
+    }
+
+    uint64_t Board::get_blacks(void) const
+    {
+        return blacks_;
+    }
+
+    uint64_t Board::get_pawns(void) const
+    {
+        return pieces_[4];
+    }
+
+    uint64_t Board::get_queens(void) const
+    {
+        return pieces_[0];
+    }
+    
+    uint64_t Board::get_kings(void) const
+    {
+        return pieces_[5];
+    }
+
+    uint64_t Board::get_rooks(void) const
+    {
+        return pieces_[1];
+    }
+    
+    uint64_t Board::get_bishops(void) const
+    {
+        return pieces_[2];
+    }
+    
+    uint64_t Board::get_knights(void) const
+    {
+        return pieces_[3];
+    }
 }
