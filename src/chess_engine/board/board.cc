@@ -95,11 +95,6 @@ namespace board
         }
         else
         {
-            // if (whites & pieces_[piecetype])[index] == 0
-            //      => unset
-
-            // 
-
             if (!is_bit_set(whites_ & pieces_[static_cast<uint8_t>(piecetype)], index))
                 unset_bit(pieces_[static_cast<uint8_t>(piecetype)], index);
             unset_bit(blacks_, index);
@@ -163,6 +158,16 @@ namespace board
     {
         init_end_ranks(piecetype, file);
         init_end_ranks(piecetype, symetric_file(file));
+    }
+
+    uint64_t Board::get(const PieceType& piece) const
+    {
+        return pieces_[static_cast<uint8_t>(piece)];
+    }
+
+    uint64_t Board::get(const Color& color) const
+    {
+        return color == Color::WHITE ? whites_ : blacks_;
     }
 
     uint64_t Board::get_whites(void) const

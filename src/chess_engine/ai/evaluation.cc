@@ -1,4 +1,5 @@
 #include "evaluation.hh"
+#include "utils/bits-utils.hh"
 
 using namespace board;
 
@@ -7,36 +8,44 @@ namespace ai
     // Result:
     // positive -> white advantage
     // negative -> black advantage
-    int evaluate(const Chessboard&)
+    int evaluate(const Chessboard& board)
     {
         int evaluation = 0;
+        const uint64_t white_board = board.get_board().get(Color::WHITE);
+        const uint64_t black_board = board.get_board().get(Color::BLACK);
 
-        // for (auto piecetype : piecetype_array)
-        // {
-        //     const bitboard_t& white_bitboard =
-        //             board.get_bitboard(piecetype, Color::WHITE);
-        //     const bitboard_t& black_bitboard =
-        //             board.get_bitboard(piecetype, Color::BLACK);
+        for (auto piece : piecetype_array)
+        {
+            uint64_t white_piece_board = white_board
+                    & board.get_board().get(piece);
+            uint64_t black_piece_board = black_board
+                    & board.get_board().get(piece);
 
-        //     const auto piecetype_i = utils::utype(piecetype);
-        //     const auto piecetype_value = piecetype_values[piecetype_i];
-        //     const auto& piecetype_square_table =
-        //             piece_square_tables[piecetype_i];
+            const auto piecetype_i = utils::utype(piece);
+            const auto piecetype_value = piecetype_values[piecetype_i];
+            const auto& piecetype_square_table =
+                    piece_square_tables[piecetype_i];
 
-        //     for (size_t rank_i = 0; rank_i < width; rank_i++)
-        //     {
-        //         for (size_t file_i = 0; file_i < width; file_i++)
-        //         {
-        //             if (white_bitboard[rank_i][file_i])
-        //                 evaluation += piecetype_value +
-        //                     piecetype_square_table[width - rank_i][file_i];
+            int white_pos = utils::pop_lsb(white_piece_board);
+            while (white_piece_board)
+            {
+                int rank_i = white_pos - white_pos; // FIXME: Alan help me
+                int file_i = white_pos - white_pos; // FIXME: Alan help me
+                evaluation += piecetype_value +
+                            piecetype_square_table[width - rank_i - 1][file_i];
+                white_pos = utils::pop_lsb(white_piece_board);
+            }
 
-        //             if (black_bitboard[rank_i][file_i])
-        //                 evaluation -= piecetype_value +
-        //                     piecetype_square_table[rank_i][file_i];
-        //         }
-        //     }
-        // }
+            int black_pos = utils::pop_lsb(black_piece_board);
+            while (black_piece_board)
+            {
+                int rank_i = black_pos - black_pos; // FIXME: Alan help me
+                int file_i = black_pos - black_pos; // FIXME: Alan help me
+                evaluation -= piecetype_value +
+                            piecetype_square_table[rank_i][file_i];
+                black_pos = utils::pop_lsb(black_piece_board);
+            }
+        }
 
         return evaluation;
     }

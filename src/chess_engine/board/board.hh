@@ -21,6 +21,17 @@ namespace board
         opt_piece_t operator[](const Position& pos) const;
         bool operator==(const Board& rhs) const;
 
+        uint64_t get(const PieceType& piece) const;
+        uint64_t get(const Color& color) const;
+        uint64_t get_whites(void) const;
+        uint64_t get_blacks(void) const;
+        uint64_t get_pawns(void) const;
+        uint64_t get_queens(void) const;
+        uint64_t get_kings(void) const;
+        uint64_t get_rooks(void) const;
+        uint64_t get_bishops(void) const;
+        uint64_t get_knights(void) const;
+
         void set_piece(const Position& pos,
                     const PieceType piecetype,
                     const Color color);
@@ -41,16 +52,7 @@ namespace board
 
         void init_end_ranks(const PieceType piecetype, const File file);
         void symetric_init_end_ranks(const PieceType piecetype,
-                                     const File file);
-
-        uint64_t get_whites(void) const;
-        uint64_t get_blacks(void) const;
-        uint64_t get_pawns(void) const;
-        uint64_t get_queens(void) const;
-        uint64_t get_kings(void) const;
-        uint64_t get_rooks(void) const;
-        uint64_t get_bishops(void) const;
-        uint64_t get_knights(void) const;
+                                     const File file);        
 
     private:
         uint64_t whites_;
