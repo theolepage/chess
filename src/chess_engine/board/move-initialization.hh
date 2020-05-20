@@ -11,6 +11,9 @@
  * chessboard.cc/hh
  * - [ ] position_threatened(Position)
  * - [ ] is_check()
+ * 
+ * - [ ] Refactoring board namespace
+ * - [ ] Do a benchmark
 */
 
 #pragma once
