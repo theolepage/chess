@@ -411,18 +411,20 @@ namespace rule
 
     std::vector<Move> generate_bishop_moves(const Chessboard& board)
     {
-        //return move_generation::generate_bishop_moves(board);
-        return generate_moves(board, PieceType::BISHOP);
+        return move_generation::generate_bishop_moves(board);
+        //return generate_moves(board, PieceType::BISHOP);
     }
 
     std::vector<Move> generate_rook_moves(const Chessboard& board)
     {
-        return generate_moves(board, PieceType::ROOK);
+        return move_generation::generate_rook_moves(board);
+        // return generate_moves(board, PieceType::ROOK);
     }
 
     std::vector<Move> generate_queen_moves(const Chessboard& board)
     {
-        return generate_moves(board, PieceType::QUEEN);
+        return move_generation::generate_queen_moves(board);
+        // return generate_moves(board, PieceType::QUEEN);
     }
 
     std::vector<Move> generate_knight_moves(const Chessboard& board)

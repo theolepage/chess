@@ -18,6 +18,8 @@ namespace utils
                 os << "1";
             else
                 os << "0";
+            if (i % 8 == 0)
+                os << std::endl;
         }
         return os;
     }

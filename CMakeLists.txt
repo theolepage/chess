@@ -94,6 +94,7 @@ set(SRC_TESTS
     tests/unit_tests/evaluate_test.cc
     tests/unit_tests/uci_communication_test.cc
     tests/unit_tests/board_test.cc
+    tests/unit_tests/move_generation_test.cc
     #FIXME
     )
 

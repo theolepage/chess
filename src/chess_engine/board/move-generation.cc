@@ -11,12 +11,14 @@ using namespace board;
 
 namespace move_generation
 {
-    std::vector<Move> generate_bishop_moves(const Chessboard& board)
+    static std::vector<Move> generate_moves(
+            const PieceType& piece,
+            const Chessboard& board
+    )
     {
         std::vector<Move> res;
 
         // Get all bishops of color currently playing
-        const PieceType piece = PieceType::BISHOP;
         const Color color = board.get_white_turn()
             ? Color::WHITE : Color::BLACK;
         const Color opponent_color = board.get_white_turn()
@@ -25,7 +27,7 @@ namespace move_generation
 
         // Iterate over all bishops of color currently playing
         int pos = utils::pop_lsb(pieces);
-        while (pieces)
+        while (pos >= 0)
         {
             uint64_t targets = MoveInitialization::get_instance().get_targets(
                 piece,
@@ -42,7 +44,7 @@ namespace move_generation
 
             // Handle capture moves
             int capture_dest = utils::pop_lsb(captures);
-            while (captures)
+            while (capture_dest >= 0)
             {
                 // Create capture move
                 res.emplace_back(
@@ -56,7 +58,7 @@ namespace move_generation
 
             // Handle simple moves
             int non_capture_dest = utils::pop_lsb(non_captures);
-            while (non_captures)
+            while (non_capture_dest >= 0)
             {
                 // Create simple move
                 res.emplace_back(
@@ -73,6 +75,18 @@ namespace move_generation
         return res;
     }
 
-    std::vector<Move> generate_rook_moves(const Chessboard& board);
-    std::vector<Move> generate_queen_moves(const Chessboard& board);
+    std::vector<Move> generate_bishop_moves(const Chessboard& board)
+    {
+        return generate_moves(PieceType::BISHOP, board);
+    }
+
+    std::vector<Move> generate_rook_moves(const Chessboard& board)
+    {
+        return generate_moves(PieceType::ROOK, board);
+    }
+
+    std::vector<Move> generate_queen_moves(const Chessboard& board)
+    {
+        return generate_moves(PieceType::QUEEN, board);
+    }
 } // namespace move_generation
