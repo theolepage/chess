@@ -411,8 +411,8 @@ namespace rule
 
     std::vector<Move> generate_bishop_moves(const Chessboard& board)
     {
-        //return move_generation::generate_bishop_moves(board);
-        return generate_moves(board, PieceType::BISHOP);
+        return move_generation::generate_bishop_moves(board);
+        // return generate_moves(board, PieceType::BISHOP);
     }
 
     std::vector<Move> generate_rook_moves(const Chessboard& board)

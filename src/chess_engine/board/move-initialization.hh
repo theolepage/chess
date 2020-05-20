@@ -2,7 +2,6 @@
  * To-Do
  *
  * move-initialization.cc/hh
- * - [ ] Change magic numbers
  * - [ ] Init pawn, king, knight masks
  * 
  * move-generation.cc
