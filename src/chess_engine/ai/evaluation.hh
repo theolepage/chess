@@ -10,6 +10,7 @@ namespace ai
     using piece_square_line_t = std::array<int, width>;
     using piece_square_table_t = std::array<piece_square_line_t, width>;
 
+    // QUEEN, ROOK, BISHOP, KNIGHT, PAWN, KING
     constexpr std::array<unsigned, nb_pieces> piecetype_values
     {
         900, 500, 330, 320, 100, 20000
@@ -87,7 +88,8 @@ namespace ai
     };
 
     // NOTE Should follow the exact same order than piecetype_array
-    // in piece-type.hh
+    // in piece-type.hh, ie:
+    // QUEEN, ROOK, BISHOP, KNIGHT, PAWN, KING
     constexpr std::array<piece_square_table_t, nb_pieces>
             piece_square_tables = {
                                    piece_square_table_queen,
