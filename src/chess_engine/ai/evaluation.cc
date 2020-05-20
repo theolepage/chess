@@ -62,13 +62,36 @@ namespace ai
         return evaluation;
     }
 
-    int evaluate_squares(const Chessboard& board)
+    int evaluate_king_squares(const Chessboard& board)
     {
-        int evaluation = 0;
         const uint64_t white_board = board.get_board().get(Color::WHITE);
         const uint64_t black_board = board.get_board().get(Color::BLACK);
 
-        for (auto piece : piecetype_array)
+        auto white_king_board = white_board &
+            board.get_board().get(PieceType::KING);
+        auto black_king_board = black_board &
+            board.get_board().get(PieceType::KING);
+
+        auto white_king_i = utils::pop_lsb(white_king_board);
+        auto black_king_i = utils::pop_lsb(black_king_board);
+
+        if (is_end_game(board))
+            return white_end_game_piece_square_table_king[white_king_i] -
+                black_end_game_piece_square_table_king[black_king_i];
+
+
+        return white_middle_game_piece_square_table_king[white_king_i] -
+            black_middle_game_piece_square_table_king[black_king_i];
+    }
+
+    int evaluate_squares(const Chessboard& board)
+    {
+        int evaluation = 0;
+
+        const uint64_t white_board = board.get_board().get(Color::WHITE);
+        const uint64_t black_board = board.get_board().get(Color::BLACK);
+
+        for (auto piece : piecetype_array_without_king)
         {
             uint64_t white_piece_board = white_board
                     & board.get_board().get(piece);
@@ -96,7 +119,7 @@ namespace ai
             }
         }
 
-        return evaluation;
+        return evaluation + evaluate_king_squares(board);
     }
 
     //  Result:

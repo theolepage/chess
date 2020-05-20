@@ -8,7 +8,7 @@ namespace ai
     constexpr size_t nb_pieces = board::nb_pieces;
 
     using piece_square_table_t = std::array<int, width * width>;
-    using piece_square_tables_t = std::array<piece_square_table_t, nb_pieces>;
+    using piece_square_tables_t = std::array<piece_square_table_t, nb_pieces - 1>;
 
     // QUEEN, ROOK, BISHOP, KNIGHT, PAWN, KING
     constexpr std::array<unsigned, nb_pieces> piecetype_values
@@ -80,9 +80,7 @@ namespace ai
         0,   0,  0,  0,  0,  0,  0,  0
     };
 
-    // FIXME There is also a king end game piece_square_table
-    constexpr piece_square_table_t black_piece_square_table_king = {
-        // king middle game
+    constexpr piece_square_table_t black_middle_game_piece_square_table_king = {
         -30,-40,-40,-50,-50,-40,-40,-30,
         -30,-40,-40,-50,-50,-40,-40,-30,
         -30,-40,-40,-50,-50,-40,-40,-30,
@@ -93,16 +91,26 @@ namespace ai
          20, 30, 10,  0,  0, 10, 30, 20
     };
 
-    // NOTE Should follow the exact same order than piecetype_array
-    // in piece-type.hh, ie:
-    // QUEEN, ROOK, BISHOP, KNIGHT, PAWN, KING
+    constexpr piece_square_table_t black_end_game_piece_square_table_king = {
+        -50,-40,-30,-20,-20,-30,-40,-50,
+        -30,-20,-10,  0,  0,-10,-20,-30,
+        -30,-10, 20, 30, 30, 20,-10,-30,
+        -30,-10, 30, 40, 40, 30,-10,-30,
+        -30,-10, 30, 40, 40, 30,-10,-30,
+        -30,-10, 20, 30, 30, 20,-10,-30,
+        -30,-30,  0,  0,  0,  0,-30,-30,
+        -50,-30,-30,-30,-30,-30,-30,-50
+    };
+
+    // NOTE Should follow the exact same order than
+    // piecetype_array_without_king in piece-type.hh, ie:
+    // QUEEN, ROOK, BISHOP, KNIGHT, PAWN
     constexpr piece_square_tables_t black_piece_square_tables = {
         black_piece_square_table_queen,
         black_piece_square_table_rook,
         black_piece_square_table_bishop,
         black_piece_square_table_knight,
-        black_piece_square_table_pawn,
-        black_piece_square_table_king
+        black_piece_square_table_pawn
     };
 
     // Return a symetric table of the one providen, along the rank axis
@@ -133,6 +141,12 @@ namespace ai
 
     constexpr piece_square_tables_t white_piece_square_tables =
         generate_symetric_tables(black_piece_square_tables);
+
+    constexpr piece_square_table_t white_middle_game_piece_square_table_king =
+        generate_symetric_table(black_middle_game_piece_square_table_king);
+
+    constexpr piece_square_table_t white_end_game_piece_square_table_king =
+        generate_symetric_table(black_end_game_piece_square_table_king);
 
     // Returns a boolean indicating if the board
     // corresponds to a near end.

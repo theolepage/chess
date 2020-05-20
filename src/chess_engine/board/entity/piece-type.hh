@@ -34,6 +34,12 @@ namespace board
         PieceType::KNIGHT, PieceType::PAWN, PieceType::KING
     };
 
+    constexpr std::array<PieceType, nb_pieces - 1> piecetype_array_without_king
+    {
+        PieceType::QUEEN,  PieceType::ROOK, PieceType::BISHOP,
+        PieceType::KNIGHT, PieceType::PAWN
+    };
+
     constexpr std::array<PieceType, nb_pieces - 2> minor_piecetype_array
     {
         PieceType::ROOK, PieceType::BISHOP, PieceType::KNIGHT, PieceType::PAWN
