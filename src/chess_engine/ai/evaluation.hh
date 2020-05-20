@@ -134,5 +134,7 @@ namespace ai
     constexpr piece_square_tables_t white_piece_square_tables =
         generate_symetric_tables(black_piece_square_tables);
 
+    int evaluate_material(const board::Chessboard& board);
+    int evaluate_squares(const board::Chessboard& board);
     int evaluate(const board::Chessboard& board);
 }
