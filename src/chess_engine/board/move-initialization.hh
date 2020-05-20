@@ -1,15 +1,13 @@
 /*
  * To-Do
  *
- * move-initialization.cc/hh (this file, a class, renamed) handles the hashmap
- * - [ ] Singleton, not static
- * - [ ] Add tests
+ * move-initialization.cc/hh
+ * - [ ] Change magic numbers
  * - [ ] Init pawn, king, knight masks
  * 
- * move-generation.cc (new file, not a class only functions)
+ * move-generation.cc
  * - [ ] Pawns: promotion, en passant, double pawn push
  * - [ ] Kings: castling
- * - [ ] All: non captures, captures
  * 
  * chessboard.cc/hh
  * - [ ] position_threatened(Position)
