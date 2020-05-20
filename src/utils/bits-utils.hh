@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <iostream>
 #include <ostream>
 
 namespace utils
@@ -10,18 +11,72 @@ namespace utils
         return (bit >> index) & 1ULL;
     }
 
-    inline std::ostream& print_bit(std::ostream& os, const uint64_t bit)
+    inline void print_bit(const uint64_t bit)
     {
-        for (int i = 63; i >= 0; --i)
+        for (int i = 56; i < 64; ++i)
         {
             if (is_bit_set(bit, i))
-                os << "1";
+                std::cout << "1";
             else
-                os << "0";
-            if (i % 8 == 0)
-                os << std::endl;
+                std::cout << "0";
         }
-        return os;
+        std::cout << std::endl;
+        for (int i = 48; i < 56; ++i)
+        {
+            if (is_bit_set(bit, i))
+                std::cout << "1";
+            else
+                std::cout << "0";
+        }
+        std::cout << std::endl;
+        for (int i = 40; i < 48; ++i)
+        {
+            if (is_bit_set(bit, i))
+                std::cout << "1";
+            else
+                std::cout << "0";
+        }
+        std::cout << std::endl;
+        for (int i = 32; i < 40; ++i)
+        {
+            if (is_bit_set(bit, i))
+                std::cout << "1";
+            else
+                std::cout << "0";
+        }
+        std::cout << std::endl;
+        for (int i = 24; i < 32; ++i)
+        {
+            if (is_bit_set(bit, i))
+                std::cout << "1";
+            else
+                std::cout << "0";
+        }
+        std::cout << std::endl;
+        for (int i = 16; i < 24; ++i)
+        {
+            if (is_bit_set(bit, i))
+                std::cout << "1";
+            else
+                std::cout << "0";
+        }
+        std::cout << std::endl;
+        for (int i = 8; i < 16; ++i)
+        {
+            if (is_bit_set(bit, i))
+                std::cout << "1";
+            else
+                std::cout << "0";
+        }
+        std::cout << std::endl;
+        for (int i = 0; i < 8; ++i)
+        {
+            if (is_bit_set(bit, i))
+                std::cout << "1";
+            else
+                std::cout << "0";
+        }
+        std::cout << std::endl;
     }
 
     // index = 0 means set first bit
@@ -50,14 +105,17 @@ namespace utils
     }
 
     // Returns the position of the least significant bit
-    inline int bit_scan_forward(const uint64_t n)
+    // Was forward
+    inline int bit_scan_lowest(const uint64_t n)
     {
         if (n == 0ULL)
             return -1;
         return __builtin_ffsll(n) - 1;
     }
 
-    inline int bit_scan_reverse(const uint64_t n)
+    // Returns the position of the most significant bit
+    // Was reverse
+    inline int bit_scan_highest(const uint64_t n)
     {
         if (n == 0ULL)
             return -1;

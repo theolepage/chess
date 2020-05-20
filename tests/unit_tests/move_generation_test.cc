@@ -62,25 +62,33 @@ TEST(move_generation_test, simple_rook_with_blockers)
     res = move_generation::generate_rook_moves(b2);
     EXPECT_EQ(4, res.size());
 
+    Chessboard b56("8/4p3/8/8/8/8/8/1p2R1p1");
+    res = move_generation::generate_rook_moves(b56);
+    EXPECT_EQ(11, res.size());
+
+    Chessboard b8("pp3p2/1pppp2p/1p1p1R1p/8/1p4p1/3p4/5p2/p7");
+    res = move_generation::generate_rook_moves(b8);
+    EXPECT_EQ(10, res.size());
+
     Chessboard b3("R1p3p1/8/8/8/8/8/8/r3R3", Color::BLACK);
     res = move_generation::generate_rook_moves(b3);
     EXPECT_EQ(11, res.size());
 
     Chessboard b4("r1p3p1/8/8/8/8/8/8/r3r3", Color::BLACK);
     res = move_generation::generate_rook_moves(b4);
-    EXPECT_EQ(9, res.size());
+    EXPECT_EQ(29, res.size());
 
     Chessboard b5("1rp3p1/8/8/8/8/8/1r2r3/8", Color::BLACK);
     res = move_generation::generate_rook_moves(b5);
-    EXPECT_EQ(9, res.size());
+    EXPECT_EQ(27, res.size());
 
     Chessboard b6("2p3p1/1r6/8/8/8/8/1r2r3/8", Color::BLACK);
     res = move_generation::generate_rook_moves(b6);
-    EXPECT_EQ(8, res.size());
+    EXPECT_EQ(32, res.size());
 
     Chessboard b7("8/1r6/8/8/8/8/1r2r3/8", Color::BLACK);
     res = move_generation::generate_rook_moves(b7);
-    EXPECT_EQ(8, res.size());
+    EXPECT_EQ(32, res.size());
 }
 
 TEST(move_generation_test, simple_queen)
@@ -97,9 +105,9 @@ TEST(move_generation_test, simple_queen)
     res = move_generation::generate_queen_moves(b2);
     EXPECT_EQ(18, res.size());
 
-    // Chessboard b2("R1p1q1p1/8/8/8/8/8/8/q3R3", Color::BLACK);
-    // res = move_generation::generate_queen_moves(b2);
-    // EXPECT_EQ(34, res.size());
+    Chessboard b3("R1p1q1p1/8/8/8/8/8/8/q3R3", Color::BLACK);
+    res = move_generation::generate_queen_moves(b3);
+    EXPECT_EQ(34, res.size());
 }
 
 int main(int argc, char *argv[])

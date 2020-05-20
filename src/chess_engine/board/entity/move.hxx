@@ -26,6 +26,11 @@ namespace board
         : start_(start)
         , end_(end)
         , piece_(piece)
+        , capture_(false)
+        , double_pawn_push_(false)
+        , queen_castling_(false)
+        , king_castling_(false)
+        , en_passant_(false)
     {}
 
     inline Move::Move(const Position& start,
@@ -36,6 +41,10 @@ namespace board
         , end_(end)
         , piece_(piece)
         , capture_(capture)
+        , double_pawn_push_(false)
+        , queen_castling_(false)
+        , king_castling_(false)
+        , en_passant_(false)
     {}
 
     inline bool Move::operator==(const Move& move) const

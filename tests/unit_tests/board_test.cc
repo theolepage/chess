@@ -30,8 +30,8 @@ TEST(board_test, simple_get)
     auto black = board(Color::BLACK);
     auto white = board(Color::WHITE);
 
-    EXPECT_EQ(0x80ULL, pawn);
-    EXPECT_EQ(0x80ULL, black);
+    EXPECT_EQ(0x1ULL, pawn);
+    EXPECT_EQ(0x1ULL, black);
     EXPECT_EQ(0x0ULL, queen);
     EXPECT_EQ(0x0ULL, white);
 }

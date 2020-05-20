@@ -8,7 +8,7 @@ using namespace board;
 TEST(Check, minimax_search_simple_checkmat)
 {
     ai::AiMini our_ai = ai::AiMini();
-    Chessboard chessboard = Chessboard(parse_perft("6k1/8/4PPPP/8/8/8/8/8 w - - 0 0 0"));
+    Chessboard chessboard = Chessboard(parse_perft("6k1/8/4PPPP/8/8/8/8/1K6 w - - 0 0 0"));
     Move bestmove = our_ai.search(chessboard);
     EXPECT_EQ(PieceType::PAWN, bestmove.get_piece());
     EXPECT_EQ(Rank::SEVEN, bestmove.get_end().get_rank());

@@ -366,7 +366,11 @@ namespace board
             else if (move.get_capture())
             {
                 assert(opt_end_piece.has_value());
+                std::cout << "start bad" << std::endl;
+                std::cout << move << std::endl;
+                std::cout << (*this) << std::endl;
                 side_piece_t eaten_piece = opt_end_piece.value();
+                std::cout << "end bad" << std::endl;
                 auto eaten_piece_type = eaten_piece.first;
                 auto eaten_piece_color = eaten_piece.second;
 

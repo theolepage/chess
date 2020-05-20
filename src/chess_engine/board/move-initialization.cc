@@ -2,8 +2,10 @@
 #include <optional>
 #include <cassert>
 #include <memory>
+#include <iostream>
 
 #include "move-initialization.hh"
+#include "utils/bits-utils.hh"
 
 namespace board
 {
@@ -88,11 +90,10 @@ namespace board
     {
         for (int i = 0; i < defs::NB_POS; i++)
         {
-            rook_masks[i] = (rays[0][i]
-                            | rays[1][i]
-                            | rays[2][i]
-                            | rays[3][i])
-                            & ~(defs::borders);
+            rook_masks[i] = (rays[0][i] & ~defs::FILE_A)
+                            | (rays[1][i] & ~defs::FILE_H)
+                            | (rays[2][i] & ~defs::RANK_EIGHT)
+                            | (rays[3][i] & ~defs::RANK_ONE);
         }
     }
 
@@ -138,7 +139,7 @@ namespace board
         }
         return current_blocker;
     }
-    
+
     uint64_t MoveInitialization::get_bishop_attacks_classical(
         int pos, uint64_t blockers)
     {
@@ -151,10 +152,16 @@ namespace board
 
             uint64_t blockers_on_ray = ray & blockers;
 
-            // We going south we want the search in the opposite direction
-            int nearest_blocker = ((diag < 6)
-                    ? utils::bit_scan_forward(blockers_on_ray)
-                    : utils::bit_scan_reverse(blockers_on_ray));
+            int nearest_blocker = -1;
+            if (diag == 4) //up left / north west
+                nearest_blocker = utils::bit_scan_lowest(blockers_on_ray);
+            else if (diag == 5) //up right / north east
+                nearest_blocker = utils::bit_scan_lowest(blockers_on_ray);
+            else if (diag == 6) // down left / south west
+                nearest_blocker = utils::bit_scan_highest(blockers_on_ray);
+            else if (diag == 7) // down right / south east
+                nearest_blocker = utils::bit_scan_highest(blockers_on_ray);
+
             if (nearest_blocker == -1)
                 continue;
 
@@ -177,10 +184,16 @@ namespace board
 
             uint64_t blockers_on_ray = ray & blockers;
 
-            // We going south we want the search in the opposite direction
-            int nearest_blocker = ((diag < 2)
-                    ? utils::bit_scan_forward(blockers_on_ray)
-                    : utils::bit_scan_reverse(blockers_on_ray));
+            int nearest_blocker = -1;
+            if (diag == 0) // left / west
+                nearest_blocker = utils::bit_scan_highest(blockers_on_ray);
+            else if (diag == 1) // right / east
+                nearest_blocker = utils::bit_scan_lowest(blockers_on_ray);
+            else if (diag == 2) // up / north
+                nearest_blocker = utils::bit_scan_lowest(blockers_on_ray);
+            else if (diag == 3) // down / south
+                nearest_blocker = utils::bit_scan_highest(blockers_on_ray);
+
             if (nearest_blocker == -1)
                 continue;
 
@@ -217,10 +230,10 @@ namespace board
             for (int b = 0; b < (1 << defs::rook_bits[pos]); b++)
             {
                 const uint64_t blockers = get_blockers(b, rook_masks[pos]);
+                uint64_t attack = get_rook_attacks_classical(pos, blockers);
                 const int key = (blockers * defs::rook_magics[pos])
                                     >> (defs::NB_POS - defs::rook_bits[pos]);
-                rook_attacks[pos][key] = get_rook_attacks_classical(pos,
-                                                                blockers);
+                rook_attacks[pos][key] = attack;
             }
         }
     }

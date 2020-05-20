@@ -18,14 +18,14 @@ namespace board
         static constexpr uint64_t RANK_SEVEN = 0xff000000000000ULL;
         static constexpr uint64_t RANK_EIGHT = 0xff00000000000000ULL;
 
-        static constexpr uint64_t FILE_A = 0x101010101010101ULL;
-        static constexpr uint64_t FILE_B = 0x202020202020202ULL;
-        static constexpr uint64_t FILE_C = 0x404040404040404ULL;
-        static constexpr uint64_t FILE_D = 0x808080808080808ULL;
-        static constexpr uint64_t FILE_E = 0x1010101010101010ULL;
-        static constexpr uint64_t FILE_F = 0x2020202020202020ULL;
-        static constexpr uint64_t FILE_G = 0x4040404040404040ULL;
-        static constexpr uint64_t FILE_H = 0x8080808080808080ULL;
+        static constexpr uint64_t FILE_H = 0x8080808080808080ull;
+        static constexpr uint64_t FILE_G = 0x4040404040404040ull;
+        static constexpr uint64_t FILE_F = 0x2020202020202020ull;
+        static constexpr uint64_t FILE_E = 0x1010101010101010ull;
+        static constexpr uint64_t FILE_D = 0x808080808080808ull;
+        static constexpr uint64_t FILE_C = 0x404040404040404ull;
+        static constexpr uint64_t FILE_B = 0x202020202020202ull;
+        static constexpr uint64_t FILE_A = 0x101010101010101ull;
 
         static constexpr uint64_t borders = FILE_A | FILE_H | RANK_ONE | RANK_EIGHT;
 

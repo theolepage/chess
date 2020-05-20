@@ -18,14 +18,14 @@ namespace move_generation
     {
         std::vector<Move> res;
 
-        // Get all bishops of color currently playing
+        // Get all piece of color currently playing
         const Color color = board.get_white_turn()
             ? Color::WHITE : Color::BLACK;
         const Color opponent_color = board.get_white_turn()
             ? Color::BLACK : Color::WHITE;
         uint64_t pieces = board.get_board()(piece, color);
 
-        // Iterate over all bishops of color currently playing
+        // Iterate over all piece of color currently playing
         int pos = utils::pop_lsb(pieces);
         while (pos >= 0)
         {
