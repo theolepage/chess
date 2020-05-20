@@ -4,6 +4,7 @@
 #include "chessboard.hh"
 #include "entity/move.hh"
 #include "utils/utype.hh"
+#include "move-generation.hh"
 
 using namespace board;
 
@@ -410,16 +411,12 @@ namespace rule
 
     std::vector<Move> generate_bishop_moves(const Chessboard& board)
     {
+        //return move_generation::generate_bishop_moves(board);
         return generate_moves(board, PieceType::BISHOP);
     }
 
     std::vector<Move> generate_rook_moves(const Chessboard& board)
     {
-        // rooks = bitboard rook & bitboard color
-        // pop from rooks:
-            // uint64_t attacks = MagicBitboard::get_attack(PieceType::ROOK, from)
-            // attacks &= ~bitboard color
-            // pop from attacks => create move(from, to, )
         return generate_moves(board, PieceType::ROOK);
     }
 

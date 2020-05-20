@@ -21,16 +21,10 @@ namespace board
         opt_piece_t operator[](const Position& pos) const;
         bool operator==(const Board& rhs) const;
 
-        uint64_t get(const PieceType& piece) const;
-        uint64_t get(const Color& color) const;
-        uint64_t get_whites(void) const;
-        uint64_t get_blacks(void) const;
-        uint64_t get_pawns(void) const;
-        uint64_t get_queens(void) const;
-        uint64_t get_kings(void) const;
-        uint64_t get_rooks(void) const;
-        uint64_t get_bishops(void) const;
-        uint64_t get_knights(void) const;
+        uint64_t operator()() const;
+        uint64_t operator()(const PieceType& piece) const;
+        uint64_t operator()(const Color& color) const;
+        uint64_t operator()(const PieceType& piece, const Color& color) const;
 
         void set_piece(const Position& pos,
                     const PieceType piecetype,
@@ -60,5 +54,14 @@ namespace board
         
         // 0 : Queen, 1 : Rook, 2 : Bishop, 3 : Knight, 4 : Pawn, 5 : King
         uint64_t pieces_[6];
+
+        uint64_t get_whites(void) const;
+        uint64_t get_blacks(void) const;
+        uint64_t get_pawns(void) const;
+        uint64_t get_queens(void) const;
+        uint64_t get_kings(void) const;
+        uint64_t get_rooks(void) const;
+        uint64_t get_bishops(void) const;
+        uint64_t get_knights(void) const;
     };
 }

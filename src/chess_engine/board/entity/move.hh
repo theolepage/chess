@@ -27,6 +27,11 @@ namespace board
              const Position& end,
              const PieceType& piece);
 
+        Move(const Position& start,
+             const Position& end,
+             const PieceType& piece,
+             bool capture);
+
         bool operator==(const Move& move) const;
         bool operator!=(const Move& move) const;
 

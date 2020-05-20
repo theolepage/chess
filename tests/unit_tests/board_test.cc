@@ -10,10 +10,10 @@ using namespace board;
 TEST(board_test, init)
 {
     Board board;
-    auto pawn = board.get_pawns();
-    auto queen = board.get_queens();
-    auto black = board.get_blacks();
-    auto white = board.get_whites();
+    auto pawn = board(PieceType::PAWN);
+    auto queen = board(PieceType::QUEEN);
+    auto black = board(Color::BLACK);
+    auto white = board(Color::WHITE);
 
     EXPECT_EQ(0x0ULL, pawn);
     EXPECT_EQ(0x0ULL, black);
@@ -25,10 +25,10 @@ TEST(board_test, simple_get)
 {
     Board board = Board();
     board.set_piece(Position(0, 0), PieceType::PAWN, Color::BLACK);
-    auto pawn = board.get_pawns();
-    auto queen = board.get_queens();
-    auto black = board.get_blacks();
-    auto white = board.get_whites();
+    auto pawn = board(PieceType::PAWN);
+    auto queen = board(PieceType::QUEEN);
+    auto black = board(Color::BLACK);
+    auto white = board(Color::WHITE);
 
     EXPECT_EQ(0x80ULL, pawn);
     EXPECT_EQ(0x80ULL, black);
@@ -47,10 +47,10 @@ TEST(board_test, put_pawns)
     board.set_piece(Position(5, 0), PieceType::PAWN, Color::BLACK);
     board.set_piece(Position(6, 0), PieceType::PAWN, Color::BLACK);
     board.set_piece(Position(7, 0), PieceType::PAWN, Color::BLACK);
-    auto pawn = board.get_pawns();
-    auto queen = board.get_queens();
-    auto black = board.get_blacks();
-    auto white = board.get_whites();
+    auto pawn = board(PieceType::PAWN);
+    auto queen = board(PieceType::QUEEN);
+    auto black = board(Color::BLACK);
+    auto white = board(Color::WHITE);
 
     EXPECT_EQ(0xffULL, pawn);
     EXPECT_EQ(0xffULL, black);

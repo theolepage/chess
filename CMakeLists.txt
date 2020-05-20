@@ -61,6 +61,8 @@ set(SRC_ENGINE
     src/chess_engine/ai/ai-mini.cc
     src/chess_engine/ai/evaluation.cc
     src/chess_engine/ai/uci.cc
+    src/chess_engine/board/move-initialization.cc
+    src/chess_engine/board/move-generation.cc
     src/chess_engine/board/rule.cc
     src/chess_engine/board/chessboard.cc
     src/chess_engine/board/board.cc

@@ -20,6 +20,24 @@ namespace board
         , en_passant_(en_passant)
     {}
 
+    inline Move::Move(const Position& start,
+               const Position& end,
+               const PieceType& piece)
+        : start_(start)
+        , end_(end)
+        , piece_(piece)
+    {}
+
+    inline Move::Move(const Position& start,
+               const Position& end,
+               const PieceType& piece,
+               const bool capture)
+        : start_(start)
+        , end_(end)
+        , piece_(piece)
+        , capture_(capture)
+    {}
+
     inline bool Move::operator==(const Move& move) const
     {
         if (promotion_.has_value() != move.promotion_.has_value())

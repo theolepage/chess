@@ -11,15 +11,11 @@ namespace ai
     int evaluate(const Chessboard& board)
     {
         int evaluation = 0;
-        const uint64_t white_board = board.get_board().get(Color::WHITE);
-        const uint64_t black_board = board.get_board().get(Color::BLACK);
-
+        
         for (auto piece : piecetype_array)
         {
-            uint64_t white_piece_board = white_board
-                    & board.get_board().get(piece);
-            uint64_t black_piece_board = black_board
-                    & board.get_board().get(piece);
+            uint64_t white_piece_board = board.get_board()(piece, Color::WHITE);
+            uint64_t black_piece_board = board.get_board()(piece, Color::BLACK);
 
             const auto piecetype_i = utils::utype(piece);
             const auto piecetype_value = piecetype_values[piecetype_i];
