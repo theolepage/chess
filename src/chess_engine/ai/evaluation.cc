@@ -27,9 +27,8 @@ namespace ai
                     piece_square_tables[piecetype_i];
 
             int white_pos = utils::pop_lsb(white_piece_board);
-            while (white_piece_board)
+            while (white_pos >= 0)
             {
-                // return 1000000;
                 Position pos(white_pos);
                 int rank_i = static_cast<int>(pos.get_rank());
                 int file_i = static_cast<int>(pos.get_file());
@@ -39,9 +38,8 @@ namespace ai
             }
 
             int black_pos = utils::pop_lsb(black_piece_board);
-            while (black_piece_board)
+            while (black_pos >= 0)
             {
-                // return 1000000;
                 Position pos(black_pos);
                 int rank_i = static_cast<int>(pos.get_rank());
                 int file_i = static_cast<int>(pos.get_file());
