@@ -23,28 +23,24 @@ namespace ai
 
             const auto piecetype_i = utils::utype(piece);
             const auto piecetype_value = piecetype_values[piecetype_i];
-            const auto& piecetype_square_table =
-                    piece_square_tables[piecetype_i];
+            const auto& white_piece_square_table =
+                    white_piece_square_tables[piecetype_i];
+            const auto& black_piece_square_table =
+                    black_piece_square_tables[piecetype_i];
 
             int white_pos = utils::pop_lsb(white_piece_board);
             while (white_pos >= 0)
             {
-                Position pos(white_pos);
-                int rank_i = static_cast<int>(pos.get_rank());
-                int file_i = static_cast<int>(pos.get_file());
                 evaluation += piecetype_value +
-                            piecetype_square_table[width - rank_i - 1][file_i];
+                            white_piece_square_table[white_pos];
                 white_pos = utils::pop_lsb(white_piece_board);
             }
 
             int black_pos = utils::pop_lsb(black_piece_board);
             while (black_pos >= 0)
             {
-                Position pos(black_pos);
-                int rank_i = static_cast<int>(pos.get_rank());
-                int file_i = static_cast<int>(pos.get_file());
                 evaluation -= piecetype_value +
-                            piecetype_square_table[rank_i][file_i];
+                            black_piece_square_table[black_pos];
                 black_pos = utils::pop_lsb(black_piece_board);
             }
         }

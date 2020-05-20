@@ -7,8 +7,8 @@ namespace ai
     constexpr size_t width = board::Chessboard::width;
     constexpr size_t nb_pieces = board::nb_pieces;
 
-    using piece_square_line_t = std::array<int, width>;
-    using piece_square_table_t = std::array<piece_square_line_t, width>;
+    using piece_square_table_t = std::array<int, width * width>;
+    using piece_square_tables_t = std::array<piece_square_table_t, nb_pieces>;
 
     // QUEEN, ROOK, BISHOP, KNIGHT, PAWN, KING
     constexpr std::array<unsigned, nb_pieces> piecetype_values
@@ -19,29 +19,35 @@ namespace ai
     // NOTE The tables are well ordered for black pieces
     // They should be symetrically accessed
     // (as if the ranks where reversed) for white pieces
-    constexpr piece_square_table_t piece_square_table_queen = {
-        -20,-10,-10, -5, -5,-10,-10,-20,
-        -10,  0,  0,  0,  0,  0,  0,-10,
-        -10,  0,  5,  5,  5,  5,  0,-10,
-        -5,  0,  5,  5,  5,  5,  0, -5,
-        0,  0,  5,  5,  5,  5,  0, -5,
-        -10,  5,  5,  5,  5,  5,  0,-10,
-        -10,  0,  5,  0,  0,  0,  0,-10,
-        -20,-10,-10, -5, -5,-10,-10,-20
+    //
+    //        File H -- File A
+    // Rank 1
+    //   |
+    // Rank 8
+    // This one is asymetric along the file axis
+    constexpr piece_square_table_t black_piece_square_table_queen = {
+        -20,-10,-10, -5, -5,-10,-10, -20,
+        -10,  0,  0,  0,  0,  0,  0, -10,
+        -10,  0,  5,  5,  5,  5,  0, -10,
+         -5,  0,  5,  5,  5,  5,  0,  -5,
+         -5,  0,  5,  5,  5,  5,  0,   0,
+        -10,  0,  5,  5,  5,  5,  5, -10,
+        -10,  0,  0,  0,  0,  5,  0, -10,
+        -20,-10,-10, -5, -5,-10,-10, -20
     };
 
-    constexpr piece_square_table_t piece_square_table_rook = {
-        0,  0,  0,  0,  0,  0,  0,  0,
-        5, 10, 10, 10, 10, 10, 10,  5,
+    constexpr piece_square_table_t black_piece_square_table_rook = {
+         0,  0,  0,  0,  0,  0,  0,  0,
+         5, 10, 10, 10, 10, 10, 10,  5,
         -5,  0,  0,  0,  0,  0,  0, -5,
         -5,  0,  0,  0,  0,  0,  0, -5,
         -5,  0,  0,  0,  0,  0,  0, -5,
         -5,  0,  0,  0,  0,  0,  0, -5,
         -5,  0,  0,  0,  0,  0,  0, -5,
-        0,  0,  0,  5,  5,  0,  0,  0
+         0,  0,  0,  5,  5,  0,  0,  0
     };
 
-    constexpr piece_square_table_t piece_square_table_bishop = {
+    constexpr piece_square_table_t black_piece_square_table_bishop = {
         -20,-10,-10,-10,-10,-10,-10,-20,
         -10,  0,  0,  0,  0,  0,  0,-10,
         -10,  0,  5, 10, 10,  5,  0,-10,
@@ -52,7 +58,7 @@ namespace ai
         -20,-10,-10,-10,-10,-10,-10,-20
     };
 
-    constexpr piece_square_table_t piece_square_table_knight = {
+    constexpr piece_square_table_t black_piece_square_table_knight = {
         -50,-40,-30,-30,-30,-30,-40,-50,
         -40,-20,  0,  0,  0,  0,-20,-40,
         -30,  0, 10, 15, 15, 10,  0,-30,
@@ -63,19 +69,19 @@ namespace ai
         -50,-40,-30,-30,-30,-30,-40,-50
     };
 
-    constexpr piece_square_table_t piece_square_table_pawn = {
-        0,  0,  0,  0,  0,  0,  0,  0,
+    constexpr piece_square_table_t black_piece_square_table_pawn = {
+        0,   0,  0,  0,  0,  0,  0,  0,
         50, 50, 50, 50, 50, 50, 50, 50,
         10, 10, 20, 30, 30, 20, 10, 10,
-        5,  5, 10, 25, 25, 10,  5,  5,
-        0,  0,  0, 20, 20,  0,  0,  0,
-        5, -5,-10,  0,  0,-10, -5,  5,
-        5, 10, 10,-20,-20, 10, 10,  5,
-        0,  0,  0,  0,  0,  0,  0,  0
+        5,   5, 10, 25, 25, 10,  5,  5,
+        0,   0,  0, 20, 20,  0,  0,  0,
+        5,  -5,-10,  0,  0,-10, -5,  5,
+        5,  10, 10,-20,-20, 10, 10,  5,
+        0,   0,  0,  0,  0,  0,  0,  0
     };
 
     // FIXME There is also a king end game piece_square_table
-    constexpr piece_square_table_t piece_square_table_king = {
+    constexpr piece_square_table_t black_piece_square_table_king = {
         // king middle game
         -30,-40,-40,-50,-50,-40,-40,-30,
         -30,-40,-40,-50,-50,-40,-40,-30,
@@ -83,22 +89,50 @@ namespace ai
         -30,-40,-40,-50,-50,-40,-40,-30,
         -20,-30,-30,-40,-40,-30,-30,-20,
         -10,-20,-20,-20,-20,-20,-20,-10,
-        20, 20,  0,  0,  0,  0, 20, 20,
-        20, 30, 10,  0,  0, 10, 30, 20
+         20, 20,  0,  0,  0,  0, 20, 20,
+         20, 30, 10,  0,  0, 10, 30, 20
     };
 
     // NOTE Should follow the exact same order than piecetype_array
     // in piece-type.hh, ie:
     // QUEEN, ROOK, BISHOP, KNIGHT, PAWN, KING
-    constexpr std::array<piece_square_table_t, nb_pieces>
-            piece_square_tables = {
-                                   piece_square_table_queen,
-                                   piece_square_table_rook,
-                                   piece_square_table_bishop,
-                                   piece_square_table_knight,
-                                   piece_square_table_pawn,
-                                   piece_square_table_king
-                                   };
+    constexpr piece_square_tables_t black_piece_square_tables = {
+        black_piece_square_table_queen,
+        black_piece_square_table_rook,
+        black_piece_square_table_bishop,
+        black_piece_square_table_knight,
+        black_piece_square_table_pawn,
+        black_piece_square_table_king
+    };
+
+    // Return a symetric table of the one providen, along the rank axis
+    constexpr piece_square_table_t
+    generate_symetric_table(piece_square_table_t table)
+    {
+        piece_square_table_t symetric_table = table;
+
+        for (size_t i = 0; i < table.size(); i++)
+        {
+            auto i_sym = width * (width - (i / width + 1)) + i % width;
+            symetric_table[i] = table[i_sym];
+        }
+
+        return symetric_table;
+    }
+
+    constexpr piece_square_tables_t
+    generate_symetric_tables (piece_square_tables_t tables)
+    {
+        piece_square_tables_t symetric_tables = tables;
+
+        for (size_t i = 0; i < symetric_tables.size(); i++)
+            symetric_tables[i] = generate_symetric_table(tables[i]);
+
+        return symetric_tables;
+    }
+
+    constexpr piece_square_tables_t white_piece_square_tables =
+        generate_symetric_tables(black_piece_square_tables);
 
     int evaluate(const board::Chessboard& board);
 }
