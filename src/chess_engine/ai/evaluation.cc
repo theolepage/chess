@@ -5,6 +5,38 @@ using namespace board;
 
 namespace ai
 {
+    inline bool no_queen_or_unique_minor_piece(const Chessboard& board,
+                                               Color color)
+    {
+        const auto queen_board = board.get_board().get(PieceType::QUEEN);
+        const auto color_board = board.get_board().get(color);
+
+        if (!(queen_board & color_board))
+            return true;
+
+        bool minor_piece_encountered = false;
+
+        for (auto piece : minor_piecetype_array)
+        {
+            const auto piece_board = board.get_board().get(piece);
+            if (piece_board & color_board)
+            {
+                if (minor_piece_encountered)
+                    return false;
+
+                minor_piece_encountered = true;
+            }
+        }
+
+        return true;
+    }
+
+    bool is_end_game(const Chessboard& board)
+    {
+        return no_queen_or_unique_minor_piece(board, Color::WHITE) &&
+            no_queen_or_unique_minor_piece(board, Color::BLACK);
+    }
+
     int evaluate_material(const Chessboard& board)
     {
         int evaluation = 0;

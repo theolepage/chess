@@ -99,6 +99,35 @@ TEST(EvaluateSquares, SimpleRook)
     EXPECT_EQ(evaluate_squares(black_board), -abs_board_value);
 }
 
+TEST(IsEndGameBoard, MiddleGame)
+{
+    Chessboard board = Chessboard("2k5/7R/1q1p1p2/8/4N3/8/2B3Q1/3K4");
+
+    EXPECT_FALSE(is_end_game(board));
+}
+
+TEST(IsEndGameBoard, EndGameNoQueens)
+{
+    Chessboard board = Chessboard("2r4k/4n3/1pp5/8/5PPP/4P3/8/1R1K2B1");
+
+    EXPECT_TRUE(is_end_game(board));
+}
+
+TEST(IsEndGameBoard, EndGameLonelyQueen)
+{
+    Chessboard board = Chessboard("1b1k3r/3p4/1n2p3/p1p5/8/8/2B2B2/K2Q4");
+
+    EXPECT_TRUE(is_end_game(board));
+}
+
+TEST(IsEndGameBoard, MiddleGameLonelyQueen)
+{
+    Chessboard board = Chessboard("1b1k3r/3p4/1n2p3/p1p5/8/1P6/2B2B2/K2Q3R");
+
+    EXPECT_FALSE(is_end_game(board));
+}
+
+
 int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);

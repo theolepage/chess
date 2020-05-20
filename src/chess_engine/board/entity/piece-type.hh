@@ -34,6 +34,11 @@ namespace board
         PieceType::KNIGHT, PieceType::PAWN, PieceType::KING
     };
 
+    constexpr std::array<PieceType, nb_pieces - 2> minor_piecetype_array
+    {
+        PieceType::ROOK, PieceType::BISHOP, PieceType::KNIGHT, PieceType::PAWN
+    };
+
     inline PieceType char_to_piece(const char c)
     {
         switch (c)

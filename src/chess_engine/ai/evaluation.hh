@@ -134,6 +134,14 @@ namespace ai
     constexpr piece_square_tables_t white_piece_square_tables =
         generate_symetric_tables(black_piece_square_tables);
 
+    // Returns a boolean indicating if the board
+    // corresponds to a near end.
+    // It may be the case either if:
+    // - Both sides have no queens
+    // - Every side which has a queen has additionally
+    //   no other pieces or one minorpiece maximum.
+    bool is_end_game(const board::Chessboard& board);
+
     int evaluate_material(const board::Chessboard& board);
     int evaluate_squares(const board::Chessboard& board);
     int evaluate(const board::Chessboard& board);
