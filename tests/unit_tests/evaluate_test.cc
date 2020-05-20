@@ -22,27 +22,35 @@ TEST(Evaluate, WhiteAdvantage)
 // NOTE It assumes that we only consider material and piece square tables
 TEST(MaterialAndPieceSquareTables, Pawn)
 {
-    Chessboard board = Chessboard("8/8/8/8/8/8/1p6/8");
+    Chessboard white_board = Chessboard("8/1P6/8/8/8/8/8/8");
+    Chessboard black_board = Chessboard("8/8/8/8/8/8/1p6/8");
 
-    EXPECT_EQ(evaluate(board), 50 + 100);
+    const int abs_board_value = 50 + 100;
+
+    EXPECT_EQ(evaluate(white_board), abs_board_value);
+    EXPECT_EQ(evaluate(black_board), -abs_board_value);
 }
 
-// NOTE It assumes that we only consider material and piece square tables
 TEST(MaterialAndPieceSquareTables, Queen)
 {
-    Chessboard board = Chessboard("8/8/8/q7/8/8/8/8");
+    Chessboard white_board = Chessboard("8/8/8/8/Q7/8/8/8");
+    Chessboard black_board = Chessboard("8/8/8/q7/8/8/8/8");
 
-    EXPECT_EQ(evaluate(board), 0 + 900);
+    const int abs_board_value = 0 + 900;
+
+    EXPECT_EQ(evaluate(white_board), abs_board_value);
+    EXPECT_EQ(evaluate(black_board), -abs_board_value);
 }
 
-// NOTE It assumes that we only consider material and piece square tables
 TEST(MaterialAndPieceSquareTables, Rook)
 {
-    Chessboard board = Chessboard("8/8/8/8/8/8/7r/8");
+    Chessboard white_board = Chessboard("8/7R/8/8/8/8/8/8");
+    Chessboard black_board = Chessboard("8/8/8/8/8/8/7r/8");
 
-    EXPECT_TRUE(false);
+    const int abs_board_value = 5 + 500;
 
-    EXPECT_EQ(evaluate(board), 5 + 500);
+    EXPECT_EQ(evaluate(white_board), abs_board_value);
+    EXPECT_EQ(evaluate(black_board), -abs_board_value);
 }
 
 int main(int argc, char **argv)
