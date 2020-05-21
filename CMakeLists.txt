@@ -63,6 +63,7 @@ set(SRC_ENGINE
     src/chess_engine/ai/uci.cc
     src/chess_engine/board/rule.cc
     src/chess_engine/board/chessboard.cc
+    src/chess_engine/board/board.cc
     src/parsing/option_parser/option-parser.cc
     src/parsing/perft_parser/perft-parser.cc
     src/parsing/pgn_parser/pgn-exception.cc
@@ -90,6 +91,7 @@ set(SRC_TESTS
     tests/unit_tests/ai_search2_test.cc
     tests/unit_tests/evaluate_test.cc
     tests/unit_tests/uci_communication_test.cc
+    tests/unit_tests/board_test.cc
     #FIXME
     )
 

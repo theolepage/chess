@@ -5,7 +5,7 @@
 #include "ai-mini.hh"
 #include "evaluation.hh"
 #include "uci.hh"
-#include "chess_engine/board/color.hh"
+#include "chess_engine/board/entity/color.hh"
 
 namespace ai
 {

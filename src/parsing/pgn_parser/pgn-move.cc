@@ -88,15 +88,15 @@ namespace board
     void PgnMove::to_Move(board::Move &previous_move) const
     {
         // Check if move is an en passant move
-        const board::Position prev_end = previous_move.end_get();
-        bool en_passant = previous_move.double_pawn_push_get() &&
+        const board::Position prev_end = previous_move.get_end();
+        bool en_passant = previous_move.get_double_pawn_push() &&
                           piece_ == board::PieceType::PAWN &&
                           capture_ &&
                           end_.get_file() == prev_end.get_file() &&
                           (utils::utype(end_.get_rank()) == 5 ||
                           utils::utype(end_.get_rank()) == 2);
 
-        previous_move.set(start_, end_, piece_, capture_, double_pawn_push_,
+        previous_move = Move(start_, end_, piece_, capture_, double_pawn_push_,
                         queen_castling_, king_castling_,
                         en_passant, promotion_);
     }

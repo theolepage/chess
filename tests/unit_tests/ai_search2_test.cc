@@ -11,9 +11,9 @@ TEST(Check, minimax_search_simple_checkmat4)
     //Chessboard chessboard = Chessboard(parse_perft("r2k1b1Q/pppn3p/3p4/1B5n/5pb1/5N2/PPPP1qPP/RNBKR3 w - - 0 1 0"));
     Chessboard chessboard = Chessboard(parse_perft("r2k1b1Q/p1pn3p/8/1B6/8/8/8/K3R3 w - - 0 1 0"));
     Move bestmove = our_ai.search(chessboard, 4);
-    EXPECT_EQ(PieceType::QUEEN, bestmove.piece_get());
-    EXPECT_EQ(Rank::EIGHT, bestmove.end_get().get_rank());
-    EXPECT_EQ(File::F, bestmove.end_get().get_file());
+    EXPECT_EQ(PieceType::QUEEN, bestmove.get_piece());
+    EXPECT_EQ(Rank::EIGHT, bestmove.get_end().get_rank());
+    EXPECT_EQ(File::F, bestmove.get_end().get_file());
 }
 int main(int argc, char *argv[])
 {

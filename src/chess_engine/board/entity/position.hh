@@ -3,6 +3,7 @@
 #include <utility>
 #include <cassert>
 #include <iostream>
+#include <optional>
 
 #include "utils/utype.hh"
 
@@ -40,31 +41,21 @@ namespace board
     class Position final
     {
     public:
-        // (x, y)
         Position(File file, Rank rank);
+        Position(int x, int y);
+        Position(int i);
+        Position(char file, char rank);
 
-        Position(uint8_t x, uint8_t y)
-        {
-            file_ = static_cast<File>(x);
-            rank_ =  static_cast<Rank>(y);
-        }
-
-        Position(char file, char rank)
-        {
-            assert(islower(file) && isdigit(rank));
-            file_ = static_cast<File>(file - 'a');
-            rank_ =  static_cast<Rank>(rank - '0' - 1); // + 1 because ONE
-                                                        // corresponds to 0
-        }
         Position& operator=(const Position& position) = default;
 
         File get_file() const;
         Rank get_rank() const;
+        int get_index(void) const;
 
         bool operator==(const Position& pos) const;
         bool operator!=(const Position& pos) const;
 
-        std::optional<Position> move(int file, int rank) const;
+        std::optional<Position> translate(int file, int rank) const;
 
         friend std::ostream& operator<<(std::ostream& os, const Position& pos);
 
