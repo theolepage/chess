@@ -10,16 +10,54 @@ namespace utils
         return (bit >> index) & 1ULL;
     }
 
+    inline int normalize_bit(int bit)
+    {
+        return bit ? 1 : 0;
+    }
+
     inline std::ostream& print_bit(std::ostream& os, const uint64_t bit)
     {
         for (int i = 63; i >= 0; --i)
-        {
-            if (is_bit_set(bit, i))
-                os << "1";
-            else
-                os << "0";
-        }
+            os << normalize_bit(is_bit_set(bit, i));
+
         return os;
+    }
+
+    inline std::ostream& print_bitboard(std::ostream& os, const uint64_t bitboard)
+    {
+        constexpr int w = 8;
+        for (int i = 0; i < w; i++)
+        {
+            for (int j = 0; j < w; j++)
+                os << normalize_bit(is_bit_set(bitboard, i * w + j));
+
+            os << std::endl;
+        }
+
+        return os;
+    }
+
+    inline uint64_t north_fill(uint64_t bitboard)
+    {
+        bitboard |= (bitboard << 8);
+        bitboard |= (bitboard << 16);
+        bitboard |= (bitboard << 32);
+
+        return bitboard;
+    }
+
+    inline uint64_t south_fill(uint64_t bitboard)
+    {
+        bitboard |= (bitboard >> 8);
+        bitboard |= (bitboard >> 16);
+        bitboard |= (bitboard >> 32);
+
+        return bitboard;
+    }
+
+    inline uint64_t file_fill(const uint64_t bitboard)
+    {
+        return north_fill(bitboard) | south_fill(bitboard);
     }
 
     // index = 0 means set first bit
