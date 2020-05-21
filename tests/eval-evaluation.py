@@ -11,7 +11,7 @@ def which(bin_name):
             return bin_path
 
 stockfish_path = which('stockfish')
-chessengine_path = stockfish_path
+chessengine_path = '../chessengine'
 
 perft_directory = 'eval-perft/'
 
@@ -19,11 +19,14 @@ perft_directory = 'eval-perft/'
 def get_perft_strings():
     perft_strings = []
 
-    # for filename in os.listdir(perft_directory):
-    #     if filename.endswith(".perft"):
-    #         perft_path = perft_directory + filename
-    #         with open (perft_path, "r") as perft_file:
-    #             perft_strings.append(cut_last_word(perft_file.readline().rstrip("\n")))
+    for filename in os.listdir(perft_directory):
+        if filename.endswith(".perft"):
+            perft_path = perft_directory + filename
+            perft_base = os.path.basename(perft_path)
+            perft_name = os.path.splitext(perft_base)[0]
+            with open (perft_path, "r") as perft_file:
+                perft_string = perft_file.readline().rstrip("\n")
+                perft_strings.append((perft_name, perft_string))
 
     return perft_strings
 
@@ -141,18 +144,21 @@ def evaluate_eval_fun(eval_fun):
     perft_and_ref_value_couples = []
     perft_and_value_couples = []
 
-    for perft in perft_strings:
-        print(perft)
-        perft_and_ref_value_couples.append((perft, ref_eval(perft)))
-        perft_and_value_couples.append((perft, eval_fun(perft)))
+    nb_perfts = len(perft_strings)
+    for i in range(nb_perfts):
+        perft_name = perft_strings[i][0]
+        perft_string = perft_strings[i][1]
+        print(i + 1, "/", nb_perfts, ": ", perft_name, ": ", perft_string, sep="")
+        perft_and_ref_value_couples.append((perft_string, ref_eval(perft_string)))
+        perft_and_value_couples.append((perft_string, eval_fun(perft_string)))
 
     perft_and_ref_value_couples.sort(key=second)
     perft_and_value_couples.sort(key=second)
 
     return dissonances(perft_and_ref_value_couples, perft_and_value_couples)
 
-# dissonances = evaluate_eval_fun(eval)
-# print("nb perft tested: " + str(len(perft_strings)))
-# print("nb winner dissonances: " + str(len(dissonances["winner_dissonances"])))
-# print("nb choice dissonances: " + str(len(dissonances["choice_dissonances"])))
-# print(dissonances)
+dissonances = evaluate_eval_fun(eval)
+print("nb perft tested: " + str(len(perft_strings)))
+print("nb winner dissonances: " + str(len(dissonances["winner_dissonances"])))
+print("nb choice dissonances: " + str(len(dissonances["choice_dissonances"])))
+#print(dissonances)
