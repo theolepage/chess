@@ -1,11 +1,10 @@
 #include "chessboard.hh"
-
 #include "parsing/option_parser/option-parser.hh"
 #include "rule.hh"
-#include "piece-type.hh"
-#include "color.hh"
-#include "position.hh"
-#include "move.hh"
+#include "entity/piece-type.hh"
+#include "entity/color.hh"
+#include "entity/position.hh"
+#include "entity/move.hh"
 
 #include <cassert>
 #include <optional>
@@ -13,129 +12,11 @@
 
 namespace board
 {
-    using side_piece_t = std::pair<PieceType, Color>;
-    using opt_piece_t = std::optional<side_piece_t>;
-    using opt_pos_t = std::optional<board::Position>;
-
-    const Chessboard::bitboard_t& Chessboard::get_bitboard(PieceType piecetype,
-                                                           Color color) const
-    {
-        const auto piecetype_i = utils::utype(piecetype);
-
-        return color == Color::WHITE ?
-            white_bitboards_[piecetype_i] :
-            black_bitboards_[piecetype_i];
-    }
-
-    // TODO can we do better than code duplication ?
-    Chessboard::bitboard_t& Chessboard::get_bitboard(PieceType piecetype,
-                                                     Color color)
-    {
-        const auto piecetype_i = utils::utype(piecetype);
-
-        return color == Color::WHITE ?
-            white_bitboards_[piecetype_i] :
-            black_bitboards_[piecetype_i];
-    }
-
-    size_t Chessboard::get_bitboard_count(const PieceType piecetype,
-                                          const Color color) const
-    {
-        const bitboard_t& bitboard = get_bitboard(piecetype, color);
-
-        size_t count = 0;
-
-        for (const auto& line : bitboard)
-            count += line.count();
-
-        return count;
-    }
-
-    void Chessboard::set_piece(const Position& pos,
-                                const PieceType piecetype,
-                                const Color color)
-    {
-        bitboard_t& piece_bitboard = get_bitboard(piecetype, color);
-
-        const auto pos_rank_i = utils::utype(pos.get_rank());
-        const auto pos_file_i = utils::utype(pos.get_file());
-
-        piece_bitboard[pos_rank_i].set(pos_file_i);
-    }
-
-    void Chessboard::unset_piece(const Position& pos,
-                                const PieceType piecetype,
-                                const Color color)
-    {
-        bitboard_t& piece_bitboard = get_bitboard(piecetype, color);
-
-        const auto pos_rank_i = utils::utype(pos.get_rank());
-        const auto pos_file_i = utils::utype(pos.get_file());
-
-        piece_bitboard[pos_rank_i].reset(pos_file_i);
-    }
-
-    void Chessboard::move_piece(const Position& start,
-                                const Position& end,
-                                const PieceType piecetype,
-                                const Color color)
-    {
-        unset_piece(start, piecetype, color);
-        set_piece(end, piecetype, color);
-    }
-
-    void Chessboard::change_piece_type(const Position& pos,
-                                        const PieceType old_type,
-                                        const PieceType new_type,
-                                        const Color color)
-    {
-        unset_piece(pos, old_type, color);
-        set_piece(pos, new_type, color);
-    }
-
-    void Chessboard::init_end_ranks(const PieceType piecetype, const File file)
-    {
-        constexpr Rank white_end_rank = Rank::ONE;
-        constexpr Rank black_end_rank = Rank::EIGHT;
-
-        set_piece(Position(file, white_end_rank), piecetype, Color::WHITE);
-        set_piece(Position(file, black_end_rank), piecetype, Color::BLACK);
-    }
-
-    File symetric_file(const File file)
-    {
-        switch (file)
-        {
-        case File::A:
-            return File::H;
-        case File::B:
-            return File::G;
-        case File::C:
-            return File::F;
-        case File::D:
-            return File::E;
-        case File::E:
-            return File::D;
-        case File::F:
-            return File::C;
-        case File::G:
-            return File::B;
-        case File::H:
-            return File::A;
-        default:
-            throw std::invalid_argument("Unknown file");
-        }
-    }
-
-    void Chessboard::symetric_init_end_ranks(const PieceType piecetype,
-                                             const File file)
-    {
-        init_end_ranks(piecetype, file);
-        init_end_ranks(piecetype, symetric_file(file));
-    }
-
     Chessboard::Chessboard()
     {
+        board_ = Board();
+        board_.init_default();
+
         white_turn_ = true;
 
         white_king_castling_ = true;
@@ -148,26 +29,13 @@ namespace board
         turn_ = 0;
         last_fifty_turn_ = 0;
 
-        for (size_t file_i = 0; file_i < width; file_i++)
-        {
-            const auto file = static_cast<File>(file_i);
-            set_piece(Position(file, Rank::TWO),
-                      PieceType::PAWN, Color::WHITE);
-            set_piece(Position(file, Rank::SEVEN),
-                      PieceType::PAWN, Color::BLACK);
-        }
-
-        symetric_init_end_ranks(PieceType::ROOK, File::A);
-        symetric_init_end_ranks(PieceType::KNIGHT, File::B);
-        symetric_init_end_ranks(PieceType::BISHOP, File::C);
-        init_end_ranks(PieceType::QUEEN, File::D);
-        init_end_ranks(PieceType::KING, File::E);
-
         register_state();
     }
 
     Chessboard::Chessboard(const FenObject& fen)
     {
+        board_ = Board();
+
         white_turn_ = fen.side_to_move_to_get() == Color::WHITE;
 
         const auto castling_chars = fen.castling_get();
@@ -202,7 +70,7 @@ namespace board
                 if (opt_side_piece.has_value())
                 {
                     const auto side_piece = opt_side_piece.value();
-                    set_piece(pos, side_piece.first, side_piece.second);
+                    board_.set_piece(pos, side_piece.first, side_piece.second);
                 }
             }
         }
@@ -210,17 +78,33 @@ namespace board
         register_state();
     }
 
-    char Chessboard::sidepiece_to_char(const PieceType piecetype,
-                                       const Color color)
+    Chessboard::Chessboard(const std::string& str, const Color& color)
+            : Chessboard(parse_perft(str + ((color == Color::WHITE)
+                                           ? std::string(" w - - 0 0 0")
+                                           : std::string(" b - - 0 0 0"))))
+    {}
+
+    Chessboard::Chessboard(const PerftObject& perft)
+            : Chessboard(perft.get_fen())
+    {}
+
+    Chessboard::Chessboard(const std::string& fen_string)
+            : Chessboard(parse_perft(fen_string + std::string(" w - - 0 0 0")))
+    {}
+
+    char Chessboard::sidepiece_to_char(const PieceType& piece,
+                                       const Color& color)
     {
-        const char piece_char = piece_to_char(piecetype);
+        const char piece_char = piece_to_char(piece);
 
         return color == Color::WHITE ? piece_char : tolower(piece_char);
     }
 
     char Chessboard::sidepiece_to_char(const side_piece_t& sidepiece)
     {
-        return sidepiece_to_char(sidepiece.first, sidepiece.second);
+        const char piece_char = piece_to_char(sidepiece.first);
+
+        return sidepiece.second == Color::WHITE ? piece_char : tolower(piece_char);
     }
 
     std::ostream& Chessboard::write_fen_rank(std::ostream& os,
@@ -306,7 +190,6 @@ namespace board
         return legal_moves;
     }
 
-    // FIXME
     bool Chessboard::has_legal_moves()
     {
         return !generate_legal_moves().empty();
@@ -315,8 +198,8 @@ namespace board
     void Chessboard::register_double_pawn_push(const Move& move,
                                                const Color color)
     {
-        const Position& start = move.start_get();
-        const Position& end = move.end_get();
+        const Position& start = move.get_start();
+        const Position& end = move.get_end();
 
         const auto start_rank_i = utils::utype(start.get_rank());
         const auto en_passant_rank_i = start_rank_i +
@@ -334,7 +217,7 @@ namespace board
 
     void Chessboard::update_last_fifty_turn(const Move& move)
     {
-        if (move.capture_get() || move.piece_get() == PieceType::PAWN)
+        if (move.get_capture() || move.get_piece() == PieceType::PAWN)
             last_fifty_turn_ = 0;
         else
             if (!white_turn_)
@@ -343,7 +226,7 @@ namespace board
 
     void Chessboard::eat_en_passant(const Move& move, const Color color)
     {
-        const Position& end = move.end_get();
+        const Position& end = move.get_end();
 
         const auto en_passant_rank_i = utils::utype(end.get_rank());
         const auto eaten_pawn_rank_i = en_passant_rank_i +
@@ -353,27 +236,27 @@ namespace board
         const auto eaten_pawn_color = color == Color::WHITE ?
             Color::BLACK : Color::WHITE;
 
-        unset_piece(Position(end.get_file(), eaten_pawn_rank),
+        board_.unset_piece(Position(end.get_file(), eaten_pawn_rank),
                        PieceType::PAWN, eaten_pawn_color);
     }
 
     void Chessboard::move_castling_rook(const Move& move, const Color color)
     {
-        const Position& end = move.end_get();
+        const Position& end = move.get_end();
 
         const auto king_file_i = utils::utype(end.get_file());
         const auto king_rank = end.get_rank();
 
-        const auto rook_start_file = move.king_castling_get() ?
+        const auto rook_start_file = move.get_king_castling() ?
                                      File::H : File::A;
         const auto rook_end_file_i = king_file_i +
-                                     (move.king_castling_get() ? -1 : 1);
+                                     (move.get_king_castling() ? -1 : 1);
         const auto rook_end_file = static_cast<File>(rook_end_file_i);
 
         const auto rook_start = Position(rook_start_file, king_rank);
         const auto rook_end = Position(rook_end_file, king_rank);
 
-        move_piece(rook_start, rook_end, PieceType::ROOK, color);
+        board_.move_piece(rook_start, rook_end, PieceType::ROOK, color);
     }
 
     void Chessboard::update_white_castling_bools(const Move& move)
@@ -381,14 +264,14 @@ namespace board
         const Position queenside_rook_pos = Position(File::A, Rank::ONE);
         const Position kingside_rook_pos = Position(File::H, Rank::ONE);
 
-        if (move.castling_get())
+        if (move.get_castling())
         {
             white_king_castling_ = false;
             white_queen_castling_ = false;
         }
         else
         {
-            const auto move_piecetype = move.piece_get();
+            const auto move_piecetype = move.get_piece();
 
             if (move_piecetype == PieceType::KING)
             {
@@ -398,7 +281,7 @@ namespace board
             }
             else if (move_piecetype == PieceType::ROOK)
             {
-                const auto rook_start = move.start_get();
+                const auto rook_start = move.get_start();
 
                 // If a rook is moved,
                 // it can only cancels one castling out of two
@@ -415,14 +298,14 @@ namespace board
         const Position queenside_rook_pos = Position(File::A, Rank::EIGHT);
         const Position kingside_rook_pos = Position(File::H, Rank::EIGHT);
 
-        if (move.castling_get())
+        if (move.get_castling())
         {
             black_king_castling_ = false;
             black_queen_castling_ = false;
         }
         else
         {
-            const auto move_piecetype = move.piece_get();
+            const auto move_piecetype = move.get_piece();
 
             if (move_piecetype == PieceType::KING)
             {
@@ -432,7 +315,7 @@ namespace board
             }
             else if (move_piecetype == PieceType::ROOK)
             {
-                const auto rook_start = move.start_get();
+                const auto rook_start = move.get_start();
 
                 // If a rook is moved,
                 // it can only cancels one castling out of two
@@ -454,29 +337,33 @@ namespace board
 
     void Chessboard::do_move(const Move& move)
     {
-        const Position& start = move.start_get();
-        const Position& end = move.end_get();
+        const Position& start = move.get_start();
+        const Position& end = move.get_end();
         const Color color = (*this)[start].value().second;
-        const PieceType piecetype = move.piece_get();
+        const PieceType piecetype = move.get_piece();
 
         // The piece that will be eaten if move is a capture
         const opt_piece_t opt_end_piece = (*this)[end];
 
-        move_piece(start, end, piecetype, color);
+        if (!move.get_capture())
+            board_.move_piece(start, end, piecetype, color);
 
         // NOTE if a move is a double pawn push, then it cannot be a capture
-        if (move.double_pawn_push_get())
+        if (move.get_double_pawn_push())
             register_double_pawn_push(move, color);
         else
         {
             forget_en_passant();
             update_last_fifty_turn(move);
 
-            if (move.en_passant_get())
+            if (move.get_en_passant())
+            {
                 eat_en_passant(move, color);
-            else if (move.castling_get())
+                board_.move_piece(start, end, piecetype, color);
+            }
+            else if (move.get_castling())
                 move_castling_rook(move, color);
-            else if (move.capture_get())
+            else if (move.get_capture())
             {
                 assert(opt_end_piece.has_value());
                 side_piece_t eaten_piece = opt_end_piece.value();
@@ -486,13 +373,14 @@ namespace board
                 assert(eaten_piece_color == (color == Color::WHITE ?
                                              Color::BLACK : Color::WHITE));
 
-                unset_piece(end, eaten_piece_type, eaten_piece_color);
+                board_.unset_piece(end, eaten_piece_type, eaten_piece_color);
+                board_.move_piece(start, end, piecetype, color);
             }
 
-            if (move.promotion_get().has_value())
+            if (move.get_promotion().has_value())
             {
-                const auto new_piecetype = move.promotion_get().value();
-                change_piece_type(end, PieceType::PAWN, new_piecetype, color);
+                const auto new_piecetype = move.get_promotion().value();
+                board_.change_piece_type(end, PieceType::PAWN, new_piecetype, color);
             }
         }
         update_castling_bools(move, color);
@@ -506,85 +394,17 @@ namespace board
         register_state();
     }
 
-    /*// In this function we place the rook correctly, since the king will be
-    // placed back thanks to do_move
-    void Chessboard::handle_undo_castling(const Move& move)
-    {
-        if (move.queen_castling_get())
-        {
-            // The white turn variable has not yet been toggled
-            // since it's done in do_move
-            if (white_turn_) // The black was playing
-            {
-                unset_piece(move.start_get(),
-                            move.promotion_get().value(),
-                            ((white_turn_) ? Color::WHITE : Color::BLACK));
-                set_piece(move.start_get(),
-                          PieceType::PAWN,
-                          ((white_turn_) ? Color::WHITE : Color::BLACK));
-            }
-        }
-    }
-
-    void Chessboard::undo_move(const Move& move,
-                               const option_parser::BoardState& state)
-    {
-        // Handle special case or just make move in reverse
-        if (move.king_castling_get() || move.queen_castling_get())
-        {
-            handle_undo_castling(move);
-        }
-
-        const Move reversed = move.get_reverse();
-        do_move(reversed);
-
-        // Then restore any eaten piece that was at end position
-        // We stored where the pawn was eaten so en passant is handled
-        if (state.ate)
-        {
-            // The white was currently playing, a black piece was eaten
-            set_piece(Position(state.eaten_x, state.eaten_y),
-                      static_cast<PieceType>(state.piece_type),
-                      ((white_turn_) ? Color::BLACK : Color::WHITE));
-        }
-
-        // If there was a promotion we need to restore as a pawn
-        if (move.promotion_get().has_value())
-        {
-            unset_piece(move.start_get(),
-                        move.promotion_get().value(),
-                        ((white_turn_) ? Color::WHITE : Color::BLACK));
-            set_piece(move.start_get(),
-                      PieceType::PAWN,
-                      ((white_turn_) ? Color::WHITE : Color::BLACK));
-        }
-
-
-        // Now restore the state flags
-
-        white_king_castling_ = state.white_king_castling;
-        white_queen_castling_ = state.white_queen_castling;
-        black_king_castling_ = state.black_king_castling;
-        black_queen_castling_ = state.black_queen_castling;
-
-        // Also need to restore en passant flag
-        if (state.en_passant)
-        {
-            en_passant_ = Position(state.en_passant_y, state.en_passant_y);
-        }
-    }*/
-
     bool Chessboard::is_move_possible(const Move& move)
     {
         // Move is invalid if in start the piece is not there or bad color
         // Scope is soooo perf, swiftly
         {
-            const auto opt_piece = (*this)[move.start_get()];
+            const auto opt_piece = (*this)[move.get_start()];
             if (!opt_piece.has_value())
             {
                 return false;
             }
-            else if (opt_piece.value().first != move.piece_get()
+            else if (opt_piece.value().first != move.get_piece()
                     || opt_piece.value().second != (white_turn_ ? Color::WHITE
                                                                : Color::BLACK))
             {
@@ -594,7 +414,7 @@ namespace board
 
         std::vector<Move> possible_piecetype_moves;
 
-        switch (move.piece_get())
+        switch (move.get_piece())
         {
             case PieceType::QUEEN:
                 possible_piecetype_moves = rule::generate_queen_moves(*this);
@@ -624,45 +444,15 @@ namespace board
 
     bool Chessboard::is_possible_move_legal(const Move& move) const
     {
-        // TODO try do undo
         Chessboard board_copy = *this;
         board_copy.do_move(move);
         board_copy.white_turn_ = !board_copy.white_turn_;
         return !board_copy.is_check();
-
-        /*option_parser::BoardState state;
-        fill_state(move, *this, state);
-
-        do_move(move);
-        white_turn_ = !white_turn_;
-        bool no_checked = !is_check();
-        white_turn_ = !white_turn_;
-        undo_move(move, state);
-        turn_ -= 2; // We called do_move 2 times
-
-        return no_checked;*/
     }
 
     bool Chessboard::is_move_legal(const Move& move)
     {
         return is_move_possible(move) && is_possible_move_legal(move);
-    }
-
-    Position Chessboard::get_king_position(void) const
-    {
-        const auto king_color = white_turn_ ? Color::WHITE : Color::BLACK;
-        const bitboard_t& king_bitboard = get_bitboard(PieceType::KING,
-                                                       king_color);
-
-        size_t rank_i = 0;
-        while (king_bitboard[rank_i].none())
-            rank_i++;
-
-        size_t file_i = 0;
-        while (!king_bitboard[rank_i][file_i])
-            file_i++;
-
-        return Position(static_cast<File>(file_i), static_cast<Rank>(rank_i));
     }
 
     bool Chessboard::is_check(void)
@@ -708,6 +498,16 @@ namespace board
     {
         return last_fifty_turn_ >= 50 || is_pat(legal_moves)
                 || threefold_repetition();
+    }
+    
+    Board& Chessboard::get_board(void)
+    {
+        return board_;
+    }
+    
+    const Board& Chessboard::get_board(void) const
+    {
+        return board_;
     }
 
     bool Chessboard::get_white_turn(void) const
@@ -757,48 +557,90 @@ namespace board
 
     Chessboard::opt_piece_t Chessboard::operator[](const Position& pos) const
     {
-        static constexpr auto colors = {Color::WHITE, Color::BLACK};
-        const size_t rank_i = utils::utype(pos.get_rank());
-        const size_t file_i = utils::utype(pos.get_file());
+        return board_[pos];
+    }
 
-        for (const auto piecetype : piecetype_array)
+    bool Chessboard::operator==(const Chessboard& rhs) const
+    {
+        return white_king_castling_ == rhs.white_king_castling_
+            && white_queen_castling_ == rhs.white_queen_castling_
+            && black_king_castling_ == rhs.black_king_castling_
+            && black_queen_castling_ == rhs.black_queen_castling_
+            && board_ == rhs.board_
+            && white_turn_ == rhs.white_turn_
+            && en_passant_ == rhs.en_passant_
+            && turn_ == rhs.turn_
+            && last_fifty_turn_ == rhs.last_fifty_turn_;
+    }
+
+    std::ostream& operator<<(std::ostream& os, const Chessboard& board)
+    {
+        constexpr std::string_view sep = " ";
+
+        for (int rank_i = Chessboard::width - 1; rank_i >= 0; rank_i--)
         {
-            for (const auto color : colors)
+            os << rank_i + 1;
+            for (size_t file_i = 0; file_i < Chessboard::width; file_i++)
             {
-                const bitboard_t& bitboard = get_bitboard(piecetype, color);
+                const auto file = static_cast<File>(file_i);
+                const auto rank = static_cast<Rank>(rank_i);
+                const auto curr_piece = board[Position(file, rank)];
 
-                if (bitboard[rank_i][file_i])
-                    return std::make_pair(piecetype, color);
+                os << sep;
+
+                if (curr_piece.has_value())
+                {
+                    const PieceType piecetype = curr_piece.value().first;
+                    const Color piece_color = curr_piece.value().second;
+
+                    os << Chessboard::sidepiece_to_char(piecetype,
+                                                        piece_color);
+                }
+                else
+                    os << empty_cell_char;
+            }
+
+            os << std::endl;
+        }
+
+        os << sep;
+        for (size_t file_i = 0; file_i < Chessboard::width; file_i++)
+            os << sep << char('A' + file_i);
+
+        return os;
+    }
+
+    // FIXME: TEMP TO MAKE RULE WORK
+
+    Chessboard::opt_piece_t Chessboard::operator()(const Position& pos,
+            const PieceType& piece_type, const Color& color) const
+    {
+        opt_piece_t res = board_[pos];
+        if (res.has_value() && res->first == piece_type && res->second == color)
+            return res;
+        return std::nullopt;
+    }
+
+    Position Chessboard::get_king_position(void) const
+    {
+        const auto king_color = white_turn_ ? Color::WHITE : Color::BLACK;
+        
+        for (int rank = 0; rank < 8; rank++)
+        {
+            for (int file = 0; file < 8; file++)
+            {
+                Position pos(file, rank);
+                if (board_[pos].has_value()
+                    && board_[pos].value().first == PieceType::KING
+                    && board_[pos].value().second == king_color)
+                {
+                    return pos;
+                }
             }
         }
 
-        return std::nullopt;
+        assert(false);
+        return Position(0, 0);
     }
 
-    std::bitset<Chessboard::width> Chessboard::operator()(const Rank rank,
-            const PieceType piece, const Color color) const
-    {
-        if (color == Color::BLACK)
-        {
-            return black_bitboards_[static_cast<uint8_t>(piece)]
-                                   [static_cast<uint8_t>(rank)];
-        }
-        else
-        {
-            return white_bitboards_[static_cast<uint8_t>(piece)]
-                                   [static_cast<uint8_t>(rank)];
-        }
-    }
-
-    Chessboard::opt_piece_t Chessboard::operator()(const Position& pos,
-            const PieceType& piece, const Color& color) const
-    {
-        const size_t rank_i = utils::utype(pos.get_rank());
-        const size_t file_i = utils::utype(pos.get_file());
-        const bitboard_t& bitboard = get_bitboard(piece, color);
-
-        if (bitboard[rank_i][file_i])
-            return std::make_pair(piece, color);
-        return std::nullopt;
-    }
 }

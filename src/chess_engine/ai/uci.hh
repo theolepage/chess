@@ -35,4 +35,11 @@ namespace uci
      * moves f7f5
      */
     std::string get_board();
+
+    /** Receive and return the command describing go state
+     * Format: go [depth DEPTH]
+     * Eg:
+     * -go depth 4
+     */
+    std::string get_go();
 } // namespace ai

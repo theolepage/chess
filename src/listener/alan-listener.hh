@@ -5,9 +5,9 @@
 #include "listener/listener.hh"
 #include "chess_engine/board/chessboard-interface.hh"
 #include "chess_engine/board/chessboard.hh"
-#include "chess_engine/board/color.hh"
-#include "chess_engine/board/piece-type.hh"
-#include "chess_engine/board/position.hh"
+#include "chess_engine/board/entity/color.hh"
+#include "chess_engine/board/entity/piece-type.hh"
+#include "chess_engine/board/entity/position.hh"
 
 using namespace std;
 
