@@ -1,13 +1,7 @@
 /*
  * To-Do
  *
- * move-generation.cc
  * - [ ] Pawns: promotion, en passant, double pawn push
- *
- * chessboard.cc/hh
- * - [ ] pos_threatened(Position)
- * - [ ] is_check()
- *
  * - [ ] Refactoring board namespace
  * - [ ] Do a benchmark
 */

@@ -244,7 +244,11 @@ namespace rule
             board_copy.get_board().move_piece(prev_step, step,
                                               PieceType::KING, color);
             if (board_copy.is_check())
+            {
+                if (!king_castling)
+                    std::cout << "Position is check " << step << std::endl; 
                 not_in_check = false;
+            }
             prev_step = step;
         }
 
@@ -407,7 +411,8 @@ namespace rule
 
     std::vector<Move> generate_king_moves(const Chessboard& board)
     {
-        return generate_moves(board, PieceType::KING);
+        return move_generation::generate_king_moves(board);
+        // return generate_moves(board, PieceType::KING);
     }
 
     std::vector<Move> generate_bishop_moves(const Chessboard& board)

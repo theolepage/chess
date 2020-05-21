@@ -65,7 +65,7 @@ namespace board
     uint64_t MoveInitialization::get_pawn_targets(const int pos,
                                                   const Color& color) const
     {
-        return pawn_masks[static_cast<int>(color)][pos];
+        return pawn_masks[color == Color::WHITE ? 0 : 1][pos];
     }
 
     // Returns a mask containing set bits on the axis
@@ -107,7 +107,7 @@ namespace board
                             | utils::bitboard_from_pos(from.translate(0, 1))
                             | utils::bitboard_from_pos(from.translate(1, 1))
 
-                            | utils::bitboard_from_pos(from.translate(-1, 1))
+                            | utils::bitboard_from_pos(from.translate(-1, 0))
                             | utils::bitboard_from_pos(from.translate(1, 0))
 
                             | utils::bitboard_from_pos(from.translate(-1, -1))

@@ -470,12 +470,12 @@ namespace board
 
         // Rook
         const uint64_t r = m.get_targets(PieceType::ROOK, index, board_());
-        if (r & board_(PieceType::ROOK, opponent_color))
+        if (r & (board_(PieceType::ROOK, opponent_color)))
             return true;
 
         // Bishop
         const uint64_t b = m.get_targets(PieceType::BISHOP, index, board_());
-        if (b & board_(PieceType::BISHOP, opponent_color))
+        if (b & (board_(PieceType::BISHOP, opponent_color)))
             return true;
 
         // Knight
@@ -501,9 +501,9 @@ namespace board
         uint64_t kings = board_(PieceType::KING,
                                 white_turn_ ? Color::WHITE : Color::BLACK);
         const int king_pos = utils::pop_lsb(kings);
+        if (king_pos == -1)
+            return false;
         return pos_threatened(Position(king_pos));
-
-        // return rule::is_king_checked(*this);
     }
 
     bool Chessboard::is_pat(void)
@@ -545,12 +545,12 @@ namespace board
         return last_fifty_turn_ >= 50 || is_pat(legal_moves)
                 || threefold_repetition();
     }
-    
+
     Board& Chessboard::get_board(void)
     {
         return board_;
     }
-    
+
     const Board& Chessboard::get_board(void) const
     {
         return board_;

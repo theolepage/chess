@@ -44,25 +44,25 @@ namespace board
         static const Position wking_pos{File::E, Rank::ONE};
         static const Position bking_pos{File::E, Rank::EIGHT};
         static const PgnMove w_small{wking_pos,
-                                     {File::G, Rank::ONE},
+                                     Position(File::G, Rank::ONE),
                                      PieceType::KING,
                                      false,
                                      ReportType::NONE,
                                      std::nullopt, false, true};
         static const PgnMove w_big{wking_pos,
-                                   {File::C, Rank::ONE},
+                                   Position(File::C, Rank::ONE),
                                    PieceType::KING,
                                    false,
                                    ReportType::NONE,
                                    std::nullopt, true, false};
         static const PgnMove b_small{bking_pos,
-                                     {File::G, Rank::EIGHT},
+                                     Position(File::G, Rank::EIGHT),
                                      PieceType::KING,
                                      false,
                                      ReportType::NONE,
                                      std::nullopt, false, true};
         static const PgnMove b_big{bking_pos,
-                                   {File::C, Rank::EIGHT},
+                                   Position(File::C, Rank::EIGHT),
                                    PieceType::KING,
                                    false,
                                    ReportType::NONE,
