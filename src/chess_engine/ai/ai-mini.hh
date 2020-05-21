@@ -1,6 +1,8 @@
 #pragma once
 
-#include "chess_engine/board/entity/move.hh"
+#include <optional>
+
+#include "chess_engine/board/move.hh"
 #include "chess_engine/board/chessboard.hh"
 
 namespace ai
@@ -8,7 +10,7 @@ namespace ai
      class AiMini final
      {
      public:
-          board::Move search(board::Chessboard& chessboard,
+          std::optional<board::Move>  search(board::Chessboard& chessboard,
                              int16_t depth) const;
      };
 }

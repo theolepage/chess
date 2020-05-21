@@ -1,4 +1,3 @@
-#include <optional>
 #include <algorithm>
 #include <vector>
 
@@ -70,13 +69,12 @@ namespace ai
           return evalAndMove(bestValue, legal_moves[bestIndex]);
      }
 
-     board::Move AiMini::search(board::Chessboard& chessboard,
+     std::optional<board::Move>  AiMini::search(board::Chessboard& chessboard,
                                 int16_t depth) const
      {
           auto eval_move = minimax(chessboard, depth, INT16_MIN, INT16_MAX,
                                   chessboard.get_white_turn());
           uci::info(depth, eval_move.first);
-          return eval_move.second.value();
-
+          return eval_move.second;
      }
 }
