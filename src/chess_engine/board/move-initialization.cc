@@ -15,6 +15,9 @@ namespace board
     {
         init_rays();
 
+        init_king_masks();
+        init_knight_masks();
+        init_pawn_masks();
         init_rook_masks();
         init_bishop_masks();
 
@@ -29,36 +32,45 @@ namespace board
 
     uint64_t MoveInitialization::get_targets(
             const PieceType& piece,
-            int pos,
+            const int pos,
             uint64_t blockers
-    )
+    ) const
     {
-        if (piece == PieceType::BISHOP)
+        uint64_t key;
+        switch (piece)
         {
-            blockers &= bishop_masks[pos];
-            const uint64_t key = (blockers * defs::bishop_magics[pos])
-                            >> (defs::NB_POS - defs::bishop_bits[pos]);
-            return bishop_attacks[pos][key];
+            case PieceType::BISHOP:
+                blockers &= bishop_masks[pos];
+                key = (blockers * defs::bishop_magics[pos])
+                                >> (defs::NB_POS - defs::bishop_bits[pos]);
+                return bishop_attacks[pos][key];
+            case PieceType::ROOK:
+                blockers &= rook_masks[pos];
+                key = (blockers * defs::rook_magics[pos])
+                                >> (defs::NB_POS - defs::rook_bits[pos]);
+                return rook_attacks[pos][key];
+            case PieceType::QUEEN:
+                return get_targets(PieceType::ROOK, pos, blockers)
+                        | get_targets(PieceType::BISHOP, pos, blockers);
+            case PieceType::KING:
+                return king_masks[pos];
+            case PieceType::KNIGHT:
+                return knight_masks[pos];
+            default:
+                assert(false);
         }
-        if (piece == PieceType::ROOK)
-        {
-            blockers &= rook_masks[pos];
-            const uint64_t key = (blockers * defs::rook_magics[pos])
-                            >> (defs::NB_POS - defs::rook_bits[pos]);
-            return rook_attacks[pos][key];
-        }
-        if (piece == PieceType::QUEEN)
-        {
-            return get_targets(PieceType::ROOK, pos, blockers)
-                    | get_targets(PieceType::BISHOP, pos, blockers);
-        }
-        assert(false);
         return 0ULL;
+    }
+
+    uint64_t MoveInitialization::get_pawn_targets(const int pos,
+                                                  const Color& color) const
+    {
+        return pawn_masks[static_cast<int>(color)][pos];
     }
 
     // Returns a mask containing set bits on the axis
     uint64_t MoveInitialization::get_ray(
-        const Position& from, const int file, const int rank)
+        const Position& from, const int file, const int rank) const
     {
         uint64_t res = 0ULL;
         std::optional<Position> pos = from.translate(file, rank);
@@ -83,6 +95,53 @@ namespace board
             rays[5][i] = get_ray(from,  1,  1); // diagonal up right
             rays[6][i] = get_ray(from, -1, -1); // diagonal down left
             rays[7][i] = get_ray(from,  1, -1); // diagonal down right
+        }
+    }
+
+    void MoveInitialization::init_king_masks(void)
+    {
+        for (int i = 0; i < defs::NB_POS; i++)
+        {
+            Position from(i);
+            king_masks[i] = utils::bitboard_from_pos(from.translate(-1, 1))
+                            | utils::bitboard_from_pos(from.translate(0, 1))
+                            | utils::bitboard_from_pos(from.translate(1, 1))
+
+                            | utils::bitboard_from_pos(from.translate(-1, 1))
+                            | utils::bitboard_from_pos(from.translate(1, 0))
+
+                            | utils::bitboard_from_pos(from.translate(-1, -1))
+                            | utils::bitboard_from_pos(from.translate(0, -1))
+                            | utils::bitboard_from_pos(from.translate(1, -1));
+        }
+    }
+
+    void MoveInitialization::init_knight_masks(void)
+    {
+        for (int i = 0; i < defs::NB_POS; i++)
+        {
+            Position from(i);
+            knight_masks[i] = utils::bitboard_from_pos(from.translate(-1,  2))
+                            | utils::bitboard_from_pos(from.translate(-2,  1))
+                            | utils::bitboard_from_pos(from.translate(1,  2))
+                            | utils::bitboard_from_pos(from.translate(2,  1))
+
+                            | utils::bitboard_from_pos(from.translate(-1, -2))
+                            | utils::bitboard_from_pos(from.translate(-2, -1))
+                            | utils::bitboard_from_pos(from.translate(1, -2))
+                            | utils::bitboard_from_pos(from.translate(2, -1));
+        }
+    }
+
+    void MoveInitialization::init_pawn_masks(void)
+    {
+        for (int i = 0; i < defs::NB_POS; i++)
+        {
+            Position from(i);
+            pawn_masks[0][i] = utils::bitboard_from_pos(from.translate(-1,  1))
+                            | utils::bitboard_from_pos(from.translate(1,  1));
+            pawn_masks[1][i] = utils::bitboard_from_pos(from.translate(-1, -1))
+                            | utils::bitboard_from_pos(from.translate(1,  -1));
         }
     }
 
@@ -126,7 +185,7 @@ namespace board
     * and uniquely for all the blockers possiblities
     */
     uint64_t MoveInitialization::get_blockers(const int blocker_index,
-                                    uint64_t current_mask)
+                                    uint64_t current_mask) const
     {
         const int nb_bits = utils::bits_count(current_mask);
         uint64_t current_blocker = 0ULL;
@@ -141,7 +200,7 @@ namespace board
     }
 
     uint64_t MoveInitialization::get_bishop_attacks_classical(
-        int pos, uint64_t blockers)
+        int pos, uint64_t blockers) const
     {
         uint64_t res = 0ULL;
 
@@ -173,7 +232,7 @@ namespace board
     }
 
     uint64_t MoveInitialization::get_rook_attacks_classical(
-        int pos, uint64_t blockers)
+        int pos, uint64_t blockers) const
     {
         uint64_t res = 0ULL;
 

@@ -5,6 +5,7 @@
 #include "entity/color.hh"
 #include "entity/position.hh"
 #include "entity/move.hh"
+#include "move-initialization.hh"
 
 #include <cassert>
 #include <optional>
@@ -455,9 +456,54 @@ namespace board
         return is_move_possible(move) && is_possible_move_legal(move);
     }
 
+    bool Chessboard::pos_threatened(const Position& pos) const
+    {
+        const Color color = white_turn_ ? Color::WHITE : Color::BLACK;
+        const Color opponent_color = white_turn_ ? Color::BLACK : Color::WHITE;
+        const int index = pos.get_index();
+        const MoveInitialization& m = MoveInitialization::get_instance();
+
+        // Queens
+        const uint64_t q = m.get_targets(PieceType::QUEEN, index, board_());
+        if (q & board_(PieceType::QUEEN, opponent_color))
+            return true;
+
+        // Rook
+        const uint64_t r = m.get_targets(PieceType::ROOK, index, board_());
+        if (r & board_(PieceType::ROOK, opponent_color))
+            return true;
+
+        // Bishop
+        const uint64_t b = m.get_targets(PieceType::BISHOP, index, board_());
+        if (b & board_(PieceType::BISHOP, opponent_color))
+            return true;
+
+        // Knight
+        const uint64_t n = m.get_targets(PieceType::KNIGHT, index, board_());
+        if (n & board_(PieceType::KNIGHT, opponent_color))
+            return true;
+
+        // Pawn
+        const uint64_t p = m.get_pawn_targets(index, color);
+        if (p & board_(PieceType::PAWN, opponent_color))
+            return true;
+
+        // King
+        const uint64_t k = m.get_targets(PieceType::KING, index, board_());
+        if (k & board_(PieceType::KING, opponent_color))
+            return true;
+
+        return false;
+    }
+
     bool Chessboard::is_check(void)
     {
-        return rule::is_king_checked(*this);
+        uint64_t kings = board_(PieceType::KING,
+                                white_turn_ ? Color::WHITE : Color::BLACK);
+        const int king_pos = utils::pop_lsb(kings);
+        return pos_threatened(Position(king_pos));
+
+        // return rule::is_king_checked(*this);
     }
 
     bool Chessboard::is_pat(void)

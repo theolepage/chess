@@ -3,12 +3,22 @@
 #include <cstdint>
 #include <iostream>
 #include <ostream>
+#include <optional>
+
+#include "chess_engine/board/entity/position.hh"
 
 namespace utils
 {
     inline int is_bit_set(const uint64_t bit, const int index)
     {
         return (bit >> index) & 1ULL;
+    }
+
+    inline uint64_t bitboard_from_pos(const std::optional<board::Position>& pos)
+    {
+        if (!pos.has_value())
+            return 0ULL;
+        return 1ULL << pos->get_index();
     }
 
     inline void print_bit(const uint64_t bit)

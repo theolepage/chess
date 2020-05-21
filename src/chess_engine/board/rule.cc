@@ -241,7 +241,8 @@ namespace rule
         for (size_t i = 0; i < temp_positions.size(); i++)
         {
             const Position step = temp_positions.at(i);
-            board_copy.get_board().move_piece(prev_step, step, PieceType::KING, color);
+            board_copy.get_board().move_piece(prev_step, step,
+                                              PieceType::KING, color);
             if (board_copy.is_check())
                 not_in_check = false;
             prev_step = step;
@@ -429,7 +430,8 @@ namespace rule
 
     std::vector<Move> generate_knight_moves(const Chessboard& board)
     {
-        return generate_moves(board, PieceType::KNIGHT);
+        return move_generation::generate_knight_moves(board);
+        // return generate_moves(board, PieceType::KNIGHT);
     }
 
     std::vector<Move> generate_all_moves(const Chessboard& board)

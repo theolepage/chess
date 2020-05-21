@@ -42,6 +42,7 @@ namespace board
         static char sidepiece_to_char(const PieceType& piece, const Color& color);
         std::string to_fen_string(void) const;
 
+        bool pos_threatened(const Position& pos) const;
         std::vector<Move> generate_legal_moves(void);
         bool has_legal_moves(void);
         void do_move(const Move& move);

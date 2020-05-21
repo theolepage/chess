@@ -1,3 +1,5 @@
+#include "move-generation.hh"
+
 #include <vector>
 
 #include "rule.hh"
@@ -88,5 +90,64 @@ namespace move_generation
     std::vector<Move> generate_queen_moves(const Chessboard& board)
     {
         return generate_moves(PieceType::QUEEN, board);
+    }
+
+    std::vector<Move> generate_knight_moves(const Chessboard& board)
+    {
+        return generate_moves(PieceType::KNIGHT, board);
+    }
+
+    std::vector<Move> generate_king_moves(const Chessboard& board)
+    {
+        std::vector<Move> res = generate_moves(PieceType::KING, board);
+
+        // Handle castling
+        const Color color = board.get_white_turn()
+                ? Color::WHITE : Color::BLACK;
+        const Rank rank = (color == Color::WHITE) ? Rank::ONE : Rank::EIGHT;
+
+        // FIXME: Beter ordering of conditions to not do useless
+        // FIME: Make sure correct masks values
+        if (board.get_king_castling(color))
+        {
+            uint64_t have_pieces_between = board.get_board()()
+                & (color == Color::WHITE ? 0x60 : 0x6000000000000000);
+            uint64_t attacked = board.pos_threatened(Position(File::E, rank))
+                                | board.pos_threatened(Position(File::F, rank))
+                                | board.pos_threatened(Position(File::G, rank));
+            if (!have_pieces_between && !attacked)
+            {
+                Move king_castling(Position(File::E, rank),
+                                   Position(File::G, rank),
+                                   PieceType::KING);
+                king_castling.set_king_castling(true);
+                res.push_back(king_castling);
+            }
+        }
+
+        if (board.get_queen_castling(color))
+        {
+            uint64_t have_pieces_between = board.get_board()()
+                & (color == Color::WHITE ? 0xE : 0xE00000000000000);
+            uint64_t attacked = board.pos_threatened(Position(File::E, rank))
+                                | board.pos_threatened(Position(File::D, rank))
+                                | board.pos_threatened(Position(File::C, rank));
+            if (!have_pieces_between && !attacked)
+            {
+                Move queen_castling(Position(File::E, rank),
+                                   Position(File::C, rank),
+                                   PieceType::QUEEN);
+                queen_castling.set_queen_castling(true);
+                res.push_back(queen_castling);
+            }
+        }
+
+        return res;
+    }
+
+    std::vector<Move> generate_pawn_moves(const Chessboard&)
+    {
+        // FIXME: Handle pawn
+        return std::vector<Move>();
     }
 } // namespace move_generation
