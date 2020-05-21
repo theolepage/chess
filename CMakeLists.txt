@@ -95,6 +95,29 @@ set(SRC_TESTS
     #FIXME
     )
 
+# MAKE CHECK_PGN TARGET
+add_custom_target(check_pgn
+    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+    COMMAND python3 ${CMAKE_SOURCE_DIR}/tests/pgn-testsuite.py
+             -v ${CMAKE_SOURCE_DIR}/chessengine
+             ${CMAKE_SOURCE_DIR}/tests/libbasic-output.so
+             ${CMAKE_SOURCE_DIR}/tests/given_pgn
+)
+
+# MAKE CHECK_PERFT TARGET
+add_custom_target(check_perft
+    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+    COMMAND python3 ${CMAKE_SOURCE_DIR}/tests/perft-testsuite.py
+             -v ${CMAKE_SOURCE_DIR}/chessengine
+             ${CMAKE_SOURCE_DIR}/tests/given_perft;
+)
+
+# MAKE CHECK_UNIT TARGET
+add_custom_target(check_unit
+    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+    COMMAND ${CMAKE_CTEST_COMMAND} --verbose
+)
+
 # MAKE CHECK TARGET
 add_custom_target(check
     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
@@ -105,8 +128,8 @@ add_custom_target(check
     COMMAND python3 ${CMAKE_SOURCE_DIR}/tests/perft-testsuite.py
              -v ${CMAKE_SOURCE_DIR}/chessengine
              ${CMAKE_SOURCE_DIR}/tests/given_perft;
-    COMMAND ${CMAKE_CTEST_COMMAND}
 )
+add_dependencies(check check_unit)
 
 # BUILD OPTIONS
 set(CMAKE_CXX_STANDARD 17)
@@ -143,7 +166,9 @@ set_target_properties(chessengine PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}) # binary destination
 target_sources(chessengine PRIVATE ${MAIN_ENGINE})
 target_link_libraries(chessengine PRIVATE SRC_ENGINE_OBJ ${LIBRARIES})
-add_dependencies(check chessengine)
+add_dependencies(check_perft chessengine)
+add_dependencies(check_pgn chessengine)
+add_dependencies(check_unit chessengine)
 
 # STATIC TARGET
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
@@ -152,7 +177,9 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
         RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}) # binary destination
     target_sources(chessengine-static PRIVATE ${MAIN_ENGINE})
     target_link_libraries(chessengine-static PRIVATE SRC_ENGINE_OBJ ${LIBRARIES} -static)
-    add_dependencies(check chessengine-static)
+    add_dependencies(check_perft chessengine-static)
+    add_dependencies(check_pgn chessengine-static)
+    add_dependencies(check_unit chessengine-static)
 endif()
 
 
@@ -180,7 +207,7 @@ if (${GTEST_FOUND} AND ${THREADS_FOUND})
         # Add the executable created to the test list of ctest
         add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
         # Add test to dependencies of check target
-        add_dependencies(check ${TEST_NAME})
+        add_dependencies(check_unit ${TEST_NAME})
         # Set timeout of the test to 5 seconds
         set_tests_properties(${TEST_NAME} PROPERTIES TIMEOUT 10)
     endforeach()
