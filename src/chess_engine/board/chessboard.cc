@@ -167,12 +167,7 @@ namespace board
 
     void Chessboard::register_state()
     {
-        std::string current_state = to_fen_string();
-
-        if (state_count_.find(current_state) == state_count_.end())
-            state_count_[current_state] = 1;
-        else
-            state_count_[current_state]++;
+        states_history_.push_back(board_);
     }
 
     std::vector<Move> Chessboard::generate_legal_moves(void)
@@ -535,11 +530,14 @@ namespace board
 
     bool Chessboard::threefold_repetition()
     {
-        std::string current_state = to_fen_string();
+        const auto& current_state = states_history_.back();
 
-        assert(state_count_.find(current_state) != state_count_.end());
+        unsigned current_state_count = 0;
+        for (const auto& state : states_history_)
+            if (state == current_state && ++current_state_count == 3)
+                return true;
 
-        return state_count_[current_state] >= 3;
+        return false;
     }
 
     bool Chessboard::is_draw(void)
