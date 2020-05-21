@@ -19,7 +19,7 @@ namespace ai
             pgn_parser::add_move_to_board(chessboard, board_str);
             std::optional<board::Move> move = ai.search(chessboard, depth);
             if (!move.has_value())
-                continue;
+                break;
             uci::play_move(pgn_parser::move_to_string(move.value()));
             chessboard.do_move(move.value());
         }
