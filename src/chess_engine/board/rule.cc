@@ -1,8 +1,8 @@
 #include <vector>
 
-#include "chess_engine/board/chessboard.hh"
-#include "chess_engine/board/move.hh"
-#include "chess_engine/board/rule.hh"
+#include "rule.hh"
+#include "chessboard.hh"
+#include "entity/move.hh"
 #include "utils/utype.hh"
 
 using namespace board;
@@ -23,14 +23,14 @@ namespace rule
                                   const int file,
                                   const int rank)
     {
-        std::optional<Position> pos = from.move(file, rank);
+        std::optional<Position> pos = from.translate(file, rank);
         while (pos)
         {
             v.push_back(*pos);
             if (board[*pos].has_value())
                 break;
 
-            pos = pos->move(file, rank);
+            pos = pos->translate(file, rank);
         }
     }
 
@@ -43,8 +43,8 @@ namespace rule
         // Find threatening positions
         std::vector<Position> threatening_pawns;
         register_pos(threatening_pawns, {
-            king_pos.move(-1, opponent_color == Color::WHITE ? -1 : 1),
-            king_pos.move(1, opponent_color == Color::WHITE ? -1 : 1)
+            king_pos.translate(-1, opponent_color == Color::WHITE ? -1 : 1),
+            king_pos.translate(1, opponent_color == Color::WHITE ? -1 : 1)
         });
         const auto threatening_knights = get_authorized_pos(board,
                                                             PieceType::KNIGHT,
@@ -84,14 +84,17 @@ namespace rule
                                                const Color& color)
     {
         std::vector<Position> res;
-        for (uint8_t rank = 0; rank < Chessboard::width; ++rank)
+        for (int rank = 0; rank < 8; rank++)
         {
-            const std::bitset<Chessboard::width> line =
-                    board(static_cast<Rank>(rank), piece, color);
-            for (uint8_t file = 0; file < Chessboard::width; ++file)
+            for (int file = 0; file < 8; file++)
             {
-                if (line[file])
-                    res.emplace_back(Position(file, rank));
+                Position pos(file, rank);
+                if (board[pos].has_value()
+                    && board[pos].value().first == piece
+                    && board[pos].value().second == color)
+                {
+                    res.emplace_back(pos);
+                }
             }
         }
         return res;
@@ -116,11 +119,11 @@ namespace rule
         else if (shift_rank < 0) shift_rank = -1;
 
         res.push_back(x);
-        std::optional<Position> pos = x.move(shift_file, shift_rank);
+        std::optional<Position> pos = x.translate(shift_file, shift_rank);
         while (pos && pos != y)
         {
             res.push_back(*pos);
-            pos = pos->move(shift_file, shift_rank);
+            pos = pos->translate(shift_file, shift_rank);
         }
         res.push_back(y);
 
@@ -148,18 +151,18 @@ namespace rule
         if (piece == PieceType::KING)
         {
             register_pos(res, {
-                from.move(-1,  1), from.move(0,  1), from.move(1,  1), //top
-                from.move(-1,  0), from.move(1,  0),                   //center
-                from.move(-1, -1), from.move(0, -1), from.move(1, -1)  //bottom
+                from.translate(-1,  1), from.translate(0,  1), from.translate(1,  1), //top
+                from.translate(-1,  0), from.translate(1,  0),                   //center
+                from.translate(-1, -1), from.translate(0, -1), from.translate(1, -1)  //bottom
             });
         }
         if (piece == PieceType::KNIGHT)
         {
             register_pos(res, {
-                from.move(-1,  2), from.move(-2,  1),   // top left
-                from.move(1,  2), from.move(2,  1),   // top right
-                from.move(-1, -2), from.move(-2, -1),   // bottom left
-                from.move(1, -2), from.move(2, -1)    // bottom right
+                from.translate(-1,  2), from.translate(-2,  1),   // top left
+                from.translate(1,  2), from.translate(2,  1),   // top right
+                from.translate(-1, -2), from.translate(-2, -1),   // bottom left
+                from.translate(1, -2), from.translate(2, -1)    // bottom right
             });
         }
         if (piece == PieceType::ROOK || piece == PieceType::QUEEN)
@@ -237,7 +240,7 @@ namespace rule
         for (size_t i = 0; i < temp_positions.size(); i++)
         {
             const Position step = temp_positions.at(i);
-            board_copy.move_piece(prev_step, step, PieceType::KING, color);
+            board_copy.get_board().move_piece(prev_step, step, PieceType::KING, color);
             if (board_copy.is_check())
                 not_in_check = false;
             prev_step = step;
@@ -337,8 +340,8 @@ namespace rule
             // Pawn cannot capture a piece that is in front of it and
             // obviously cannot capture same color.
             const std::optional<Position> to_forward = (color == Color::BLACK)
-                ? from.move(0, -1)
-                : from.move(0,  1);
+                ? from.translate(0, -1)
+                : from.translate(0,  1);
             if (to_forward && !board[*to_forward])
             {
                 if (!register_promotion(res, from, *to_forward, color, false))
@@ -347,8 +350,8 @@ namespace rule
 
                 const std::optional<Position> to_forward_2 =
                         (color == Color::BLACK)
-                        ? from.move(0, -2)
-                        : from.move(0,  2);
+                        ? from.translate(0, -2)
+                        : from.translate(0,  2);
                 const bool first_move = (color == Color::BLACK)
                         ? from.get_rank() == Rank::SEVEN
                         : from.get_rank() == Rank::TWO;
@@ -362,12 +365,12 @@ namespace rule
             // other color on it. In this case it is also a capture.
             const std::optional<Position> to_diag_left =
                     (color == Color::BLACK)
-                    ? from.move(-1, -1)
-                    : from.move(-1,  1);
+                    ? from.translate(-1, -1)
+                    : from.translate(-1,  1);
             const std::optional<Position> to_diag_right =
                     (color == Color::BLACK)
-                    ? from.move(1, -1)
-                    : from.move(1,  1);
+                    ? from.translate(1, -1)
+                    : from.translate(1,  1);
 
             if (to_diag_left)
             {
@@ -412,6 +415,11 @@ namespace rule
 
     std::vector<Move> generate_rook_moves(const Chessboard& board)
     {
+        // rooks = bitboard rook & bitboard color
+        // pop from rooks:
+            // uint64_t attacks = MagicBitboard::get_attack(PieceType::ROOK, from)
+            // attacks &= ~bitboard color
+            // pop from attacks => create move(from, to, )
         return generate_moves(board, PieceType::ROOK);
     }
 

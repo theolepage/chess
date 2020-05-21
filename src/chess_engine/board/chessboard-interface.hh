@@ -2,9 +2,9 @@
 
 #include <optional>
 
-#include "color.hh"
-#include "piece-type.hh"
-#include "position.hh"
+#include "entity/color.hh"
+#include "entity/piece-type.hh"
+#include "entity/position.hh"
 
 namespace board
 {

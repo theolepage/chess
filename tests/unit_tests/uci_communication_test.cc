@@ -2,9 +2,9 @@
 
 #include <string>
 
-#include "chess_engine/board/move.hh"
-#include "chess_engine/board/position.hh"
-#include "chess_engine/board/piece-type.hh"
+#include "chess_engine/board/entity/move.hh"
+#include "chess_engine/board/entity/position.hh"
+#include "chess_engine/board/entity/piece-type.hh"
 #include "parsing/pgn_parser/ebnf-parser.hh"
 
 using namespace board;
@@ -29,15 +29,15 @@ TEST(EBNFParser, StringToMovePromotion)
    string move = "e7f8n";
 
    Move m = string_to_move(board, move);
-   EXPECT_TRUE(m.capture_get());
-   EXPECT_TRUE(m.promotion_get().has_value());
-   EXPECT_EQ(PieceType::KNIGHT, m.promotion_get().value());
-   EXPECT_EQ(Position(File::E, Rank::SEVEN), m.start_get());
-   EXPECT_EQ(Position(File::F, Rank::EIGHT), m.end_get());
-   EXPECT_FALSE(m.double_pawn_push_get());
-   EXPECT_FALSE(m.queen_castling_get());
-   EXPECT_FALSE(m.king_castling_get());
-   EXPECT_FALSE(m.en_passant_get());
+   EXPECT_TRUE(m.get_capture());
+   EXPECT_TRUE(m.get_promotion().has_value());
+   EXPECT_EQ(PieceType::KNIGHT, m.get_promotion().value());
+   EXPECT_EQ(Position(File::E, Rank::SEVEN), m.get_start());
+   EXPECT_EQ(Position(File::F, Rank::EIGHT), m.get_end());
+   EXPECT_FALSE(m.get_double_pawn_push());
+   EXPECT_FALSE(m.get_queen_castling());
+   EXPECT_FALSE(m.get_king_castling());
+   EXPECT_FALSE(m.get_en_passant());
 }
 
 TEST(EBNFParser, StringToMoveCastling)
@@ -47,14 +47,14 @@ TEST(EBNFParser, StringToMoveCastling)
    string move = "e1g1";
 
    Move m = string_to_move(board, move);
-   EXPECT_FALSE(m.capture_get());
-   EXPECT_FALSE(m.promotion_get().has_value());
-   EXPECT_EQ(Position(File::E, Rank::ONE), m.start_get());
-   EXPECT_EQ(Position(File::G, Rank::ONE), m.end_get());
-   EXPECT_FALSE(m.double_pawn_push_get());
-   EXPECT_FALSE(m.queen_castling_get());
-   EXPECT_TRUE(m.king_castling_get());
-   EXPECT_FALSE(m.en_passant_get());
+   EXPECT_FALSE(m.get_capture());
+   EXPECT_FALSE(m.get_promotion().has_value());
+   EXPECT_EQ(Position(File::E, Rank::ONE), m.get_start());
+   EXPECT_EQ(Position(File::G, Rank::ONE), m.get_end());
+   EXPECT_FALSE(m.get_double_pawn_push());
+   EXPECT_FALSE(m.get_queen_castling());
+   EXPECT_TRUE(m.get_king_castling());
+   EXPECT_FALSE(m.get_en_passant());
 }
 
 TEST(EBNFParser, StringToMoveEnPassant)
@@ -64,14 +64,14 @@ TEST(EBNFParser, StringToMoveEnPassant)
    string move = "b4a3";
 
    Move m = string_to_move(board, move);
-   EXPECT_TRUE(m.capture_get());
-   EXPECT_FALSE(m.promotion_get().has_value());
-   EXPECT_EQ(Position(File::B, Rank::FOUR), m.start_get());
-   EXPECT_EQ(Position(File::A, Rank::THREE), m.end_get());
-   EXPECT_FALSE(m.double_pawn_push_get());
-   EXPECT_FALSE(m.queen_castling_get());
-   EXPECT_FALSE(m.king_castling_get());
-   EXPECT_TRUE(m.en_passant_get());
+   EXPECT_TRUE(m.get_capture());
+   EXPECT_FALSE(m.get_promotion().has_value());
+   EXPECT_EQ(Position(File::B, Rank::FOUR), m.get_start());
+   EXPECT_EQ(Position(File::A, Rank::THREE), m.get_end());
+   EXPECT_FALSE(m.get_double_pawn_push());
+   EXPECT_FALSE(m.get_queen_castling());
+   EXPECT_FALSE(m.get_king_castling());
+   EXPECT_TRUE(m.get_en_passant());
 }
 
 TEST(UCIMove, BasePositionNoMove)

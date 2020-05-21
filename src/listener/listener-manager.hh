@@ -3,7 +3,7 @@
 #include "listener.hh"
 #include "chess_engine/board/chessboard-interface.hh"
 #include "chess_engine/board/chessboard.hh"
-#include "chess_engine/board/position.hh"
+#include "chess_engine/board/entity/position.hh"
 #include "parsing/pgn_parser/pgn-move.hh"
 
 namespace listener

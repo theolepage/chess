@@ -1,10 +1,10 @@
-#include <optional>
 #include <algorithm>
 #include <vector>
 
 #include "ai-mini.hh"
 #include "evaluation.hh"
-#include "chess_engine/board/color.hh"
+#include "uci.hh"
+#include "chess_engine/board/entity/color.hh"
 
 namespace ai
 {
@@ -69,9 +69,12 @@ namespace ai
           return evalAndMove(bestValue, legal_moves[bestIndex]);
      }
 
-     board::Move AiMini::search(board::Chessboard& chessboard) const
+     std::optional<board::Move>  AiMini::search(board::Chessboard& chessboard,
+                                int16_t depth) const
      {
-          return minimax(chessboard, 4, INT16_MIN, INT16_MAX,
-                         chessboard.get_white_turn()).second.value();
+          auto eval_move = minimax(chessboard, depth, INT16_MIN, INT16_MAX,
+                                  chessboard.get_white_turn());
+          uci::info(depth, eval_move.first);
+          return eval_move.second;
      }
 }
