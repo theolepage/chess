@@ -1,11 +1,11 @@
 #include "gtest/gtest.h"
 
 #include "chess_engine/board/chessboard.hh"
-#include "chess_engine/board/rule.hh"
 #include "parsing/perft_parser/perft-parser.hh"
+#include "chess_engine/board/move-generation.hh"
 
 using namespace board;
-using namespace rule;
+using namespace move_generation;
 using namespace std;
 
 /*
@@ -56,9 +56,10 @@ TEST(PossibleMove, Pawn)
 // TODO FIX
 TEST(PossibleMove, Castling)
 {
+    std::vector<Move> res;
     Chessboard board = Chessboard(parse_perft("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1 1"));
-    auto moves = generate_moves(board, PieceType::KING);
-    EXPECT_EQ(4, moves.size());
+    generate_king_moves(board, res);
+    EXPECT_EQ(4, res.size());
 }
 
 /*

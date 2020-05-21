@@ -6,6 +6,7 @@
 #include <fstream>
 #include <dlfcn.h>
 
+#include "chess_engine/board/move-initialization.hh"
 #include "chess_engine/ai/ai-launcher.hh"
 #include "listener/listener.hh"
 #include "listener/listener-manager.hh"
@@ -118,6 +119,7 @@ namespace option_parser
                 std::cout << desc << '\n'; // print help message
             else
             {
+                board::MoveInitialization::get_instance();
                 if (vm.count("listeners"))
                     load_listerners(listeners_path, manager);
                 if (vm.count("pgn"))

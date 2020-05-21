@@ -20,6 +20,33 @@ namespace board
         , en_passant_(en_passant)
     {}
 
+    inline Move::Move(const Position& start,
+               const Position& end,
+               const PieceType& piece)
+        : start_(start)
+        , end_(end)
+        , piece_(piece)
+        , capture_(false)
+        , double_pawn_push_(false)
+        , queen_castling_(false)
+        , king_castling_(false)
+        , en_passant_(false)
+    {}
+
+    inline Move::Move(const Position& start,
+               const Position& end,
+               const PieceType& piece,
+               const bool capture)
+        : start_(start)
+        , end_(end)
+        , piece_(piece)
+        , capture_(capture)
+        , double_pawn_push_(false)
+        , queen_castling_(false)
+        , king_castling_(false)
+        , en_passant_(false)
+    {}
+
     inline bool Move::operator==(const Move& move) const
     {
         if (promotion_.has_value() != move.promotion_.has_value())

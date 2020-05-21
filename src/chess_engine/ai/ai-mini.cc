@@ -21,9 +21,11 @@ namespace ai
 
           const std::vector<board::Move> legal_moves =
                     chessboard.generate_legal_moves();
-          if (chessboard.is_draw(legal_moves))
+
+          bool is_check = chessboard.is_check();
+          if (chessboard.is_draw(legal_moves, is_check))
                return evalAndMove(0, std::nullopt);
-          if (chessboard.is_checkmate(legal_moves))
+          if (chessboard.is_checkmate(legal_moves, is_check))
                return evalAndMove(isMaxPlayer ? INT16_MIN : INT16_MAX,
                                   std::nullopt);
           if (isMaxPlayer)

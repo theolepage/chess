@@ -1,10 +1,11 @@
 #include "chessboard.hh"
 #include "parsing/option_parser/option-parser.hh"
-#include "rule.hh"
 #include "entity/piece-type.hh"
 #include "entity/color.hh"
 #include "entity/position.hh"
 #include "entity/move.hh"
+#include "move-initialization.hh"
+#include "move-generation.hh"
 
 #include <cassert>
 #include <optional>
@@ -104,7 +105,9 @@ namespace board
     {
         const char piece_char = piece_to_char(sidepiece.first);
 
-        return sidepiece.second == Color::WHITE ? piece_char : tolower(piece_char);
+        return sidepiece.second == Color::WHITE
+                                    ? piece_char
+                                    : tolower(piece_char);
     }
 
     std::ostream& Chessboard::write_fen_rank(std::ostream& os,
@@ -177,7 +180,7 @@ namespace board
         std::vector<Move> legal_moves;
 
         const std::vector<Move> possible_moves =
-                rule::generate_all_moves(*this);
+                move_generation::generate_all_moves(*this);
 
         for (const Move& move : possible_moves)
         {
@@ -380,7 +383,10 @@ namespace board
             if (move.get_promotion().has_value())
             {
                 const auto new_piecetype = move.get_promotion().value();
-                board_.change_piece_type(end, PieceType::PAWN, new_piecetype, color);
+                board_.change_piece_type(end,
+                                         PieceType::PAWN,
+                                         new_piecetype,
+                                         color);
             }
         }
         update_castling_bools(move, color);
@@ -412,32 +418,32 @@ namespace board
             }
         }
 
-        std::vector<Move> possible_piecetype_moves;
+        std::vector<Move> possible_moves;
 
         switch (move.get_piece())
         {
             case PieceType::QUEEN:
-                possible_piecetype_moves = rule::generate_queen_moves(*this);
+                move_generation::generate_queen_moves(*this, possible_moves);
                 break;
             case PieceType::ROOK:
-                possible_piecetype_moves = rule::generate_rook_moves(*this);
+                move_generation::generate_rook_moves(*this, possible_moves);
                 break;
             case PieceType::BISHOP:
-                possible_piecetype_moves = rule::generate_bishop_moves(*this);
+                move_generation::generate_bishop_moves(*this, possible_moves);
                 break;
             case PieceType::KNIGHT:
-                possible_piecetype_moves = rule::generate_knight_moves(*this);
+                move_generation::generate_knight_moves(*this, possible_moves);
                 break;
             case PieceType::PAWN:
-                possible_piecetype_moves = rule::generate_pawn_moves(*this);
+                move_generation::generate_pawn_moves(*this, possible_moves);
                 break;
             case PieceType::KING:
-                possible_piecetype_moves = rule::generate_king_moves(*this);
+                move_generation::generate_king_moves(*this, possible_moves);
                 break;
         };
 
-        const auto start = possible_piecetype_moves.begin();
-        const auto end = possible_piecetype_moves.end();
+        const auto start = possible_moves.begin();
+        const auto end = possible_moves.end();
 
         return std::find(start, end, move) != end;
     }
@@ -455,9 +461,54 @@ namespace board
         return is_move_possible(move) && is_possible_move_legal(move);
     }
 
+    bool Chessboard::pos_threatened(const Position& pos) const
+    {
+        const Color color = white_turn_ ? Color::WHITE : Color::BLACK;
+        const Color opponent_color = white_turn_ ? Color::BLACK : Color::WHITE;
+        const int index = pos.get_index();
+        const MoveInitialization& m = MoveInitialization::get_instance();
+
+        // Queens
+        const uint64_t q = m.get_targets(PieceType::QUEEN, index, board_());
+        if (q & board_(PieceType::QUEEN, opponent_color))
+            return true;
+
+        // Rook
+        const uint64_t r = m.get_targets(PieceType::ROOK, index, board_());
+        if (r & (board_(PieceType::ROOK, opponent_color)))
+            return true;
+
+        // Bishop
+        const uint64_t b = m.get_targets(PieceType::BISHOP, index, board_());
+        if (b & (board_(PieceType::BISHOP, opponent_color)))
+            return true;
+
+        // Knight
+        const uint64_t n = m.get_targets(PieceType::KNIGHT, index, board_());
+        if (n & board_(PieceType::KNIGHT, opponent_color))
+            return true;
+
+        // Pawn
+        const uint64_t p = m.get_pawn_targets(index, color);
+        if (p & board_(PieceType::PAWN, opponent_color))
+            return true;
+
+        // King
+        const uint64_t k = m.get_targets(PieceType::KING, index, board_());
+        if (k & board_(PieceType::KING, opponent_color))
+            return true;
+
+        return false;
+    }
+
     bool Chessboard::is_check(void)
     {
-        return rule::is_king_checked(*this);
+        uint64_t kings = board_(PieceType::KING,
+                                white_turn_ ? Color::WHITE : Color::BLACK);
+        const int king_pos = utils::pop_lsb(kings);
+        if (king_pos == -1)
+            return false;
+        return pos_threatened(Position(king_pos));
     }
 
     bool Chessboard::is_pat(void)
@@ -465,9 +516,10 @@ namespace board
         return !is_check() && !has_legal_moves();
     }
 
-    bool Chessboard::is_pat(const std::vector<board::Move>& legal_moves)
+    bool Chessboard::is_pat(const std::vector<board::Move>& legal_moves,
+                            const bool is_check)
     {
-        return !is_check() && legal_moves.empty();
+        return !is_check && legal_moves.empty();
     }
 
     bool Chessboard::is_checkmate(void)
@@ -475,9 +527,10 @@ namespace board
         return is_check() && !has_legal_moves();
     }
 
-    bool Chessboard::is_checkmate(const std::vector<board::Move>& legal_moves)
+    bool Chessboard::is_checkmate(const std::vector<board::Move>& legal_moves,
+                                  const bool is_check)
     {
-        return is_check() && legal_moves.empty();
+        return is_check && legal_moves.empty();
     }
 
     bool Chessboard::threefold_repetition()
@@ -494,17 +547,23 @@ namespace board
         return last_fifty_turn_ >= 50 || is_pat() || threefold_repetition();
     }
 
-    bool Chessboard::is_draw(const std::vector<board::Move>& legal_moves)
+    bool Chessboard::is_draw(const std::vector<board::Move>& legal_moves,
+                             const bool is_check)
     {
-        return last_fifty_turn_ >= 50 || is_pat(legal_moves)
+        return last_fifty_turn_ >= 50 || is_pat(legal_moves, is_check)
                 || threefold_repetition();
     }
-    
+
+    Color Chessboard::get_playing_color() const
+    {
+        return white_turn_ ? Color::WHITE : Color::BLACK;
+    }
+
     Board& Chessboard::get_board(void)
     {
         return board_;
     }
-    
+
     const Board& Chessboard::get_board(void) const
     {
         return board_;
@@ -608,39 +667,6 @@ namespace board
             os << sep << char('A' + file_i);
 
         return os;
-    }
-
-    // FIXME: TEMP TO MAKE RULE WORK
-
-    Chessboard::opt_piece_t Chessboard::operator()(const Position& pos,
-            const PieceType& piece_type, const Color& color) const
-    {
-        opt_piece_t res = board_[pos];
-        if (res.has_value() && res->first == piece_type && res->second == color)
-            return res;
-        return std::nullopt;
-    }
-
-    Position Chessboard::get_king_position(void) const
-    {
-        const auto king_color = white_turn_ ? Color::WHITE : Color::BLACK;
-        
-        for (int rank = 0; rank < 8; rank++)
-        {
-            for (int file = 0; file < 8; file++)
-            {
-                Position pos(file, rank);
-                if (board_[pos].has_value()
-                    && board_[pos].value().first == PieceType::KING
-                    && board_[pos].value().second == king_color)
-                {
-                    return pos;
-                }
-            }
-        }
-
-        assert(false);
-        return Position(0, 0);
     }
 
 }

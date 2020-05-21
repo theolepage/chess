@@ -61,7 +61,8 @@ set(SRC_ENGINE
     src/chess_engine/ai/ai-mini.cc
     src/chess_engine/ai/evaluation.cc
     src/chess_engine/ai/uci.cc
-    src/chess_engine/board/rule.cc
+    src/chess_engine/board/move-initialization.cc
+    src/chess_engine/board/move-generation.cc
     src/chess_engine/board/chessboard.cc
     src/chess_engine/board/board.cc
     src/parsing/option_parser/option-parser.cc
@@ -83,7 +84,6 @@ set(SRC_TESTS
     tests/unit_tests/chessboard_test.cc
     tests/unit_tests/fenrank_test.cc
     tests/unit_tests/fenobject_test.cc
-    tests/unit_tests/rule_test.cc
     tests/unit_tests/possible_move_test.cc
     tests/unit_tests/check_test.cc
     tests/unit_tests/game_test.cc
@@ -92,6 +92,7 @@ set(SRC_TESTS
     tests/unit_tests/evaluate_test.cc
     tests/unit_tests/uci_communication_test.cc
     tests/unit_tests/board_test.cc
+    tests/unit_tests/move_generation_test.cc
     #FIXME
     )
 
