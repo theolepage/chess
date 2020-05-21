@@ -21,7 +21,7 @@ namespace ai
             if (!move.has_value())
                 continue;
             uci::play_move(pgn_parser::move_to_string(move.value()));
-            chessboard.do_move(move);
+            chessboard.do_move(move.value());
         }
     }
 }
