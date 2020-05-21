@@ -8,8 +8,8 @@ namespace ai
     inline bool no_queen_or_unique_minor_piece(const Chessboard& board,
                                                Color color)
     {
-        const auto queen_board = board.get_board().get(PieceType::QUEEN);
-        const auto color_board = board.get_board().get(color);
+        const auto queen_board = board.get_board()(PieceType::QUEEN);
+        const auto color_board = board.get_board()(color);
 
         if (!(queen_board & color_board))
             return true;
@@ -18,7 +18,7 @@ namespace ai
 
         for (auto piece : minor_piecetype_array)
         {
-            const auto piece_board = board.get_board().get(piece);
+            const auto piece_board = board.get_board()(piece);
             if (piece_board & color_board)
             {
                 if (minor_piece_encountered)
@@ -60,13 +60,13 @@ namespace ai
 
     int evaluate_king_squares(const Chessboard& board)
     {
-        const uint64_t white_board = board.get_board().get(Color::WHITE);
-        const uint64_t black_board = board.get_board().get(Color::BLACK);
+        const uint64_t white_board = board.get_board()(Color::WHITE);
+        const uint64_t black_board = board.get_board()(Color::BLACK);
 
         auto white_king_board = white_board &
-            board.get_board().get(PieceType::KING);
+            board.get_board()(PieceType::KING);
         auto black_king_board = black_board &
-            board.get_board().get(PieceType::KING);
+            board.get_board()(PieceType::KING);
 
         auto white_king_i = utils::pop_lsb(white_king_board);
         auto black_king_i = utils::pop_lsb(black_king_board);
@@ -84,15 +84,15 @@ namespace ai
     {
         int evaluation = 0;
 
-        const uint64_t white_board = board.get_board().get(Color::WHITE);
-        const uint64_t black_board = board.get_board().get(Color::BLACK);
+        const uint64_t white_board = board.get_board()(Color::WHITE);
+        const uint64_t black_board = board.get_board()(Color::BLACK);
 
         for (auto piece : piecetype_array_without_king)
         {
             uint64_t white_piece_board = white_board
-                    & board.get_board().get(piece);
+                    & board.get_board()(piece);
             uint64_t black_piece_board = black_board
-                    & board.get_board().get(piece);
+                    & board.get_board()(piece);
 
             const auto piece_i = utils::utype(piece);
             const auto& white_piece_square_table =
@@ -120,7 +120,7 @@ namespace ai
 
     inline uint64_t pawn_open_files(const Chessboard& board)
     {
-        return utils::file_fill(board.get_board().get(PieceType::PAWN));
+        return utils::file_fill(board.get_board()(PieceType::PAWN));
     }
 
     int evaluate_file_openings(const Chessboard& board)
@@ -129,11 +129,11 @@ namespace ai
         if (!open_files)
             return 0;
 
-        const auto white_board = board.get_board().get(Color::WHITE);
-        const auto black_board = board.get_board().get(Color::BLACK);
+        const auto white_board = board.get_board()(Color::WHITE);
+        const auto black_board = board.get_board()(Color::BLACK);
 
-        const auto queen_board = board.get_board().get(PieceType::QUEEN);
-        const auto rook_board = board.get_board().get(PieceType::ROOK);
+        const auto queen_board = board.get_board()(PieceType::QUEEN);
+        const auto rook_board = board.get_board()(PieceType::ROOK);
 
         int evaluation = 0;
 
