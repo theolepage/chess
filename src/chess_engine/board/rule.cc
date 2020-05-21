@@ -334,7 +334,11 @@ namespace rule
 
     std::vector<Move> generate_pawn_moves(const Chessboard& board)
     {
+        return move_generation::generate_pawn_moves(board);
+
+        /*
         std::vector<Move> res;
+
         const Color color = board.get_white_turn() ? Color::WHITE
                                                    : Color::BLACK;
         const PieceType piece = PieceType::PAWN;
@@ -405,8 +409,8 @@ namespace rule
                                         true, false, false, false, en_passant);
             }
         }
-
         return res;
+        */
     }
 
     std::vector<Move> generate_king_moves(const Chessboard& board)

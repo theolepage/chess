@@ -1,8 +1,8 @@
 /*
  * To-Do
  *
- * - [ ] Pawns: promotion, en passant, double pawn push
- * - [ ] Refactoring board namespace
+ * - [ ] Refactoring, small optimizations
+ * - [ ] Check coding style
  * - [ ] Do a benchmark
 */
 
