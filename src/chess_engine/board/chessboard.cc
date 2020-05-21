@@ -213,10 +213,16 @@ namespace board
             en_passant_ = std::nullopt;
     }
 
-    void Chessboard::update_last_fifty_turn(const Move& move)
+    void Chessboard::update_draw_data(const Move& move)
     {
         if (move.get_capture() || move.get_piece() == PieceType::PAWN)
+        {
             last_fifty_turn_ = 0;
+            // If a piece is captured (ie if there will never be again as much
+            // pieces as before on the board) or if a pawn is moved,
+            // we know that no precedent board state will ever appear again
+            states_history_.clear();
+        }
         else
             if (!white_turn_)
                 last_fifty_turn_++;
@@ -352,7 +358,7 @@ namespace board
         else
         {
             forget_en_passant();
-            update_last_fifty_turn(move);
+            update_draw_data(move);
 
             if (move.get_en_passant())
             {

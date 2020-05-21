@@ -100,7 +100,7 @@ namespace board
                                      const File file);
         void register_double_pawn_push(const Move& move, const Color color);
         void forget_en_passant(void);
-        void update_last_fifty_turn(const Move& move);
+        void update_draw_data(const Move& move);
         void eat_en_passant(const Move& move, const Color color);
         void move_castling_rook(const Move& move, const Color color);
         void update_white_castling_bools(const Move& move);
