@@ -89,6 +89,29 @@ namespace utils
         std::cout << std::endl;
     }
 
+    inline uint64_t north_fill(uint64_t bitboard)
+    {
+        bitboard |= (bitboard << 8);
+        bitboard |= (bitboard << 16);
+        bitboard |= (bitboard << 32);
+
+        return bitboard;
+    }
+
+    inline uint64_t south_fill(uint64_t bitboard)
+    {
+        bitboard |= (bitboard >> 8);
+        bitboard |= (bitboard >> 16);
+        bitboard |= (bitboard >> 32);
+
+        return bitboard;
+    }
+
+    inline uint64_t file_fill(const uint64_t bitboard)
+    {
+        return north_fill(bitboard) | south_fill(bitboard);
+    }
+
     // index = 0 means set first bit
     inline void set_bit(uint64_t& bit, const int index)
     {

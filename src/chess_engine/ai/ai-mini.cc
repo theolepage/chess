@@ -1,9 +1,9 @@
-#include <optional>
 #include <algorithm>
 #include <vector>
 
 #include "ai-mini.hh"
 #include "evaluation.hh"
+#include "uci.hh"
 #include "chess_engine/board/entity/color.hh"
 
 namespace ai
@@ -16,6 +16,9 @@ namespace ai
                                    int16_t beta,
                                    const bool isMaxPlayer)
      {
+          if (depth == 0)
+               return evalAndMove(evaluate(chessboard), std::nullopt);
+
           const std::vector<board::Move> legal_moves =
                     chessboard.generate_legal_moves();
 
@@ -25,9 +28,6 @@ namespace ai
           if (chessboard.is_checkmate(legal_moves, is_check))
                return evalAndMove(isMaxPlayer ? INT16_MIN : INT16_MAX,
                                   std::nullopt);
-          if (depth == 0)
-               return evalAndMove(evaluate(chessboard), std::nullopt);
-
           if (isMaxPlayer)
           {
                int16_t bestValue = INT16_MIN;
@@ -71,9 +71,12 @@ namespace ai
           return evalAndMove(bestValue, legal_moves[bestIndex]);
      }
 
-     board::Move AiMini::search(board::Chessboard& chessboard) const
+     std::optional<board::Move>  AiMini::search(board::Chessboard& chessboard,
+                                int16_t depth) const
      {
-          return minimax(chessboard, 3, INT16_MIN, INT16_MAX,
-                         chessboard.get_white_turn()).second.value();
+          auto eval_move = minimax(chessboard, depth, INT16_MIN, INT16_MAX,
+                                  chessboard.get_white_turn());
+          uci::info(depth, eval_move.first);
+          return eval_move.second;
      }
 }

@@ -161,4 +161,17 @@ namespace pgn_parser
             chessboard.do_move(string_to_move(chessboard, last_move));
         }
     }
+
+    std::optional<int16_t> get_depth(const std::string& go_str)
+    {
+        static constexpr std::string_view depth_str = "depth";
+        std::vector<std::string> tokens;
+        boost::split(tokens, go_str, boost::is_any_of(" "));
+
+        if (tokens.at(1) == depth_str)
+        {
+            return std::stoi(tokens.at(2));
+        }
+        return std::nullopt;
+    }
 }
