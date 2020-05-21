@@ -1,11 +1,3 @@
-/*
- * To-Do
- *
- * - [ ] Refactoring, small optimizations
- * - [ ] Check coding style
- * - [ ] Do a benchmark
-*/
-
 #pragma once
 
 #include <cstdint>

@@ -2,7 +2,6 @@
 
 #include <vector>
 
-#include "rule.hh"
 #include "chessboard.hh"
 #include "entity/move.hh"
 #include "utils/utype.hh"
@@ -13,24 +12,40 @@ using namespace board;
 
 namespace move_generation
 {
-    static std::vector<Move> generate_moves(
+    static void generate_moves_aux(std::vector<Move>& moves,
+                                   const Position& from,
+                                   const PieceType& piece,
+                                   uint64_t targets,
+                                   const bool capture)
+    {
+        int to = utils::pop_lsb(targets);
+        while (to >= 0)
+        {
+            moves.emplace_back(
+                Position(from),
+                Position(to),
+                piece,
+                capture
+            );
+            to = utils::pop_lsb(targets);
+        }
+    }
+
+    static void generate_moves(
             const PieceType& piece,
-            const Chessboard& board
+            const Chessboard& board,
+            std::vector<Move>& moves
     )
     {
-        std::vector<Move> res;
-
-        // Get all piece of color currently playing
-        const Color color = board.get_white_turn()
-            ? Color::WHITE : Color::BLACK;
-        const Color opponent_color = board.get_white_turn()
-            ? Color::BLACK : Color::WHITE;
+        const Color color = board.get_playing_color();
+        const Color opponent_color = get_opposite_color(color);
         uint64_t pieces = board.get_board()(piece, color);
 
         // Iterate over all piece of color currently playing
         int pos = utils::pop_lsb(pieces);
         while (pos >= 0)
         {
+            Position from(pos);
             uint64_t targets = MoveInitialization::get_instance().get_targets(
                 piece,
                 pos,
@@ -42,121 +57,109 @@ namespace move_generation
 
             // Extract non captures moves and captures moves
             uint64_t captures = targets & board.get_board()(opponent_color);
-            uint64_t non_captures = targets & ~board.get_board()(opponent_color);
+            uint64_t simples = targets & ~board.get_board()(opponent_color);
 
-            // Handle capture moves
-            int capture_dest = utils::pop_lsb(captures);
-            while (capture_dest >= 0)
-            {
-                // Create capture move
-                res.emplace_back(
-                    Position(pos),
-                    Position(capture_dest),
-                    piece,
-                    true
-                );
-                capture_dest = utils::pop_lsb(captures);
-            }
-
-            // Handle simple moves
-            int non_capture_dest = utils::pop_lsb(non_captures);
-            while (non_capture_dest >= 0)
-            {
-                // Create simple move
-                res.emplace_back(
-                    Position(pos),
-                    Position(non_capture_dest),
-                    piece
-                );
-                non_capture_dest = utils::pop_lsb(non_captures);
-            }
+            generate_moves_aux(moves, from, piece, captures, true);
+            generate_moves_aux(moves, from, piece, simples, false);
 
             pos = utils::pop_lsb(pieces);
         }
-
-        return res;
     }
 
-    std::vector<Move> generate_bishop_moves(const Chessboard& board)
+    static void generate_king_castling(std::vector<Move>& moves,
+                                       const Chessboard& board)
     {
-        return generate_moves(PieceType::BISHOP, board);
-    }
-
-    std::vector<Move> generate_rook_moves(const Chessboard& board)
-    {
-        return generate_moves(PieceType::ROOK, board);
-    }
-
-    std::vector<Move> generate_queen_moves(const Chessboard& board)
-    {
-        return generate_moves(PieceType::QUEEN, board);
-    }
-
-    std::vector<Move> generate_knight_moves(const Chessboard& board)
-    {
-        return generate_moves(PieceType::KNIGHT, board);
-    }
-
-    std::vector<Move> generate_king_moves(const Chessboard& board)
-    {
-        std::vector<Move> res = generate_moves(PieceType::KING, board);
-        const Color color = board.get_white_turn()
-                ? Color::WHITE : Color::BLACK;
+        const Color color = board.get_playing_color();
         const Rank rank = (color == Color::WHITE) ? Rank::ONE : Rank::EIGHT;
 
-        if (board.get_king_castling(color))
+        const uint64_t obstacles =
+            utils::bitboard_from_pos(Position(File::F, rank))
+            | utils::bitboard_from_pos(Position(File::G, rank));
+        const uint64_t have_pieces_between = board.get_board()() & obstacles;
+
+        if (have_pieces_between == 0ULL)
         {
-           const uint64_t obstacles =
-                utils::bitboard_from_pos(Position(File::F, rank))
-                | utils::bitboard_from_pos(Position(File::G, rank));
-            const uint64_t have_pieces_between = board.get_board()() & obstacles;
-            if (have_pieces_between == 0ULL)
+            const bool attacked = board.pos_threatened(Position(File::E, rank))
+                || board.pos_threatened(Position(File::F, rank))
+                || board.pos_threatened(Position(File::G, rank));
+            if (!attacked)
             {
-                const bool attacked = board.pos_threatened(Position(File::E, rank))
-                                || board.pos_threatened(Position(File::F, rank))
-                                || board.pos_threatened(Position(File::G, rank));
-                if (!attacked)
-                {
-                    Move king_castling(Position(File::E, rank),
-                                    Position(File::G, rank),
-                                    PieceType::KING);
-                    king_castling.set_king_castling(true);
-                    res.push_back(king_castling);
-                }
+                Move king_castling(Position(File::E, rank),
+                                Position(File::G, rank),
+                                PieceType::KING);
+                king_castling.set_king_castling(true);
+                moves.push_back(king_castling);
             }
         }
+    }
 
-        if (board.get_queen_castling(color))
-        {
-            const uint64_t obstacles =
+    static void generate_queen_castling(std::vector<Move>& moves,
+                                       const Chessboard& board)
+    {
+        const Color color = board.get_playing_color();
+        const Rank rank = (color == Color::WHITE) ? Rank::ONE : Rank::EIGHT;
+
+        const uint64_t obstacles =
                 utils::bitboard_from_pos(Position(File::B, rank))
                 | utils::bitboard_from_pos(Position(File::C, rank))
                 | utils::bitboard_from_pos(Position(File::D, rank));
-            const uint64_t have_pieces_between = board.get_board()() & obstacles;
-            if (have_pieces_between == 0ULL)
+        const uint64_t have_pieces_between = board.get_board()() & obstacles;
+        if (have_pieces_between == 0ULL)
+        {
+            const bool attacked = board.pos_threatened(Position(File::E, rank))
+                || board.pos_threatened(Position(File::D, rank))
+                || board.pos_threatened(Position(File::C, rank));
+            if (!attacked)
             {
-                const bool attacked = board.pos_threatened(Position(File::E, rank))
-                                    || board.pos_threatened(Position(File::D, rank))
-                                    || board.pos_threatened(Position(File::C, rank));
-                if (!attacked)
-                {
-                    Move queen_castling(Position(File::E, rank),
-                                    Position(File::C, rank),
-                                    PieceType::KING);
-                    queen_castling.set_queen_castling(true);
-                    res.push_back(queen_castling);
-                }
+                Move queen_castling(Position(File::E, rank),
+                                Position(File::C, rank),
+                                PieceType::KING);
+                queen_castling.set_queen_castling(true);
+                moves.push_back(queen_castling);
             }
         }
-
-        return res;
     }
 
-    static bool register_pawns_promotions(std::vector<Move>& moves,
+    void generate_bishop_moves(const Chessboard& board,
+                               std::vector<Move>& moves)
+    {
+        return generate_moves(PieceType::BISHOP, board, moves);
+    }
+
+    void generate_rook_moves(const Chessboard& board,
+                             std::vector<Move>& moves)
+    {
+        return generate_moves(PieceType::ROOK, board, moves);
+    }
+
+    void generate_queen_moves(const Chessboard& board,
+                              std::vector<Move>& moves)
+    {
+        return generate_moves(PieceType::QUEEN, board, moves);
+    }
+
+    void generate_knight_moves(const Chessboard& board,
+                               std::vector<Move>& moves)
+    {
+        return generate_moves(PieceType::KNIGHT, board, moves);
+    }
+
+    void generate_king_moves(const Chessboard& board,
+                             std::vector<Move>& moves)
+    {
+        generate_moves(PieceType::KING, board, moves);
+
+        if (board.get_king_castling(board.get_playing_color()))
+            generate_king_castling(moves, board);
+        if (board.get_queen_castling(board.get_playing_color()))
+            generate_queen_castling(moves, board);
+    }
+
+    static bool generate_pawns_promotions(std::vector<Move>& moves,
                                           const Position& from,
                                           const Position& to,
                                           const Color& color,
-                                          bool capture)
+                                          const bool capture)
     {
         Move move(from, to, PieceType::PAWN, capture);
 
@@ -184,15 +187,11 @@ namespace move_generation
         return true;
     }
 
-    std::vector<Move> generate_pawn_moves(const Chessboard& board)
+    static void generate_pawn_forward(std::vector<Move>& moves,
+                                      const Chessboard& board,
+                                      const uint64_t pawns,
+                                      const Color& color)
     {
-        std::vector<Move> res;
-
-        const Color color = board.get_white_turn()
-                ? Color::WHITE : Color::BLACK;
-        uint64_t pawns = board.get_board()(PieceType::PAWN, color);
-
-        // Simple move (move 1 rank forward)
         uint64_t pawns_one_forward = ~board.get_board()()
             & (color == Color::WHITE
                 ? (pawns << 8)
@@ -206,14 +205,19 @@ namespace move_generation
                     : (dest_one_forward + 8));
             Position to(dest_one_forward);
 
-            if (!register_pawns_promotions(res, from, to, color, false))
-                res.emplace_back(from, to, PieceType::PAWN);
+            if (!generate_pawns_promotions(moves, from, to, color, false))
+                moves.emplace_back(from, to, PieceType::PAWN);
 
             dest_one_forward = utils::pop_lsb(pawns_one_forward);
         }
+    }
 
-        // Double move (move 2 rank forward)
-        pawns_one_forward = ~board.get_board()()
+    static void generate_pawn_double(std::vector<Move>& moves,
+                                     const Chessboard& board,
+                                     const uint64_t pawns,
+                                     const Color& color)
+    {
+        uint64_t pawns_one_forward = ~board.get_board()()
             & (color == Color::WHITE
                 ? ((defs::RANK_TWO & pawns) << 8)
                 : ((defs::RANK_SEVEN & pawns) >> 8));
@@ -232,16 +236,20 @@ namespace move_generation
 
             Move move(from, to, PieceType::PAWN);
             move.set_double_pawn_push(true);
-            res.push_back(move);
+            moves.push_back(move);
 
             dest_two_forward = utils::pop_lsb(pawns_two_forward);
         }
+    }
 
-        // Attacks on left diagonal
-        const Color opponent_color = color == Color::WHITE
-            ? Color::BLACK
-            : Color::WHITE;
-        uint64_t enemies = board.get_board()(opponent_color);
+    static void generate_pawn_attacks_left(std::vector<Move>& moves,
+                                          const Chessboard& board,
+                                          const uint64_t pawns,
+                                          const Color& color)
+    {
+        const Color opponent_color = get_opposite_color(color);
+        const uint64_t enemies = board.get_board()(opponent_color);
+
         uint64_t left_attacks = enemies
             & (color == Color::WHITE
                 ? (pawns << 7) & ~defs::FILE_H
@@ -255,14 +263,15 @@ namespace move_generation
                     : (dest_left_attack + 9));
             Position to(dest_left_attack);
 
-            if (!register_pawns_promotions(res, from, to, color, true))
-                res.emplace_back(from, to, PieceType::PAWN, true);
+            if (!generate_pawns_promotions(moves, from, to, color, true))
+                moves.emplace_back(from, to, PieceType::PAWN, true);
 
             dest_left_attack = utils::pop_lsb(left_attacks);
         }
         if (board.get_en_passant().has_value())
         {
-            uint64_t left_en_passant = utils::bitboard_from_pos(board.get_en_passant().value())
+            uint64_t left_en_passant = utils::bitboard_from_pos(
+                                                board.get_en_passant().value())
                 & (color == Color::WHITE
                     ? (pawns << 7) & ~defs::FILE_H
                     : (pawns >> 9) & ~defs::FILE_H);
@@ -277,11 +286,19 @@ namespace move_generation
 
                 Move move(from, to, PieceType::PAWN, true);
                 move.set_en_passant(true);
-                res.push_back(move);
+                moves.push_back(move);
             }
         }
-        
-        // Attacks on right diagonal
+    }
+
+    static void generate_pawn_attacks_right(std::vector<Move>& moves,
+                                          const Chessboard& board,
+                                          const uint64_t pawns,
+                                          const Color& color)
+    {
+        const Color opponent_color = get_opposite_color(color);
+        const uint64_t enemies = board.get_board()(opponent_color);
+
         uint64_t right_attacks = enemies
             & (color == Color::WHITE
                 ? (pawns << 9) & ~defs::FILE_A
@@ -295,14 +312,15 @@ namespace move_generation
                     : (dest_right_attack + 7));
             Position to(dest_right_attack);
 
-            if (!register_pawns_promotions(res, from, to, color, true))
-                res.emplace_back(from, to, PieceType::PAWN, true);
+            if (!generate_pawns_promotions(moves, from, to, color, true))
+                moves.emplace_back(from, to, PieceType::PAWN, true);
 
             dest_right_attack = utils::pop_lsb(right_attacks);
         }
         if (board.get_en_passant().has_value())
         {
-            uint64_t right_en_passant = utils::bitboard_from_pos(board.get_en_passant().value())
+            uint64_t right_en_passant = utils::bitboard_from_pos(
+                                                board.get_en_passant().value())
                 & (color == Color::WHITE
                     ? (pawns << 9) & ~defs::FILE_A
                     : (pawns >> 7) & ~defs::FILE_A);
@@ -317,10 +335,32 @@ namespace move_generation
 
                 Move move(from, to, PieceType::PAWN, true);
                 move.set_en_passant(true);
-                res.push_back(move);
+                moves.push_back(move);
             }
         }
+    }
 
+    void generate_pawn_moves(const Chessboard& board,
+                             std::vector<Move>& moves)
+    {
+        const Color color = board.get_playing_color();
+        const uint64_t pawns = board.get_board()(PieceType::PAWN, color);
+
+        generate_pawn_attacks_left(moves, board, pawns, color);
+        generate_pawn_attacks_right(moves, board, pawns, color);
+        generate_pawn_forward(moves, board, pawns, color);
+        generate_pawn_double(moves, board, pawns, color);
+    }
+
+    std::vector<Move> generate_all_moves(const Chessboard& board)
+    {
+        std::vector<Move> res;
+        generate_pawn_moves(board, res);
+        generate_king_moves(board, res);
+        generate_queen_moves(board, res);
+        generate_knight_moves(board, res);
+        generate_rook_moves(board, res);
+        generate_bishop_moves(board, res);
         return res;
     }
 } // namespace move_generation

@@ -11,7 +11,7 @@ namespace ai
     int evaluate(const Chessboard& board)
     {
         int evaluation = 0;
-        
+
         for (auto piece : piecetype_array)
         {
             uint64_t white_piece_board = board.get_board()(piece, Color::WHITE);
