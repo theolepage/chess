@@ -17,7 +17,7 @@ def perft_eval(perft_string, engine_path):
     engine = chess.engine.SimpleEngine.popen_uci(engine_path)
 
     # Analyse position of the board from the engine:
-    info = engine.analyse(board, chess.engine.Limit(depth=6))
+    info = engine.analyse(board, chess.engine.Limit(depth=0))
 
     # stop the engine
     engine.quit()

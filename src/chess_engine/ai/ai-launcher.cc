@@ -12,8 +12,10 @@ namespace ai
         board::Chessboard chessboard = board::Chessboard();
         while (true)
         {
-            pgn_parser::add_move_to_board(chessboard, uci::get_board());
-            board::Move move = ai.search(chessboard);
+            std::string board_str = uci::get_board();
+            int16_t depth = pgn_parser::get_depth(uci::get_go()).value_or(4);
+            pgn_parser::add_move_to_board(chessboard, board_str);
+            board::Move move = ai.search(chessboard, depth);
             uci::play_move(pgn_parser::move_to_string(move));
             chessboard.do_move(move);
         }

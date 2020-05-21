@@ -49,7 +49,12 @@ namespace uci
     std::string get_board()
     {
         auto board = get_input("position *"); // Get the board
-        get_input("go *"); // Wait for a go from GUI
         return board;
+    }
+
+    std::string get_go()
+    {
+        auto go_str = get_input("go *"); // Wait for a go from GUI
+        return go_str;
     }
 } // namespace ai

@@ -8,6 +8,7 @@ namespace ai
      class AiMini final
      {
      public:
-          board::Move search(board::Chessboard& chessboard) const;
+          board::Move search(board::Chessboard& chessboard,
+                             int16_t depth) const;
      };
 }
