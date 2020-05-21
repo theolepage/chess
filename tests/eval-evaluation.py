@@ -16,8 +16,8 @@ chessengine_path = '../chessengine-static'
 perft_directory = 'eval-perft/'
 
 
-def get_perft_strings():
-    perft_strings = []
+def get_perfts():
+    perfts = []
 
     for filename in os.listdir(perft_directory):
         if filename.endswith(".perft"):
@@ -26,11 +26,11 @@ def get_perft_strings():
             perft_name = os.path.splitext(perft_base)[0]
             with open (perft_path, "r") as perft_file:
                 perft_string = perft_file.readline().rstrip("\n")
-                perft_strings.append((perft_name, perft_string))
+                perfts.append((perft_name, perft_string))
 
-    return perft_strings
+    return perfts
 
-perft_strings = get_perft_strings()
+perfts = get_perfts()
 
 # This is usefull to normalize Score objects to integers
 # and should be a large value
@@ -132,6 +132,8 @@ def dissonances(perft_and_ref_value_couples, perft_and_value_couples):
     winner_dissonances = []
     choice_dissonances = []
 
+    perft_strings = [perft[1] for perft in perfts]
+
     for perft in perft_strings:
         winner_dissonance = get_winner_dissonance(perft, perft_and_ref_value_couples, perft_and_value_couples)
         if winner_dissonance:
@@ -148,13 +150,14 @@ def evaluate_eval_fun(eval_fun):
     perft_and_ref_value_couples = []
     perft_and_value_couples = []
 
-    nb_perfts = len(perft_strings)
+    nb_perfts = len(perfts)
     for i in range(nb_perfts):
-        perft_name = perft_strings[i][0]
-        perft_string = perft_strings[i][1]
+        perft_name = perfts[i][0]
+        perft_string = perfts[i][1]
         print(i + 1, "/", nb_perfts, ": ", perft_name, ": ", perft_string, sep="")
         perft_and_ref_value_couples.append((perft_string, ref_eval(perft_string)))
         perft_and_value_couples.append((perft_string, eval_fun(perft_string)))
+        print()
 
     perft_and_ref_value_couples.sort(key=second)
     perft_and_value_couples.sort(key=second)
@@ -162,7 +165,8 @@ def evaluate_eval_fun(eval_fun):
     return dissonances(perft_and_ref_value_couples, perft_and_value_couples)
 
 dissonances = evaluate_eval_fun(eval)
-print("nb perft tested: " + str(len(perft_strings)))
-print("nb winner dissonances: " + str(len(dissonances["winner_dissonances"])))
-print("nb choice dissonances: " + str(len(dissonances["choice_dissonances"])))
+nb_perfts = len(perfts)
+print("nb perft tested:", nb_perfts)
+print("nb winner dissonances: ", len(dissonances["winner_dissonances"]), "/", nb_perfts, sep="")
+print("nb choice dissonances: ", len(dissonances["choice_dissonances"]), "/", int((nb_perfts * (nb_perfts - 1)) / 2), sep="")
 #print(dissonances)
