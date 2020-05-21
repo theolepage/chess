@@ -10,6 +10,9 @@ namespace ai
     using piece_square_table_t = std::array<int, width * width>;
     using piece_square_tables_t = std::array<piece_square_table_t, nb_pieces - 1>;
 
+    constexpr unsigned queen_on_open_file_bonus = 10; // FIXME
+    constexpr unsigned rook_on_open_file_bonus = 5; // FIXME
+
     // QUEEN, ROOK, BISHOP, KNIGHT, PAWN, KING
     constexpr std::array<unsigned, nb_pieces> piecetype_values
     {
@@ -156,7 +159,13 @@ namespace ai
     //   no other pieces or one minorpiece maximum.
     bool is_end_game(const board::Chessboard& board);
 
+
     int evaluate_material(const board::Chessboard& board);
+
     int evaluate_squares(const board::Chessboard& board);
+
+    int evaluate_file_openings(const board::Chessboard& board);
+    int evaluate_king_safety(const board::Chessboard& board);
+
     int evaluate(const board::Chessboard& board);
 }

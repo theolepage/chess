@@ -122,11 +122,51 @@ namespace ai
         return evaluation + evaluate_king_squares(board);
     }
 
+    inline uint64_t pawn_open_files(const Chessboard& board)
+    {
+        return utils::file_fill(board.get_board().get(PieceType::PAWN));
+    }
+
+    int evaluate_file_openings(const Chessboard& board)
+    {
+        const auto open_files = pawn_open_files(board);
+        if (!open_files)
+            return 0;
+
+        const auto white_board = board.get_board().get(Color::WHITE);
+        const auto black_board = board.get_board().get(Color::BLACK);
+
+        const auto queen_board = board.get_board().get(PieceType::QUEEN);
+        const auto rook_board = board.get_board().get(PieceType::ROOK);
+
+        int evaluation = 0;
+
+        if (open_files & (white_board & queen_board))
+            evaluation += queen_on_open_file_bonus;
+
+        if (open_files & (black_board & queen_board))
+            evaluation -= queen_on_open_file_bonus;
+
+        if (open_files & (white_board & rook_board))
+            evaluation += rook_on_open_file_bonus;
+
+        if (open_files & (black_board & rook_board))
+            evaluation -= rook_on_open_file_bonus;
+
+        return evaluation;
+    }
+
+    int evaluate_king_safety(const Chessboard& board)
+    {
+        return evaluate_file_openings(board);
+    }
+
     //  Result:
     // positive -> white advantage
     // negative -> black advantage
     int evaluate(const Chessboard& board)
     {
-        return evaluate_material(board) + evaluate_squares(board);
+        return evaluate_material(board) + evaluate_squares(board) +
+            evaluate_king_safety(board);
     }
 }
