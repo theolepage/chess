@@ -4,6 +4,7 @@
 
 #include "ai-mini.hh"
 #include "evaluation.hh"
+#include "uci.hh"
 #include "chess_engine/board/color.hh"
 
 namespace ai
@@ -71,7 +72,11 @@ namespace ai
 
      board::Move AiMini::search(board::Chessboard& chessboard) const
      {
-          return minimax(chessboard, 4, INT16_MIN, INT16_MAX,
-                         chessboard.get_white_turn()).second.value();
+          int16_t depth = 4;
+          auto eval_move = minimax(chessboard, depth, INT16_MIN, INT16_MAX,
+                                  chessboard.get_white_turn());
+          uci::info(depth, eval_move.first);
+          return eval_move.second.value();
+
      }
 }

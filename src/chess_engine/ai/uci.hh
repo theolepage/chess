@@ -21,6 +21,10 @@ namespace uci
      */
     void play_move(const std::string& move);
 
+    /** Send score and depth info to GUI
+     */
+    void info(const int depth, const int evaluation_score);
+
     /** Receive and return the command describing a board state
      * Format: position [startpos | fen FEN] (moves ...)
      * Eg:
