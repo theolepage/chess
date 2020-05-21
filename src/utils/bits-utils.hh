@@ -1,7 +1,11 @@
 #pragma once
 
 #include <cstdint>
+#include <iostream>
 #include <ostream>
+#include <optional>
+
+#include "chess_engine/board/entity/position.hh"
 
 namespace utils
 {
@@ -10,31 +14,79 @@ namespace utils
         return (bit >> index) & 1ULL;
     }
 
-    inline int normalize_bit(int bit)
+    inline uint64_t bitboard_from_pos(const std::optional<board::Position>& pos)
     {
-        return bit ? 1 : 0;
+        if (!pos.has_value())
+            return 0ULL;
+        return 1ULL << pos->get_index();
     }
 
-    inline std::ostream& print_bit(std::ostream& os, const uint64_t bit)
+    inline void print_bit(const uint64_t bit)
     {
-        for (int i = 63; i >= 0; --i)
-            os << normalize_bit(is_bit_set(bit, i));
-
-        return os;
-    }
-
-    inline std::ostream& print_bitboard(std::ostream& os, const uint64_t bitboard)
-    {
-        constexpr int w = 8;
-        for (int i = 0; i < w; i++)
+        for (int i = 56; i < 64; ++i)
         {
-            for (int j = 0; j < w; j++)
-                os << normalize_bit(is_bit_set(bitboard, i * w + j));
-
-            os << std::endl;
+            if (is_bit_set(bit, i))
+                std::cout << "1";
+            else
+                std::cout << "0";
         }
-
-        return os;
+        std::cout << std::endl;
+        for (int i = 48; i < 56; ++i)
+        {
+            if (is_bit_set(bit, i))
+                std::cout << "1";
+            else
+                std::cout << "0";
+        }
+        std::cout << std::endl;
+        for (int i = 40; i < 48; ++i)
+        {
+            if (is_bit_set(bit, i))
+                std::cout << "1";
+            else
+                std::cout << "0";
+        }
+        std::cout << std::endl;
+        for (int i = 32; i < 40; ++i)
+        {
+            if (is_bit_set(bit, i))
+                std::cout << "1";
+            else
+                std::cout << "0";
+        }
+        std::cout << std::endl;
+        for (int i = 24; i < 32; ++i)
+        {
+            if (is_bit_set(bit, i))
+                std::cout << "1";
+            else
+                std::cout << "0";
+        }
+        std::cout << std::endl;
+        for (int i = 16; i < 24; ++i)
+        {
+            if (is_bit_set(bit, i))
+                std::cout << "1";
+            else
+                std::cout << "0";
+        }
+        std::cout << std::endl;
+        for (int i = 8; i < 16; ++i)
+        {
+            if (is_bit_set(bit, i))
+                std::cout << "1";
+            else
+                std::cout << "0";
+        }
+        std::cout << std::endl;
+        for (int i = 0; i < 8; ++i)
+        {
+            if (is_bit_set(bit, i))
+                std::cout << "1";
+            else
+                std::cout << "0";
+        }
+        std::cout << std::endl;
     }
 
     inline uint64_t north_fill(uint64_t bitboard)
@@ -86,14 +138,17 @@ namespace utils
     }
 
     // Returns the position of the least significant bit
-    inline int bit_scan_forward(const uint64_t n)
+    // Was forward
+    inline int bit_scan_lowest(const uint64_t n)
     {
         if (n == 0ULL)
             return -1;
         return __builtin_ffsll(n) - 1;
     }
 
-    inline int bit_scan_reverse(const uint64_t n)
+    // Returns the position of the most significant bit
+    // Was reverse
+    inline int bit_scan_highest(const uint64_t n)
     {
         if (n == 0ULL)
             return -1;

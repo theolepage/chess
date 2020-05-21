@@ -13,7 +13,9 @@ namespace board
     public:
         using opt_piece_t = std::optional<PieceType>;
 
-        Move(const Position& start,
+        Move() = delete;
+
+        explicit Move(const Position& start,
              const Position& end,
              const PieceType& piece,
              const bool capture,
@@ -23,9 +25,14 @@ namespace board
              const bool en_passant,
              const opt_piece_t& promotion = std::nullopt);
 
-        Move(const Position& start,
+        explicit Move(const Position& start,
              const Position& end,
              const PieceType& piece);
+
+        explicit Move(const Position& start,
+             const Position& end,
+             const PieceType& piece,
+             bool capture);
 
         bool operator==(const Move& move) const;
         bool operator!=(const Move& move) const;

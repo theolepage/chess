@@ -43,17 +43,17 @@ namespace board
             return std::nullopt;
 
         const Color piece_color = ((white) ? Color::WHITE : Color::BLACK);
-        if (is_bit_set(get_pawns(), index))
+        if (is_bit_set((*this)(PieceType::PAWN), index))
             return Board::side_piece_t(PieceType::PAWN, piece_color);
-        if (is_bit_set(get_rooks(), index))
+        if (is_bit_set((*this)(PieceType::ROOK), index))
             return Board::side_piece_t(PieceType::ROOK, piece_color);
-        if (is_bit_set(get_knights(), index))
+        if (is_bit_set((*this)(PieceType::KNIGHT), index))
             return Board::side_piece_t(PieceType::KNIGHT, piece_color);
-        if (is_bit_set(get_bishops(), index))
+        if (is_bit_set((*this)(PieceType::BISHOP), index))
             return Board::side_piece_t(PieceType::BISHOP, piece_color);
-        if (is_bit_set(get_queens(), index))
+        if (is_bit_set((*this)(PieceType::QUEEN), index))
             return Board::side_piece_t(PieceType::QUEEN, piece_color);
-        if (is_bit_set(get_kings(), index))
+        if (is_bit_set((*this)(PieceType::KING), index))
             return Board::side_piece_t(PieceType::KING, piece_color);
 
         assert(false);
@@ -160,53 +160,23 @@ namespace board
         init_end_ranks(piecetype, symetric_file(file));
     }
 
-    uint64_t Board::get(const PieceType& piece) const
+    uint64_t Board::operator()() const
+    {
+        return whites_ | blacks_;
+    }
+
+    uint64_t Board::operator()(const PieceType& piece) const
     {
         return pieces_[static_cast<uint8_t>(piece)];
     }
 
-    uint64_t Board::get(const Color& color) const
+    uint64_t Board::operator()(const Color& color) const
     {
         return color == Color::WHITE ? whites_ : blacks_;
     }
 
-    uint64_t Board::get_whites(void) const
+    uint64_t Board::operator()(const PieceType& piece, const Color& color) const
     {
-        return whites_;
-    }
-
-    uint64_t Board::get_blacks(void) const
-    {
-        return blacks_;
-    }
-
-    uint64_t Board::get_pawns(void) const
-    {
-        return pieces_[4];
-    }
-
-    uint64_t Board::get_queens(void) const
-    {
-        return pieces_[0];
-    }
-    
-    uint64_t Board::get_kings(void) const
-    {
-        return pieces_[5];
-    }
-
-    uint64_t Board::get_rooks(void) const
-    {
-        return pieces_[1];
-    }
-    
-    uint64_t Board::get_bishops(void) const
-    {
-        return pieces_[2];
-    }
-    
-    uint64_t Board::get_knights(void) const
-    {
-        return pieces_[3];
+        return (*this)(piece) & (*this)(color);
     }
 }

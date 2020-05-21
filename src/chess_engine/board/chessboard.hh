@@ -42,6 +42,7 @@ namespace board
         static char sidepiece_to_char(const PieceType& piece, const Color& color);
         std::string to_fen_string(void) const;
 
+        bool pos_threatened(const Position& pos) const;
         std::vector<Move> generate_legal_moves(void);
         bool has_legal_moves(void);
         void do_move(const Move& move);
@@ -50,13 +51,17 @@ namespace board
         bool is_move_possible(const Move& move);
         bool is_check(void);
         bool is_checkmate(void);
-        bool is_checkmate(const std::vector<board::Move>& legal_moves);
+        bool is_checkmate(const std::vector<board::Move>& legal_moves,
+                          const bool is_check);
         bool is_pat(void);
-        bool is_pat(const std::vector<board::Move>& legal_moves);
+        bool is_pat(const std::vector<board::Move>& legal_moves,
+                    const bool is_check);
         bool threefold_repetition(void);
         bool is_draw(void);
-        bool is_draw(const std::vector<board::Move>& legal_moves);
+        bool is_draw(const std::vector<board::Move>& legal_moves,
+                     const bool is_check);
 
+        Color get_playing_color() const;
         Board& get_board(void);
         const Board& get_board(void) const;
         opt_pos_t get_en_passant() const;
@@ -71,11 +76,6 @@ namespace board
         bool operator==(const Chessboard& rhs) const;
         friend std::ostream& operator<<(std::ostream& os,
                                         const Chessboard& board);
-
-        // FIXME: TEMP
-        Position get_king_position(void) const;
-        opt_piece_t operator()(const Position& pos,
-            const PieceType& piece, const Color& color) const;
 
     private:
         Board board_;

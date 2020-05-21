@@ -41,10 +41,11 @@ namespace board
     class Position final
     {
     public:
-        Position(File file, Rank rank);
-        Position(int x, int y);
-        Position(int i);
-        Position(char file, char rank);
+        Position() = delete;
+        explicit Position(File file, Rank rank);
+        explicit Position(int x, int y);
+        explicit Position(int i);
+        explicit Position(char file, char rank);
 
         Position& operator=(const Position& position) = default;
 

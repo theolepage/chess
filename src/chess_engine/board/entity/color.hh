@@ -9,4 +9,9 @@ namespace board
         BLACK = true
     };
 
+    inline Color get_opposite_color(const Color& color)
+    {
+        return (color == Color::WHITE) ? Color::BLACK : Color::WHITE;
+    }
+
 } // namespace board

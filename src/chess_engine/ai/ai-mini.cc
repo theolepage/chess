@@ -12,18 +12,21 @@ namespace ai
 
      static evalAndMove minimax(board::Chessboard& chessboard,
                                    const int16_t depth,
+                                   const int16_t depth_q,
                                    int16_t alpha,
                                    int16_t beta,
                                    const bool isMaxPlayer)
      {
-          if (depth == 0)
+          if (depth == 0 || depth_q == 0)
                return evalAndMove(evaluate(chessboard), std::nullopt);
 
           const std::vector<board::Move> legal_moves =
                     chessboard.generate_legal_moves();
-          if (chessboard.is_draw(legal_moves))
+
+          bool is_check = chessboard.is_check();
+          if (chessboard.is_draw(legal_moves, is_check))
                return evalAndMove(0, std::nullopt);
-          if (chessboard.is_checkmate(legal_moves))
+          if (chessboard.is_checkmate(legal_moves, is_check))
                return evalAndMove(isMaxPlayer ? INT16_MIN : INT16_MAX,
                                   std::nullopt);
           if (isMaxPlayer)
@@ -34,9 +37,20 @@ namespace ai
                {
                     board::Chessboard chessboard_ = chessboard;
                     chessboard_.do_move(legal_moves[i]);
-                    const int16_t eval = minimax(chessboard_, depth - 1,
-                                                 alpha, beta,
-                                                 !isMaxPlayer).first;
+                    int16_t eval;
+                    if (depth <= 1 && (legal_moves[i].get_capture()
+                                       || legal_moves[i].get_promotion()))
+                    {
+                         eval = minimax(chessboard_, depth, depth_q - 1,
+                                        alpha, beta,
+                                        !isMaxPlayer).first;
+                    }
+                    else
+                    {
+                         eval = minimax(chessboard_, depth - 1, depth_q,
+                                        alpha, beta,
+                                        !isMaxPlayer).first;
+                    }
                     if (eval > bestValue)
                     {
                          bestValue = eval;
@@ -55,8 +69,20 @@ namespace ai
           {
                board::Chessboard chessboard_ = chessboard;
                chessboard_.do_move(legal_moves[i]);
-               int16_t eval = minimax(chessboard_, depth - 1, alpha, beta,
-                                        !isMaxPlayer).first;
+               int16_t eval;
+               if (depth <= 1 && (legal_moves[i].get_capture()
+                                  || legal_moves[i].get_promotion()))
+               {
+                    eval = minimax(chessboard_, depth - 1, depth_q - 1,
+                                   alpha, beta,
+                                   !isMaxPlayer).first;
+               }
+               else
+               {
+                    eval = minimax(chessboard_, depth - 1, depth_q,
+                                   alpha, beta,
+                                   !isMaxPlayer).first;
+               }
                if (eval < bestValue)
                {
                     bestValue = eval;
@@ -72,7 +98,8 @@ namespace ai
      std::optional<board::Move>  AiMini::search(board::Chessboard& chessboard,
                                 int16_t depth) const
      {
-          auto eval_move = minimax(chessboard, depth, INT16_MIN, INT16_MAX,
+          auto eval_move = minimax(chessboard, depth, 6,
+                                  INT16_MIN, INT16_MAX,
                                   chessboard.get_white_turn());
           uci::info(depth, eval_move.first);
           return eval_move.second;

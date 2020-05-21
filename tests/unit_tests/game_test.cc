@@ -1,11 +1,9 @@
 #include "gtest/gtest.h"
 
 #include "chess_engine/board/chessboard.hh"
-#include "chess_engine/board/rule.hh"
 #include "parsing/perft_parser/perft-parser.hh"
 
 using namespace board;
-using namespace rule;
 using namespace std;
 
 TEST(DrawPGN, CastlingIllegal)

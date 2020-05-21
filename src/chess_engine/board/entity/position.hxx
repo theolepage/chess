@@ -13,18 +13,18 @@ namespace board
 
     inline Position::Position(int i)
     {
-        // 10000000
         // 00000000
         // 00000000
         // 00000000
         // 00000000
         // 00000000
         // 00000000
-        // 00000001
+        // 00000000
+        // 01000000
         
         assert(i >= 0 && i < 64);
         rank_ = static_cast<Rank>(i / 8);
-        file_ = static_cast<File>(7 - (i % 8));
+        file_ = static_cast<File>(i % 8);
     }
 
     inline Position::Position(char file, char rank)
@@ -85,7 +85,7 @@ namespace board
         // 00000000
         // 10000000
         // rank_ = 1(0)     file_ = A(0)
-        // expected = 7 (cause we set the bit at indice 7 aka 8th bit)
-        return static_cast<int>(rank_) * 8 + (7 - static_cast<int>(file_));
+        // expected = 0 (cause we set the bit at indice 0 aka 1th bit)
+        return static_cast<int>(rank_) * 8 + static_cast<int>(file_);
     }
 } // namespace board
