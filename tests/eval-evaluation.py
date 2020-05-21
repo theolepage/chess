@@ -11,7 +11,7 @@ def which(bin_name):
             return bin_path
 
 stockfish_path = which('stockfish')
-chessengine_path = '../chessengine'
+chessengine_path = '../chessengine-static'
 
 perft_directory = 'eval-perft/'
 
@@ -49,10 +49,14 @@ def score_to_centipawns(pov_score):
     return score.score(mate_score=mate_score)
 
 def ref_eval(perft):
-    return score_to_centipawns(perft_eval(perft, stockfish_path))
+    res = score_to_centipawns(perft_eval(perft, stockfish_path))
+    print(f"stockfish : {res}")
+    return res
 
 def eval(perft):
-    return score_to_centipawns(perft_eval(perft, chessengine_path))
+    res = score_to_centipawns(perft_eval(perft, chessengine_path))
+    print(f"blipblop : {res}")
+    return res
 
 def identity(x):
     return x
