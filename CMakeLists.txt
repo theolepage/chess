@@ -139,7 +139,8 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${OPT_FLAGS}")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g3 -fsanitize=address")
 string(REPLACE "-O3" "" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
 
-# BUILD_TYPE (if not defined by the user)
+
+# BUILD_TYPE (if not defined by the user) + lichess
 if (NOT CMAKE_BUILD_TYPE)
     string(REGEX REPLACE ".*/build_" "" BUILD_NAME ${CMAKE_BINARY_DIR})
     # Default BUILD_TYPE is Release
@@ -147,6 +148,9 @@ if (NOT CMAKE_BUILD_TYPE)
     # If folder is named "build_debug" BUILD_TYPE is set to: Debug
     if(${BUILD_NAME} STREQUAL "Debug" OR ${BUILD_NAME} STREQUAL "debug")
         set(CMAKE_BUILD_TYPE Debug)
+    endif()
+    if(${BUILD_NAME} STREQUAL "lichess" OR ${BUILD_NAME} STREQUAL "Lichess")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DLICHESS")
     endif()
     message(STATUS "Build type : ${CMAKE_BUILD_TYPE}")
 endif()
