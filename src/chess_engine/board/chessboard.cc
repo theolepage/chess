@@ -167,12 +167,7 @@ namespace board
 
     void Chessboard::register_state()
     {
-        std::string current_state = to_fen_string();
-
-        if (state_count_.find(current_state) == state_count_.end())
-            state_count_[current_state] = 1;
-        else
-            state_count_[current_state]++;
+        states_history_.push_back(board_);
     }
 
     std::vector<Move> Chessboard::generate_legal_moves(void)
@@ -218,10 +213,16 @@ namespace board
             en_passant_ = std::nullopt;
     }
 
-    void Chessboard::update_last_fifty_turn(const Move& move)
+    void Chessboard::update_draw_data(const Move& move)
     {
         if (move.get_capture() || move.get_piece() == PieceType::PAWN)
+        {
             last_fifty_turn_ = 0;
+            // If a piece is captured (ie if there will never be again as much
+            // pieces as before on the board) or if a pawn is moved,
+            // we know that no precedent board state will ever appear again
+            states_history_.clear();
+        }
         else
             if (!white_turn_)
                 last_fifty_turn_++;
@@ -357,7 +358,7 @@ namespace board
         else
         {
             forget_en_passant();
-            update_last_fifty_turn(move);
+            update_draw_data(move);
 
             if (move.get_en_passant())
             {
@@ -535,11 +536,14 @@ namespace board
 
     bool Chessboard::threefold_repetition()
     {
-        std::string current_state = to_fen_string();
+        const auto& current_state = states_history_.back();
 
-        assert(state_count_.find(current_state) != state_count_.end());
+        unsigned current_state_count = 0;
+        for (const auto& state : states_history_)
+            if (state == current_state && ++current_state_count == 3)
+                return true;
 
-        return state_count_[current_state] >= 3;
+        return false;
     }
 
     bool Chessboard::is_draw(void)
