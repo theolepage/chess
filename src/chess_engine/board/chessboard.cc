@@ -30,7 +30,7 @@ namespace board
         turn_ = 0;
         last_fifty_turn_ = 0;
 
-        //register_state();
+        register_state();
     }
 
     Chessboard::Chessboard(const FenObject& fen)
@@ -76,7 +76,7 @@ namespace board
             }
         }
 
-        //register_state();
+        register_state();
     }
 
     Chessboard::Chessboard(const std::string& str, const Color& color)
@@ -398,7 +398,7 @@ namespace board
 
         white_turn_ = !white_turn_;
 
-        //register_state();
+        register_state();
     }
 
     bool Chessboard::is_move_possible(const Move& move)

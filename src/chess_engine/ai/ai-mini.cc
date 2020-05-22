@@ -140,7 +140,7 @@ namespace ai
                                 int16_t depth) const
      {
           depth = adapte_depth(chessboard.get_board(), depth);
-          auto eval_move = minimax(chessboard, depth, 3,
+          auto eval_move = minimax(chessboard, depth, 4,
                                   INT16_MIN, INT16_MAX,
                                   chessboard.get_white_turn());
           uci::info(depth, eval_move.first);
