@@ -132,7 +132,6 @@ namespace pgn_parser
     void add_move_to_board(board::Chessboard& chessboard,
                            const std::string& string_board)
     {
-        // TODO find way better when know how protocols works
         static bool first = true;
         static constexpr std::string_view startpos = "startpos";
         static constexpr std::string_view move_str = "moves";

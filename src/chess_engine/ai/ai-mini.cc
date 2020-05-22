@@ -1,17 +1,63 @@
 #include <algorithm>
 #include <vector>
+#include <cmath>
 
 #include "ai-mini.hh"
 #include "evaluation.hh"
 #include "uci.hh"
 #include "chess_engine/board/entity/color.hh"
+#include "chess_engine/board/board.hh"
+#include "utils/bits-utils.hh"
 
 namespace ai
 {
      using evalAndMove = std::pair<int16_t, std::optional<board::Move>>;
 
+     class BasicDepthAdapter
+     {
+     public:
+          BasicDepthAdapter() = delete;
+
+          static int16_t adapte_depth(const board::Board& board,
+                                        const int16_t depth)
+          {
+               const uint8_t board_value = get_basic_value(board);
+               return updated_depth(board_value, depth);
+          }
+     private:
+          // First basic board evaluation, just number of piece
+          static int get_basic_value(const board::Board& board)
+          {
+               return utils::bits_count(board());
+          }
+
+          static constexpr float SLOPE = 0.05f;
+          static constexpr int NB_TOTAL_PIECES = 20;
+
+          // For our base case (20 max piece and base depth of 5)
+          // The function is 0.05 * (x - 20) ^ 2 + 5
+          // Visualize it by pasting it in Chrome
+          static int16_t updated_depth(const int board_value,
+                                        const int16_t depth)
+          {
+               assert(board_value >= 0);
+               return static_cast<int16_t>(
+               SLOPE
+               * powf(static_cast<float>(board_value - NB_TOTAL_PIECES), 2.0f)
+               + static_cast<float>(depth));
+          }
+     };
+
+     // Hardcoded depth adaptation
+     // Based on the speed of our implementation
+     // Increase depth based on the board
+     static int16_t adapte_depth(const board::Board& board, const int16_t depth)
+     {
+          return BasicDepthAdapter::adapte_depth(board, depth);
+     }
+
      static evalAndMove minimax(board::Chessboard& chessboard,
-                                   const int16_t depth,
+                                   int16_t depth,
                                    const int16_t depth_q,
                                    int16_t alpha,
                                    int16_t beta,
@@ -98,6 +144,7 @@ namespace ai
      std::optional<board::Move>  AiMini::search(board::Chessboard& chessboard,
                                 int16_t depth) const
      {
+          depth = adapte_depth(chessboard.get_board(), depth);
           auto eval_move = minimax(chessboard, depth, 6,
                                   INT16_MIN, INT16_MAX,
                                   chessboard.get_white_turn());

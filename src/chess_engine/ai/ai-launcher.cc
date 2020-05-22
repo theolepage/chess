@@ -15,7 +15,7 @@ namespace ai
         while (true)
         {
             std::string board_str = uci::get_board();
-            int16_t depth = pgn_parser::get_depth(uci::get_go()).value_or(4);
+            int16_t depth = pgn_parser::get_depth(uci::get_go()).value_or(5);
             pgn_parser::add_move_to_board(chessboard, board_str);
             std::optional<board::Move> move = ai.search(chessboard, depth);
             if (!move.has_value())
