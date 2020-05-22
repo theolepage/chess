@@ -41,7 +41,6 @@ namespace option_parser
         const char* symbol_name = "listener_create";
         for (const std::string& listener_path : listeners_path)
         {
-            // TODO correct flags ?
             void* handle = safe_dl_call(dlopen(listener_path.c_str(),
                                                RTLD_NOW | RTLD_GLOBAL));
             if (handle == nullptr)
@@ -132,7 +131,6 @@ namespace option_parser
         }
         catch (const error &ex)
         {
-            //TODO triggered on bad option, what expected ?
             std::cerr << ex.what() << '\n';
         }
     }

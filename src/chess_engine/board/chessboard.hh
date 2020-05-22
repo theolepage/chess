@@ -80,10 +80,8 @@ namespace board
     private:
         Board board_;
 
-        // a hash table which key corresponds to a fen string representing
-        // a state of the board and which value is the number of occurrences
-        // of this state during the game
-        std::unordered_map<std::string, short> state_count_;
+        // used by threefold_repetition
+        std::vector<Board> states_history_;
 
         bool white_turn_;
         bool white_king_castling_;
@@ -102,7 +100,7 @@ namespace board
                                      const File file);
         void register_double_pawn_push(const Move& move, const Color color);
         void forget_en_passant(void);
-        void update_last_fifty_turn(const Move& move);
+        void update_draw_data(const Move& move);
         void eat_en_passant(const Move& move, const Color color);
         void move_castling_rook(const Move& move, const Color color);
         void update_white_castling_bools(const Move& move);

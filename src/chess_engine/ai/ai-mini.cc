@@ -1,23 +1,64 @@
 #include <algorithm>
 #include <vector>
+#include <cmath>
 
 #include "ai-mini.hh"
 #include "evaluation.hh"
 #include "uci.hh"
 #include "chess_engine/board/entity/color.hh"
+#include "chess_engine/board/board.hh"
+#include "utils/bits-utils.hh"
 
 namespace ai
 {
      using evalAndMove = std::pair<int16_t, std::optional<board::Move>>;
 
+     class BasicDepthAdapter
+     {
+     public:
+          BasicDepthAdapter() = delete;
+
+          static int16_t adapte_depth(const board::Board& board,
+                                        const int16_t depth)
+          {
+               const uint8_t board_value = get_basic_value(board);
+               return updated_depth(board_value, depth);
+          }
+     private:
+          // First basic board evaluation, just number of piece
+          static int get_basic_value(const board::Board& board)
+          {
+               return utils::bits_count(board());
+          }
+
+          static int16_t updated_depth(const int board_value,
+                                        const int16_t depth)
+          {
+
+               if (board_value > 12)
+                    return depth;
+               if (board_value > 6)
+                    return depth + 1;
+               return depth + 2;
+          }
+     };
+
+     // Hardcoded depth adaptation
+     // Based on the speed of our implementation
+     // Increase depth based on the board
+     static int16_t adapte_depth(const board::Board& board, const int16_t depth)
+     {
+          return BasicDepthAdapter::adapte_depth(board, depth);
+     }
+
      static evalAndMove minimax(board::Chessboard& chessboard,
-                                   const int16_t depth,
+                                   int16_t depth,
                                    const int16_t depth_q,
                                    int16_t alpha,
                                    int16_t beta,
                                    const bool isMaxPlayer)
      {
-          if (depth == 0 || depth_q == 0)
+          if (depth <= 0 || depth_q == 0)
                return evalAndMove(evaluate(chessboard), std::nullopt);
 
           const std::vector<board::Move> legal_moves =
@@ -98,7 +139,8 @@ namespace ai
      std::optional<board::Move>  AiMini::search(board::Chessboard& chessboard,
                                 int16_t depth) const
      {
-          auto eval_move = minimax(chessboard, depth, 6,
+          depth = adapte_depth(chessboard.get_board(), depth);
+          auto eval_move = minimax(chessboard, depth, 4,
                                   INT16_MIN, INT16_MAX,
                                   chessboard.get_white_turn());
           uci::info(depth, eval_move.first);
