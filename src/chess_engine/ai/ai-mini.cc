@@ -31,20 +31,15 @@ namespace ai
                return utils::bits_count(board());
           }
 
-          static constexpr float SLOPE = 0.05f;
-          static constexpr int NB_TOTAL_PIECES = 20;
-
-          // For our base case (20 max piece and base depth of 5)
-          // The function is 0.05 * (x - 20) ^ 2 + 5
-          // Visualize it by pasting it in Chrome
           static int16_t updated_depth(const int board_value,
                                         const int16_t depth)
           {
-               assert(board_value >= 0);
-               return static_cast<int16_t>(
-               SLOPE
-               * powf(static_cast<float>(board_value - NB_TOTAL_PIECES), 2.0f)
-               + static_cast<float>(depth));
+
+               if (board_value > 12)
+                    return depth;
+               if (board_value > 6)
+                    return depth + 1;
+               return depth + 2;
           }
      };
 
@@ -63,7 +58,7 @@ namespace ai
                                    int16_t beta,
                                    const bool isMaxPlayer)
      {
-          if (depth == 0 || depth_q == 0)
+          if (depth <= 0 || depth_q == 0)
                return evalAndMove(evaluate(chessboard), std::nullopt);
 
           const std::vector<board::Move> legal_moves =
@@ -145,7 +140,7 @@ namespace ai
                                 int16_t depth) const
      {
           depth = adapte_depth(chessboard.get_board(), depth);
-          auto eval_move = minimax(chessboard, depth, 6,
+          auto eval_move = minimax(chessboard, depth, 3,
                                   INT16_MIN, INT16_MAX,
                                   chessboard.get_white_turn());
           uci::info(depth, eval_move.first);
