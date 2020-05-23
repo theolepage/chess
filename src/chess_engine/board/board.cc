@@ -89,13 +89,15 @@ namespace board
         const int index = pos.get_index();
         if (color == Color::WHITE)
         {
-            if (!is_bit_set(blacks_ & pieces_[static_cast<uint8_t>(piecetype)], index))
+            if (!is_bit_set(blacks_
+                & pieces_[static_cast<uint8_t>(piecetype)], index))
                 unset_bit(pieces_[static_cast<uint8_t>(piecetype)], index);
             unset_bit(whites_, index);
         }
         else
         {
-            if (!is_bit_set(whites_ & pieces_[static_cast<uint8_t>(piecetype)], index))
+            if (!is_bit_set(whites_
+                & pieces_[static_cast<uint8_t>(piecetype)], index))
                 unset_bit(pieces_[static_cast<uint8_t>(piecetype)], index);
             unset_bit(blacks_, index);
         }
