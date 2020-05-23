@@ -152,18 +152,12 @@ namespace move_generation
             generate_queen_castling(moves, board);
     }
 
-    static bool generate_pawns_promotions(std::vector<Move>& moves,
+    static void generate_pawns_promotions(std::vector<Move>& moves,
                                           const Position& from,
                                           const Position& to,
-                                          const Color& color,
                                           const bool capture)
     {
         Move move(from, to, PieceType::PAWN, capture);
-
-        if (color == Color::WHITE && to.get_index() < 56)
-            return false;
-        if (color == Color::BLACK && to.get_index() > 7)
-            return false;
 
         Move queen_promotion = move;
         queen_promotion.set_promotion(PieceType::QUEEN);
@@ -180,8 +174,6 @@ namespace move_generation
         Move knight_promotion = move;
         knight_promotion.set_promotion(PieceType::KNIGHT);
         moves.push_back(knight_promotion);
-
-        return true;
     }
 
     static void generate_pawn_forward(std::vector<Move>& moves,
@@ -202,7 +194,10 @@ namespace move_generation
                     : (dest_one_forward + 8));
             Position to(dest_one_forward);
 
-            if (!generate_pawns_promotions(moves, from, to, color, false))
+            if ((color == Color::WHITE && dest_one_forward >= 56)
+                || (color == Color::BLACK && dest_one_forward <= 7))
+                generate_pawns_promotions(moves, from, to, false);
+            else
                 moves.emplace_back(from, to, PieceType::PAWN);
 
             dest_one_forward = utils::pop_lsb(pawns_one_forward);
@@ -260,7 +255,10 @@ namespace move_generation
                     : (dest_left_attack + 9));
             Position to(dest_left_attack);
 
-            if (!generate_pawns_promotions(moves, from, to, color, true))
+            if ((color == Color::WHITE && dest_left_attack >= 56)
+                || (color == Color::BLACK && dest_left_attack <= 7))
+                generate_pawns_promotions(moves, from, to, true);
+            else
                 moves.emplace_back(from, to, PieceType::PAWN, true);
 
             dest_left_attack = utils::pop_lsb(left_attacks);
@@ -309,7 +307,10 @@ namespace move_generation
                     : (dest_right_attack + 7));
             Position to(dest_right_attack);
 
-            if (!generate_pawns_promotions(moves, from, to, color, true))
+            if ((color == Color::WHITE && dest_right_attack >= 56)
+                || (color == Color::BLACK && dest_right_attack <= 7))
+                generate_pawns_promotions(moves, from, to, true);
+            else
                 moves.emplace_back(from, to, PieceType::PAWN, true);
 
             dest_right_attack = utils::pop_lsb(right_attacks);

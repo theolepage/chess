@@ -343,7 +343,7 @@ namespace board
     {
         const Position& start = move.get_start();
         const Position& end = move.get_end();
-        const Color color = (*this)[start].value().second;
+        const Color color = get_playing_color();
         const PieceType piecetype = move.get_piece();
 
         // The piece that will be eaten if move is a capture
@@ -469,19 +469,14 @@ namespace board
         const int index = pos.get_index();
         const MoveInitialization& m = MoveInitialization::get_instance();
 
-        // Queens
-        const uint64_t q = m.get_targets(PieceType::QUEEN, index, board_());
-        if (q & board_(PieceType::QUEEN, opponent_color))
-            return true;
-
-        // Rook
+        // Rook / Queens
         const uint64_t r = m.get_targets(PieceType::ROOK, index, board_());
-        if (r & (board_(PieceType::ROOK, opponent_color)))
+        if (r & (board_(PieceType::ROOK, opponent_color) | board_(PieceType::QUEEN, opponent_color)))
             return true;
 
-        // Bishop
+        // Bishop / Queens
         const uint64_t b = m.get_targets(PieceType::BISHOP, index, board_());
-        if (b & (board_(PieceType::BISHOP, opponent_color)))
+        if (b & (board_(PieceType::BISHOP, opponent_color) | board_(PieceType::QUEEN, opponent_color)))
             return true;
 
         // Knight
