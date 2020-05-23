@@ -39,7 +39,8 @@ namespace board
         Chessboard(const std::string& fen_string);
 
         static char sidepiece_to_char(const side_piece_t& sidepiece);
-        static char sidepiece_to_char(const PieceType& piece, const Color& color);
+        static char sidepiece_to_char(const PieceType& piece,
+                                      const Color& color);
         std::string to_fen_string(void) const;
 
         bool pos_threatened(const Position& pos) const;

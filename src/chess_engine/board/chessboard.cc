@@ -471,12 +471,14 @@ namespace board
 
         // Rook / Queens
         const uint64_t r = m.get_targets(PieceType::ROOK, index, board_());
-        if (r & (board_(PieceType::ROOK, opponent_color) | board_(PieceType::QUEEN, opponent_color)))
+        if (r & (board_(PieceType::ROOK, opponent_color)
+            | board_(PieceType::QUEEN, opponent_color)))
             return true;
 
         // Bishop / Queens
         const uint64_t b = m.get_targets(PieceType::BISHOP, index, board_());
-        if (b & (board_(PieceType::BISHOP, opponent_color) | board_(PieceType::QUEEN, opponent_color)))
+        if (b & (board_(PieceType::BISHOP, opponent_color)
+            | board_(PieceType::QUEEN, opponent_color)))
             return true;
 
         // Knight

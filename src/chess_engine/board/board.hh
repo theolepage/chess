@@ -46,12 +46,12 @@ namespace board
 
         void init_end_ranks(const PieceType piecetype, const File file);
         void symetric_init_end_ranks(const PieceType piecetype,
-                                     const File file);        
+                                     const File file);
 
     private:
         uint64_t whites_;
         uint64_t blacks_;
-        
+
         // 0 : Queen, 1 : Rook, 2 : Bishop, 3 : Knight, 4 : Pawn, 5 : King
         uint64_t pieces_[6];
 

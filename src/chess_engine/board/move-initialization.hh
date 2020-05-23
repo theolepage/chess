@@ -30,7 +30,8 @@ namespace board
 
         MoveInitialization();
 
-        uint64_t get_ray(const Position& from, const int file, const int rank) const;
+        uint64_t get_ray(const Position& from, const int file,
+                         const int rank) const;
         void init_rays(void);
 
         void init_rook_masks(void);
@@ -55,7 +56,8 @@ namespace board
         * By using the index bit representation we generate all the possiblities
         * and uniquely for all the blockers possiblities
         */
-        uint64_t get_blockers(const int blocker_index, uint64_t current_mask) const;
+        uint64_t get_blockers(const int blocker_index,
+                              uint64_t current_mask) const;
 
         uint64_t get_bishop_attacks_classical(int pos, uint64_t blockers) const;
         uint64_t get_rook_attacks_classical(int pos, uint64_t blockers) const;

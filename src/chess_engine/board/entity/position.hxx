@@ -21,7 +21,7 @@ namespace board
         // 00000000
         // 00000000
         // 01000000
-        
+
         assert(i >= 0 && i < 64);
         rank_ = static_cast<Rank>(i / 8);
         file_ = static_cast<File>(i % 8);
@@ -31,7 +31,7 @@ namespace board
     {
         assert(islower(file) && isdigit(rank));
         file_ = static_cast<File>(file - 'a');
-        rank_ =  static_cast<Rank>(rank - '0' - 1); 
+        rank_ =  static_cast<Rank>(rank - '0' - 1);
         // + 1 because ONE corresponds to 0
     }
 

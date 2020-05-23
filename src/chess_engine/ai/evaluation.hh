@@ -8,7 +8,8 @@ namespace ai
     constexpr size_t nb_pieces = board::nb_pieces;
 
     using piece_square_table_t = std::array<int, width * width>;
-    using piece_square_tables_t = std::array<piece_square_table_t, nb_pieces - 1>;
+    using piece_square_tables_t =
+            std::array<piece_square_table_t, nb_pieces - 1>;
 
     constexpr unsigned queen_on_open_file_bonus = 10; // FIXME
     constexpr unsigned rook_on_open_file_bonus = 5; // FIXME
