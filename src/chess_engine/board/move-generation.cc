@@ -25,7 +25,8 @@ namespace move_generation
                 Position(from),
                 Position(to),
                 piece,
-                capture);
+                capture
+            );
             to = utils::pop_lsb(targets);
         }
     }
@@ -33,7 +34,8 @@ namespace move_generation
     static void generate_moves(
             const PieceType& piece,
             const Chessboard& board,
-            std::vector<Move>& moves)
+            std::vector<Move>& moves
+    )
     {
         const Color color = board.get_playing_color();
         const Color opponent_color = get_opposite_color(color);
@@ -47,7 +49,8 @@ namespace move_generation
             uint64_t targets = MoveInitialization::get_instance().get_targets(
                 piece,
                 pos,
-                board.get_board()());
+                board.get_board()()
+            );
 
             // Remove pieces from player currently playing
             targets &= ~board.get_board()(color);

@@ -33,7 +33,8 @@ namespace board
     uint64_t MoveInitialization::get_targets(
             const PieceType& piece,
             const int pos,
-            uint64_t blockers) const
+            uint64_t blockers
+    ) const
     {
         uint64_t key;
         switch (piece)
@@ -172,7 +173,7 @@ namespace board
     * @param index of the current blocker
     * @param mask of possible move of the current piece
     * @return the mask representing the current blocker
-    *
+    * 
     * We need a way to generate a unique mask of blockers or each blocker
     * To do that we are going to use the bit representation of index
     * To generate all those possibilites the for loops goes on all the set
