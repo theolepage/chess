@@ -35,9 +35,9 @@ namespace ai
                                         const int16_t depth)
           {
 
-               if (board_value > 12)
+               if (board_value > 20)
                     return depth;
-               if (board_value > 6)
+               if (board_value > 12)
                     return depth + 1;
                return depth + 2;
           }
@@ -140,7 +140,7 @@ namespace ai
                                 int16_t depth) const
      {
           depth = adapte_depth(chessboard.get_board(), depth);
-          auto eval_move = minimax(chessboard, depth, 4,
+          auto eval_move = minimax(chessboard, depth, 6,
                                   INT16_MIN, INT16_MAX,
                                   chessboard.get_white_turn());
           uci::info(depth, eval_move.first);
